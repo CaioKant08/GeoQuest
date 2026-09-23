@@ -812,7 +812,153 @@
       .avatar-actions{justify-content:center}
     }
 
-  </style>
+  
+
+    /* ===== XP global + ranking ===== */
+    .player-hud{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .xp-hud{
+      width:210px;
+      padding:9px 12px;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 8px 20px rgba(22,37,61,.05);
+    }
+    .xp-hud-top{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:8px;font-size:.77rem;color:var(--muted);margin-bottom:6px;
+    }
+    .xp-hud-top span{font-weight:800;color:var(--accent)}
+    .xp-hud-top b{color:var(--ink);font-size:.78rem}
+    .xp-hud-track{
+      height:7px;background:#e8eef7;border-radius:999px;overflow:hidden;
+    }
+    .xp-hud-fill{
+      height:100%;width:0;
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      border-radius:inherit;
+      transition:width .35s ease;
+    }
+    .xp-hud small{
+      display:block;text-align:right;margin-top:4px;
+      color:var(--muted);font-size:.67rem;
+    }
+    .ranking-btn{
+      min-height:42px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 13px;
+      background:rgba(255,255,255,.9);
+      color:var(--ink);
+      font-weight:800;
+      cursor:pointer;
+      white-space:nowrap;
+      box-shadow:0 8px 20px rgba(22,37,61,.05);
+    }
+    .ranking-btn:hover{border-color:#b8c8e3}
+
+    .ranking-modal{
+      position:fixed;inset:0;
+      background:rgba(15,23,42,.42);
+      display:none;align-items:center;justify-content:center;
+      padding:18px;z-index:90;
+    }
+    .ranking-modal.open{display:flex}
+    .ranking-card{
+      width:min(590px,100%);
+      max-height:88vh;
+      overflow:auto;
+      background:var(--paper);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:24px;
+      box-shadow:0 30px 80px rgba(15,23,42,.22);
+    }
+    .ranking-head{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      gap:14px;margin-bottom:16px;
+    }
+    .ranking-kicker{
+      color:var(--accent);font-size:.72rem;font-weight:900;
+      letter-spacing:.12em;text-transform:uppercase;
+    }
+    .ranking-head h3{margin:4px 0 4px;font-size:1.35rem}
+    .ranking-head p{margin:0;color:var(--muted);font-size:.88rem}
+    .ranking-summary{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:13px 15px;margin-bottom:12px;
+      border-radius:16px;background:var(--accent-soft);
+      border:1px solid #cfdcff;color:#536783;
+    }
+    .ranking-summary b{font-size:1.1rem;color:var(--accent)}
+    .ranking-list{display:grid;gap:8px}
+    .ranking-row{
+      display:grid;
+      grid-template-columns:38px 44px minmax(0,1fr) auto;
+      align-items:center;gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:15px;
+      background:var(--paper-2);
+    }
+    .ranking-row.me{
+      border-color:#9fb5f1;
+      background:var(--accent-soft);
+    }
+    .rank-pos{
+      width:34px;height:34px;display:grid;place-items:center;
+      font-weight:900;color:var(--muted);
+    }
+    .rank-pos.top1,.rank-pos.top2,.rank-pos.top3{
+      border-radius:50%;background:#fff;border:1px solid var(--border);
+    }
+    .rank-avatar{
+      width:42px;height:42px;border-radius:50%;
+      display:grid;place-items:center;overflow:hidden;
+      background:#fff;border:1px solid var(--border-strong);
+      color:var(--accent);font-weight:900;
+    }
+    .rank-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .rank-user{min-width:0}
+    .rank-user b{
+      display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .rank-user small{display:block;color:var(--muted);font-size:.73rem;margin-top:2px}
+    .rank-xp{text-align:right;font-weight:900;color:var(--accent);white-space:nowrap}
+    .ranking-loading,.ranking-empty{
+      padding:24px;text-align:center;color:var(--muted);
+      border:1px dashed var(--border);border-radius:16px;
+    }
+    body.dark .xp-hud,
+    body.dark .ranking-btn{background:rgba(21,30,44,.97)}
+    body.dark .xp-hud-track{background:#253247}
+    body.dark .rank-pos.top1,
+    body.dark .rank-pos.top2,
+    body.dark .rank-pos.top3,
+    body.dark .rank-avatar{background:#111927}
+    body.dark .ranking-summary{border-color:#344c83}
+
+    @media(max-width:820px){
+      .topbar{flex-wrap:wrap}
+      .player-hud{
+        order:3;width:100%;
+        display:grid;grid-template-columns:1fr auto;
+      }
+      .xp-hud{width:100%}
+    }
+    @media(max-width:560px){
+      .ranking-btn{padding:8px 11px}
+      .ranking-card{padding:17px}
+      .ranking-row{grid-template-columns:32px 40px minmax(0,1fr) auto;padding:9px}
+      .rank-avatar{width:38px;height:38px}
+    }
+</style>
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
@@ -883,7 +1029,19 @@
 <small>Plataforma gamificada • Geometria Analítica</small>
 </div>
 </div>
-<div class="account-area" id="accountArea">
+<div class="player-hud">
+<div class="xp-hud" title="XP total da conta">
+<div class="xp-hud-top">
+<span id="globalLevel">Nível 1</span>
+<b id="globalXpText">0 XP</b>
+</div>
+<div class="xp-hud-track">
+<div class="xp-hud-fill" id="globalXpBar"></div>
+</div>
+<small id="globalXpNext">0 / 1000 XP</small>
+</div>
+<button class="ranking-btn" id="rankingBtn" type="button">🏆 Ranking</button>
+</div><div class="account-area" id="accountArea">
 <div class="account-menu-wrap">
 <button aria-expanded="false" class="profile-trigger" id="profileTrigger" type="button">
 <span class="profile-avatar" id="headerAvatar">G</span>
@@ -1055,6 +1213,24 @@
 </div>
 <div aria-live="polite" class="settings-status" id="settingsStatus"></div>
 </div>
+</div><div aria-hidden="true" class="ranking-modal" id="rankingModal">
+<div aria-labelledby="rankingTitle" aria-modal="true" class="ranking-card" role="dialog">
+<div class="ranking-head">
+<div>
+<span class="ranking-kicker">GeoQuest</span>
+<h3 id="rankingTitle">Ranking de XP</h3>
+<p>Classificação geral dos jogadores pelo XP acumulado.</p>
+</div>
+<button aria-label="Fechar" class="icon-btn" id="closeRanking" type="button">×</button>
+</div>
+<div class="ranking-summary" id="myRankSummary">
+<span>Sua posição</span>
+<b>—</b>
+</div>
+<div class="ranking-list" id="rankingList">
+<div class="ranking-loading">Carregando ranking...</div>
+</div>
+</div>
 </div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
 <script>
 (() => {
@@ -1082,6 +1258,15 @@
   const removeAvatarBtn = document.getElementById("removeAvatarBtn");
   const settingsStatus = document.getElementById("settingsStatus");
   const authMessage = document.getElementById("authMessage");
+  const globalLevel = document.getElementById("globalLevel");
+  const globalXpText = document.getElementById("globalXpText");
+  const globalXpBar = document.getElementById("globalXpBar");
+  const globalXpNext = document.getElementById("globalXpNext");
+  const rankingBtn = document.getElementById("rankingBtn");
+  const rankingModal = document.getElementById("rankingModal");
+  const closeRanking = document.getElementById("closeRanking");
+  const rankingList = document.getElementById("rankingList");
+  const myRankSummary = document.getElementById("myRankSummary");
   const tabLogin = document.getElementById("tabLogin");
   const tabSignup = document.getElementById("tabSignup");
   const loginForm = document.getElementById("loginForm");
@@ -1150,6 +1335,7 @@
     if(menuUserEmail) menuUserEmail.textContent=user?.email || "";
     paintAvatar(headerAvatar,avatarUrl,name);
     paintAvatar(avatarPreview,avatarUrl,name);
+    ensureProfile(user);
   }
 
   if(!window.supabase || !window.supabase.createClient){
@@ -1159,6 +1345,183 @@
 
   const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
     auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  });
+
+  const XP_PER_LEVEL = 1000;
+  let currentProfile = null;
+  let profileBusy = false;
+
+  function renderGlobalXP(totalXp=0){
+    const xp=Math.max(0,Number(totalXp)||0);
+    const level=Math.floor(xp/XP_PER_LEVEL)+1;
+    const inside=xp%XP_PER_LEVEL;
+    const pct=Math.min(100,(inside/XP_PER_LEVEL)*100);
+
+    if(globalLevel) globalLevel.textContent=`Nível ${level}`;
+    if(globalXpText) globalXpText.textContent=`${xp.toLocaleString("pt-BR")} XP`;
+    if(globalXpBar) globalXpBar.style.width=pct+"%";
+    if(globalXpNext) globalXpNext.textContent=`${inside} / ${XP_PER_LEVEL} XP`;
+  }
+
+  async function ensureProfile(user){
+    if(!user) return null;
+    const displayName=user.user_metadata?.display_name || user.email?.split("@")[0] || "Jogador";
+    const avatarUrl=user.user_metadata?.avatar_url || null;
+
+    const {data:existing,error:readError}=await db
+      .from("profiles")
+      .select("id,display_name,avatar_url,xp")
+      .eq("id",user.id)
+      .maybeSingle();
+
+    if(readError){
+      console.warn("profiles:",readError.message);
+      renderGlobalXP(0);
+      return null;
+    }
+
+    if(existing){
+      currentProfile=existing;
+      renderGlobalXP(existing.xp);
+      if(existing.display_name!==displayName || (existing.avatar_url||null)!==avatarUrl){
+        const {data:updated}=await db.from("profiles")
+          .update({display_name:displayName,avatar_url:avatarUrl,updated_at:new Date().toISOString()})
+          .eq("id",user.id)
+          .select("id,display_name,avatar_url,xp")
+          .single();
+        if(updated) currentProfile=updated;
+      }
+      return currentProfile;
+    }
+
+    const {data:created,error:createError}=await db
+      .from("profiles")
+      .insert({id:user.id,display_name:displayName,avatar_url:avatarUrl,xp:0})
+      .select("id,display_name,avatar_url,xp")
+      .single();
+
+    if(createError){
+      console.warn("create profile:",createError.message);
+      return null;
+    }
+    currentProfile=created;
+    renderGlobalXP(created.xp);
+    return created;
+  }
+
+  window.geoquestAddXP=async function(amount){
+    const gain=Math.max(0,Math.round(Number(amount)||0));
+    if(!gain || profileBusy) return;
+    const {data:{user}}=await db.auth.getUser();
+    if(!user) return;
+
+    profileBusy=true;
+    try{
+      const {data:row,error:readError}=await db
+        .from("profiles").select("xp").eq("id",user.id).single();
+      if(readError) throw readError;
+
+      const next=(Number(row.xp)||0)+gain;
+      renderGlobalXP(next);
+
+      const {data:updated,error:updateError}=await db
+        .from("profiles")
+        .update({xp:next,updated_at:new Date().toISOString()})
+        .eq("id",user.id)
+        .select("id,display_name,avatar_url,xp")
+        .single();
+      if(updateError) throw updateError;
+      currentProfile=updated;
+    }catch(err){
+      console.warn("XP não salvo:",err?.message || err);
+      if(currentProfile) renderGlobalXP(currentProfile.xp);
+    }finally{
+      profileBusy=false;
+    }
+  };
+
+  function rankInitials(name){
+    return (name||"G").trim().split(/\s+/).slice(0,2).map(p=>p[0]||"").join("").toUpperCase()||"G";
+  }
+
+  async function loadRanking(){
+    if(!rankingList) return;
+    rankingList.innerHTML='<div class="ranking-loading">Carregando ranking...</div>';
+
+    const {data:{user}}=await db.auth.getUser();
+    const {data,error}=await db
+      .from("profiles")
+      .select("id,display_name,avatar_url,xp")
+      .order("xp",{ascending:false})
+      .order("display_name",{ascending:true})
+      .limit(100);
+
+    if(error){
+      rankingList.innerHTML='<div class="ranking-empty">O ranking ainda não está configurado no banco.</div>';
+      if(myRankSummary) myRankSummary.innerHTML='<span>Sua posição</span><b>—</b>';
+      return;
+    }
+
+    if(!data?.length){
+      rankingList.innerHTML='<div class="ranking-empty">Ainda não há jogadores no ranking.</div>';
+      return;
+    }
+
+    const myIndex=data.findIndex(p=>p.id===user?.id);
+    if(myRankSummary){
+      myRankSummary.innerHTML=`<span>Sua posição</span><b>${myIndex>=0 ? "#"+(myIndex+1) : "—"}</b>`;
+    }
+
+    rankingList.innerHTML="";
+    data.forEach((p,index)=>{
+      const row=document.createElement("div");
+      row.className="ranking-row"+(p.id===user?.id?" me":"");
+
+      const pos=document.createElement("div");
+      pos.className="rank-pos"+(index<3?` top${index+1}`:"");
+      pos.textContent=index===0?"🥇":index===1?"🥈":index===2?"🥉":String(index+1);
+
+      const avatar=document.createElement("div");
+      avatar.className="rank-avatar";
+      if(p.avatar_url){
+        const img=document.createElement("img");
+        img.src=p.avatar_url; img.alt="";
+        avatar.appendChild(img);
+      }else{
+        avatar.textContent=rankInitials(p.display_name);
+      }
+
+      const userBox=document.createElement("div");
+      userBox.className="rank-user";
+      const name=document.createElement("b");
+      name.textContent=p.display_name || "Jogador";
+      const level=document.createElement("small");
+      level.textContent=`Nível ${Math.floor((Number(p.xp)||0)/XP_PER_LEVEL)+1}`;
+      userBox.append(name,level);
+
+      const xpBox=document.createElement("div");
+      xpBox.className="rank-xp";
+      xpBox.textContent=`${(Number(p.xp)||0).toLocaleString("pt-BR")} XP`;
+
+      row.append(pos,avatar,userBox,xpBox);
+      rankingList.appendChild(row);
+    });
+  }
+
+  rankingBtn?.addEventListener("click",async()=>{
+    rankingModal?.classList.add("open");
+    rankingModal?.setAttribute("aria-hidden","false");
+    await loadRanking();
+  });
+  closeRanking?.addEventListener("click",()=>{
+    rankingModal?.classList.remove("open");
+    rankingModal?.setAttribute("aria-hidden","true");
+  });
+  rankingModal?.addEventListener("click",(e)=>{
+    if(e.target===rankingModal){
+      rankingModal.classList.remove("open");
+      rankingModal.setAttribute("aria-hidden","true");
+    }
   });
 
   tabLogin.addEventListener("click",()=>setTab("login"));
@@ -1319,6 +1682,11 @@
       });
       if(updateError) throw updateError;
 
+      await db.from("profiles").update({
+        avatar_url:publicUrl,
+        display_name:updateData.user?.user_metadata?.display_name || updateData.user?.email?.split("@")[0] || "Jogador",
+        updated_at:new Date().toISOString()
+      }).eq("id",user.id);
       showLoggedIn(updateData.user);
       pendingAvatarFile=null;
       avatarInput.value="";
@@ -1356,6 +1724,10 @@
 
       const {data,error}=await db.auth.updateUser({data:{avatar_url:null}});
       if(error) throw error;
+      await db.from("profiles").update({
+        avatar_url:null,
+        updated_at:new Date().toISOString()
+      }).eq("id",user.id);
       showLoggedIn(data.user);
       setSettingsStatus("Foto removida.","ok");
     }catch(err){
@@ -1508,6 +1880,7 @@
       let gain=100 + q.level*25 + Math.min(streak*15,75);
       if(lightning) gain+=100;
       xp+=gain;
+      if(window.geoquestAddXP) window.geoquestAddXP(gain);
       $("#feedback").innerHTML=`<span class="ok"><b>✅ Acertou!</b> +${gain} XP</span><br>${q.exp}`;
     }else{
       lives=Math.max(0,lives-1);
@@ -1584,7 +1957,5 @@
   });
 })();
 </script>
-
-
 </body>
 </html>
