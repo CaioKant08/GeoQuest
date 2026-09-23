@@ -958,6 +958,41 @@
       .ranking-row{grid-template-columns:32px 40px minmax(0,1fr) auto;padding:9px}
       .rank-avatar{width:38px;height:38px}
     }
+
+
+    .game-head-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .quit-run-btn{
+      border-color:#e5b7b7;
+      color:#a52a2a;
+      background:#fff8f8;
+    }
+    .quit-run-btn:hover{
+      border-color:#d99191;
+      background:#fff1f1;
+    }
+    .xp-save-status{
+      margin-top:8px;
+      font-size:.72rem;
+      color:var(--muted);
+      text-align:right;
+    }
+    body.dark .quit-run-btn{
+      background:#2b1d23;
+      border-color:#5f3842;
+      color:#ff9eaa;
+    }
+    @media(max-width:620px){
+      .game-head{align-items:flex-start}
+      .game-head-actions{width:100%;justify-content:stretch}
+      .game-head-actions .btn{flex:1}
+    }
+    .ranking-head-actions{display:flex;align-items:center;gap:8px;flex:none}
 </style>
 </head>
 <body>
@@ -1125,7 +1160,7 @@
 </section>
 <section class="screen" id="game">
 <div class="backlink">
-<button class="btn ghost" id="backBtn">← Voltar ao menu</button>
+<button class="btn ghost" id="backBtn" type="button">← Menu principal</button>
 </div>
 <div class="game-shell">
 <aside class="card side">
@@ -1148,8 +1183,7 @@
 <div class="topic" id="topic">Plano cartesiano</div>
 <div id="counter" style="font-weight:800;margin-top:2px">Questão 1</div>
 </div>
-<button class="btn lightning-btn" id="lightningToggle">Ativar Relâmpago</button>
-</div>
+<div class="game-head-actions"><button class="btn lightning-btn" id="lightningToggle">Ativar Relâmpago</button><button class="btn ghost quit-run-btn" id="quitRunBtn" type="button">Sair da partida</button></div></div>
 <div class="timer-wrap" id="timerWrap">
 <div class="timer-row"><span>Tempo restante</span><span id="timerText">15,0 s</span></div>
 <div class="timer-track"><div class="timer-bar" id="timerBar"></div></div>
@@ -1160,7 +1194,7 @@
 <div class="options" id="options"></div>
 <div aria-live="polite" class="feedback" id="feedback"></div>
 <div class="game-actions">
-<button class="btn ghost" id="restartBtn">Reiniciar partida</button>
+<button class="btn ghost" id="restartBtn" type="button">Reiniciar partida</button>
 <button class="btn primary" id="nextBtn" style="display:none">Próxima questão →</button>
 </div>
 </div>
@@ -1221,8 +1255,8 @@
 <h3 id="rankingTitle">Ranking de XP</h3>
 <p>Classificação geral dos jogadores pelo XP acumulado.</p>
 </div>
-<button aria-label="Fechar" class="icon-btn" id="closeRanking" type="button">×</button>
-</div>
+
+<div class="ranking-head-actions"><button class="icon-btn" id="refreshRankingBtn" title="Atualizar ranking" type="button">↻</button><button aria-label="Fechar" class="icon-btn" id="closeRanking" type="button">×</button></div></div>
 <div class="ranking-summary" id="myRankSummary">
 <span>Sua posição</span>
 <b>—</b>
@@ -1382,7 +1416,8 @@
 
     if(existing){
       currentProfile=existing;
-      renderGlobalXP(existing.xp);
+      displayedGlobalXp=Number(existing.xp)||0;
+      renderGlobalXP(displayedGlobalXp);
       if(existing.display_name!==displayName || (existing.avatar_url||null)!==avatarUrl){
         const {data:updated}=await db.from("profiles")
           .update({display_name:displayName,avatar_url:avatarUrl,updated_at:new Date().toISOString()})
@@ -1405,39 +1440,58 @@
       return null;
     }
     currentProfile=created;
-    renderGlobalXP(created.xp);
+    displayedGlobalXp=Number(created.xp)||0;
+    renderGlobalXP(displayedGlobalXp);
     return created;
   }
 
-  window.geoquestAddXP=async function(amount){
+  let xpQueue = Promise.resolve();
+  let displayedGlobalXp = 0;
+
+  function setCurrentProfileXP(value){
+    const xp=Math.max(0,Number(value)||0);
+    displayedGlobalXp=xp;
+    if(currentProfile) currentProfile.xp=xp;
+    renderGlobalXP(xp);
+  }
+
+  window.geoquestAddXP=function(amount){
     const gain=Math.max(0,Math.round(Number(amount)||0));
-    if(!gain || profileBusy) return;
-    const {data:{user}}=await db.auth.getUser();
-    if(!user) return;
+    if(!gain) return xpQueue;
 
-    profileBusy=true;
-    try{
-      const {data:row,error:readError}=await db
-        .from("profiles").select("xp").eq("id",user.id).single();
-      if(readError) throw readError;
+    // Mostra o ganho imediatamente no topo.
+    setCurrentProfileXP(displayedGlobalXp + gain);
 
-      const next=(Number(row.xp)||0)+gain;
-      renderGlobalXP(next);
+    // Persiste em sequência no Supabase.
+    xpQueue=xpQueue.then(async()=>{
+      const {data,error}=await db.rpc("geoquest_add_xp",{p_amount:gain});
+      if(error) throw error;
 
-      const {data:updated,error:updateError}=await db
-        .from("profiles")
-        .update({xp:next,updated_at:new Date().toISOString()})
-        .eq("id",user.id)
-        .select("id,display_name,avatar_url,xp")
-        .single();
-      if(updateError) throw updateError;
-      currentProfile=updated;
-    }catch(err){
+      // A função retorna o XP total atualizado.
+      const total=Array.isArray(data) ? data[0]?.xp : data?.xp ?? data;
+      if(total !== undefined && total !== null){
+        setCurrentProfileXP(total);
+      }else{
+        const {data:{user}}=await db.auth.getUser();
+        if(user){
+          const {data:row}=await db.from("profiles").select("xp").eq("id",user.id).single();
+          if(row) setCurrentProfileXP(row.xp);
+        }
+      }
+    }).catch(async err=>{
       console.warn("XP não salvo:",err?.message || err);
-      if(currentProfile) renderGlobalXP(currentProfile.xp);
-    }finally{
-      profileBusy=false;
-    }
+      const {data:{user}}=await db.auth.getUser();
+      if(user){
+        const {data:row}=await db.from("profiles").select("xp").eq("id",user.id).single();
+        if(row) setCurrentProfileXP(row.xp);
+      }
+    });
+
+    return xpQueue;
+  };
+
+  window.geoquestFlushXP=function(){
+    return xpQueue;
   };
 
   function rankInitials(name){
@@ -1508,19 +1562,55 @@
     });
   }
 
-  rankingBtn?.addEventListener("click",async()=>{
-    rankingModal?.classList.add("open");
-    rankingModal?.setAttribute("aria-hidden","false");
-    await loadRanking();
+  async function openRanking(){
+    if(!rankingModal || !rankingList) return;
+    rankingModal.classList.add("open");
+    rankingModal.setAttribute("aria-hidden","false");
+    try{
+      await loadRanking();
+    }catch(err){
+      console.warn("Erro ao carregar ranking:",err?.message || err);
+      rankingList.innerHTML='<div class="ranking-empty">Não foi possível carregar o ranking agora.</div>';
+    }
+  }
+
+  function hideRanking(){
+    if(!rankingModal) return;
+    rankingModal.classList.remove("open");
+    rankingModal.setAttribute("aria-hidden","true");
+  }
+
+  // Delegação de eventos: não depende da ordem em que o botão foi criado.
+  document.addEventListener("click",(event)=>{
+    const rankButton=event.target.closest?.("#rankingBtn");
+    if(rankButton){
+      event.preventDefault();
+      openRanking();
+      return;
+    }
+
+    const refreshButton=event.target.closest?.("#refreshRankingBtn");
+    if(refreshButton){
+      event.preventDefault();
+      loadRanking();
+      return;
+    }
+
+    const closeButton=event.target.closest?.("#closeRanking");
+    if(closeButton){
+      event.preventDefault();
+      hideRanking();
+      return;
+    }
+
+    if(event.target===rankingModal){
+      hideRanking();
+    }
   });
-  closeRanking?.addEventListener("click",()=>{
-    rankingModal?.classList.remove("open");
-    rankingModal?.setAttribute("aria-hidden","true");
-  });
-  rankingModal?.addEventListener("click",(e)=>{
-    if(e.target===rankingModal){
-      rankingModal.classList.remove("open");
-      rankingModal.setAttribute("aria-hidden","true");
+
+  document.addEventListener("keydown",(event)=>{
+    if(event.key==="Escape" && rankingModal?.classList.contains("open")){
+      hideRanking();
     }
   });
 
@@ -1928,7 +2018,7 @@
     render();
   }
 
-  function finish(){
+  async function finish(){
     clearTimer();
     $("#rScore").textContent=score;
     $("#rTotal").textContent=questions.length;
@@ -1940,12 +2030,53 @@
       rate>=65 ? "Bom desempenho. Vale revisar os erros antes de outra rodada." :
       "A base está sendo construída. Refaça a campanha e observe as explicações dos erros.";
     show("results");
+    if(window.geoquestFlushXP){
+      try{ await window.geoquestFlushXP(); }catch(_e){}
+    }
   }
 
   document.querySelectorAll("[data-mode]").forEach(el=>el.addEventListener("click",()=>start(el.dataset.mode)));
+  function resetRunState(){
+    clearTimer();
+    idx=0;
+    lives=3;
+    xp=0;
+    streak=0;
+    bestStreak=0;
+    score=0;
+    answered=false;
+    lightning=false;
+  }
+
+  function leaveRun(){
+    // Sai imediatamente. O XP global já ganho continua sendo salvo em segundo plano.
+    clearTimer();
+    show("home");
+
+    if(window.geoquestFlushXP){
+      Promise.resolve(window.geoquestFlushXP()).catch(()=>{});
+    }
+
+    resetRunState();
+  }
+
   $("#nextBtn").addEventListener("click",next);
-  $("#restartBtn").addEventListener("click",()=>start(mode));
-  $("#backBtn").addEventListener("click",()=>{clearTimer();show("home")});
+
+  $("#restartBtn").addEventListener("click",(event)=>{
+    event.preventDefault();
+    clearTimer();
+    start(mode);
+  });
+
+  $("#backBtn").addEventListener("click",(event)=>{
+    event.preventDefault();
+    leaveRun();
+  });
+
+  $("#quitRunBtn").addEventListener("click",(event)=>{
+    event.preventDefault();
+    leaveRun();
+  });
   $("#againBtn").addEventListener("click",()=>start(lastMode));
   $("#menuBtn").addEventListener("click",()=>show("home"));
   $("#lightningToggle").addEventListener("click",()=>{
