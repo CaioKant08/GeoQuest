@@ -1410,7 +1410,6 @@
 
     if(readError){
       console.warn("profiles:",readError.message);
-      renderGlobalXP(0);
       return null;
     }
 
@@ -1459,32 +1458,40 @@
     const gain=Math.max(0,Math.round(Number(amount)||0));
     if(!gain) return xpQueue;
 
-    // Mostra o ganho imediatamente no topo.
-    setCurrentProfileXP(displayedGlobalXp + gain);
-
-    // Persiste em sequência no Supabase.
+    // Cada ganho entra em sequência. O próximo só começa depois do anterior.
     xpQueue=xpQueue.then(async()=>{
-      const {data,error}=await db.rpc("geoquest_add_xp",{p_amount:gain});
-      if(error) throw error;
+      const {data:{user},error:userError}=await db.auth.getUser();
+      if(userError || !user) throw userError || new Error("Usuário não autenticado.");
 
-      // A função retorna o XP total atualizado.
-      const total=Array.isArray(data) ? data[0]?.xp : data?.xp ?? data;
-      if(total !== undefined && total !== null){
-        setCurrentProfileXP(total);
-      }else{
-        const {data:{user}}=await db.auth.getUser();
-        if(user){
-          const {data:row}=await db.from("profiles").select("xp").eq("id",user.id).single();
-          if(row) setCurrentProfileXP(row.xp);
-        }
-      }
-    }).catch(async err=>{
+      const {data:row,error:readError}=await db
+        .from("profiles")
+        .select("xp")
+        .eq("id",user.id)
+        .single();
+
+      if(readError) throw readError;
+
+      const next=(Number(row.xp)||0)+gain;
+
+      const {data:updated,error:updateError}=await db
+        .from("profiles")
+        .update({
+          xp:next,
+          updated_at:new Date().toISOString()
+        })
+        .eq("id",user.id)
+        .select("id,display_name,avatar_url,xp")
+        .single();
+
+      if(updateError) throw updateError;
+
+      currentProfile=updated;
+      setCurrentProfileXP(updated.xp);
+      return updated.xp;
+    }).catch(err=>{
       console.warn("XP não salvo:",err?.message || err);
-      const {data:{user}}=await db.auth.getUser();
-      if(user){
-        const {data:row}=await db.from("profiles").select("xp").eq("id",user.id).single();
-        if(row) setCurrentProfileXP(row.xp);
-      }
+      // Não zera a barra se houver erro; mantém o último valor válido.
+      return displayedGlobalXp;
     });
 
     return xpQueue;
