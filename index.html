@@ -196,10 +196,164 @@
       .result-grid{grid-template-columns:1fr 1fr}
       .game-actions .btn{width:100%}
     }
+
+    /* ===== Autenticação GeoQuest ===== */
+    .auth-gate{
+      min-height:calc(100vh - 44px);
+      display:grid;
+      place-items:center;
+      padding:28px 0 48px;
+    }
+    .auth-shell{
+      width:min(920px,100%);
+      display:grid;
+      grid-template-columns:1fr .9fr;
+      overflow:hidden;
+    }
+    .auth-intro{
+      padding:34px;
+      background:
+        radial-gradient(circle at 18% 20%,rgba(124,92,255,.22),transparent 34%),
+        linear-gradient(155deg,#121a31,#0d1426);
+      border-right:1px solid var(--border);
+    }
+    .auth-intro h2{
+      font-size:clamp(2rem,5vw,3.7rem);
+      line-height:1;
+      letter-spacing:-.045em;
+      margin:18px 0 14px;
+    }
+    .auth-intro p{color:var(--muted);line-height:1.6}
+    .auth-points{display:grid;gap:10px;margin-top:22px}
+    .auth-point{
+      display:flex;align-items:center;gap:10px;
+      color:#dce2f2;font-size:.92rem
+    }
+    .auth-point span{
+      width:30px;height:30px;display:grid;place-items:center;
+      border-radius:9px;background:rgba(255,255,255,.05);
+      border:1px solid var(--border)
+    }
+    .auth-form-wrap{padding:30px;background:var(--panel)}
+    .auth-tabs{
+      display:grid;grid-template-columns:1fr 1fr;
+      background:#0c1221;border:1px solid var(--border);
+      padding:4px;border-radius:14px;margin-bottom:22px
+    }
+    .auth-tab{
+      border:0;background:transparent;color:var(--muted);
+      min-height:42px;border-radius:10px;cursor:pointer;font-weight:800
+    }
+    .auth-tab.active{background:var(--panel2);color:var(--text)}
+    .auth-form{display:grid;gap:13px}
+    .auth-form[hidden]{display:none}
+    .field label{
+      display:block;font-size:.8rem;color:var(--muted);margin-bottom:6px
+    }
+    .field input{
+      width:100%;min-height:48px;border-radius:13px;
+      border:1px solid var(--border);background:#0c1221;
+      color:var(--text);padding:0 13px;font-size:16px;outline:none
+    }
+    .field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.12)}
+    .auth-message{
+      min-height:44px;border-radius:12px;padding:10px 12px;
+      font-size:.86rem;line-height:1.4;display:none
+    }
+    .auth-message.show{display:block}
+    .auth-message.error{background:rgba(255,94,108,.09);border:1px solid rgba(255,94,108,.3);color:#ffafb7}
+    .auth-message.success{background:rgba(53,196,106,.09);border:1px solid rgba(53,196,106,.28);color:#9aedb2}
+    .auth-note{color:var(--muted);font-size:.78rem;line-height:1.45;margin-top:4px}
+    .account-area{display:none;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+    .account-area.show{display:flex}
+    .account-user{
+      max-width:250px;border:1px solid var(--border);
+      background:rgba(255,255,255,.03);border-radius:999px;
+      padding:7px 11px;font-size:.82rem;white-space:nowrap;
+      overflow:hidden;text-overflow:ellipsis
+    }
+    .logout-btn{
+      border:1px solid var(--border);background:transparent;color:var(--muted);
+      min-height:38px;padding:7px 11px;border-radius:999px;cursor:pointer;font-weight:700
+    }
+    .loading-auth{
+      min-height:70vh;display:grid;place-items:center;color:var(--muted);
+      text-align:center
+    }
+    #appWrap[hidden], #authGate[hidden], #authLoading[hidden]{display:none!important}
+    @media(max-width:760px){
+      .auth-shell{grid-template-columns:1fr}
+      .auth-intro{border-right:0;border-bottom:1px solid var(--border);padding:24px}
+      .auth-form-wrap{padding:22px}
+      .auth-intro h2{font-size:2.45rem}
+    }
+
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div id="authLoading" class="loading-auth">
+    <div>
+      <div style="font-size:2rem;margin-bottom:8px">G</div>
+      <div>Conectando ao GeoQuest...</div>
+    </div>
+  </div>
+
+  <div id="authGate" class="wrap" hidden>
+    <section class="auth-gate">
+      <div class="card auth-shell">
+        <div class="auth-intro">
+          <span class="eyebrow">🎯 GeoQuest</span>
+          <h2>Entre no jogo.</h2>
+          <p>Sua conta identifica você no GeoQuest. Depois vamos usar a mesma conta para salvar XP, progresso e montar o ranking entre a galera.</p>
+          <div class="auth-points">
+            <div class="auth-point"><span>👤</span> Uma conta para cada jogador</div>
+            <div class="auth-point"><span>📱</span> Login no celular ou computador</div>
+            <div class="auth-point"><span>🏆</span> Preparado para ranking de XP</div>
+          </div>
+        </div>
+
+        <div class="auth-form-wrap">
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab active" id="tabLogin">Entrar</button>
+            <button type="button" class="auth-tab" id="tabSignup">Criar conta</button>
+          </div>
+
+          <form id="loginForm" class="auth-form">
+            <div class="field">
+              <label for="loginEmail">E-mail</label>
+              <input id="loginEmail" type="email" autocomplete="email" required placeholder="voce@email.com">
+            </div>
+            <div class="field">
+              <label for="loginPassword">Senha</label>
+              <input id="loginPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="Sua senha">
+            </div>
+            <button id="loginSubmit" class="btn primary" type="submit">Entrar no GeoQuest</button>
+          </form>
+
+          <form id="signupForm" class="auth-form" hidden>
+            <div class="field">
+              <label for="signupName">Nome no ranking</label>
+              <input id="signupName" type="text" autocomplete="nickname" minlength="2" maxlength="30" required placeholder="Ex.: Caio">
+            </div>
+            <div class="field">
+              <label for="signupEmail">E-mail</label>
+              <input id="signupEmail" type="email" autocomplete="email" required placeholder="voce@email.com">
+            </div>
+            <div class="field">
+              <label for="signupPassword">Senha</label>
+              <input id="signupPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo de 8 caracteres">
+            </div>
+            <button id="signupSubmit" class="btn primary" type="submit">Criar minha conta</button>
+            <div class="auth-note">Se a confirmação de e-mail estiver ativada no Supabase, você receberá um link antes do primeiro login.</div>
+          </form>
+
+          <div id="authMessage" class="auth-message" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="appWrap" class="wrap" hidden>
     <header class="topbar">
       <div class="brand">
         <div class="logo">G</div>
@@ -208,7 +362,10 @@
           <small>Geometria Analítica • ENEM</small>
         </div>
       </div>
-      <div class="chip">Progresso salvo nesta sessão</div>
+      <div id="accountArea" class="account-area">
+        <div id="accountUser" class="account-user">Jogador</div>
+        <button id="logoutBtn" type="button" class="logout-btn">Sair</button>
+      </div>
     </header>
 
     <main>
@@ -334,6 +491,165 @@
       </section>
     </main>
   </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<script>
+(() => {
+  const SUPABASE_URL = "https://qymrelopegrdxwaltrrw.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_hUelJ8J29VXjihF7B13F0w_LI6Vb7rj";
+  const SITE_URL = "https://caiokant08.github.io/GeoQuest/";
+
+  const authLoading = document.getElementById("authLoading");
+  const authGate = document.getElementById("authGate");
+  const appWrap = document.getElementById("appWrap");
+  const accountArea = document.getElementById("accountArea");
+  const accountUser = document.getElementById("accountUser");
+  const authMessage = document.getElementById("authMessage");
+  const tabLogin = document.getElementById("tabLogin");
+  const tabSignup = document.getElementById("tabSignup");
+  const loginForm = document.getElementById("loginForm");
+  const signupForm = document.getElementById("signupForm");
+
+  if (!window.supabase || !window.supabase.createClient) {
+    authLoading.innerHTML = "<div><b>Não foi possível carregar o sistema de login.</b><br><span style='color:var(--muted)'>Verifique sua conexão com a internet e atualize a página.</span></div>";
+    return;
+  }
+
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  });
+
+  function friendlyError(message) {
+    const m = (message || "").toLowerCase();
+    if (m.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
+    if (m.includes("email not confirmed")) return "Confirme seu e-mail antes de entrar.";
+    if (m.includes("user already registered")) return "Já existe uma conta cadastrada com este e-mail.";
+    if (m.includes("password should be")) return "A senha não atende aos requisitos mínimos.";
+    if (m.includes("rate limit")) return "Muitas tentativas seguidas. Aguarde um pouco e tente novamente.";
+    return message || "Ocorreu um erro. Tente novamente.";
+  }
+
+  function setMessage(text, type="error") {
+    authMessage.textContent = text;
+    authMessage.className = "auth-message show " + type;
+  }
+
+  function clearMessage() {
+    authMessage.textContent = "";
+    authMessage.className = "auth-message";
+  }
+
+  function setMode(mode) {
+    const login = mode === "login";
+    tabLogin.classList.toggle("active", login);
+    tabSignup.classList.toggle("active", !login);
+    loginForm.hidden = !login;
+    signupForm.hidden = login;
+    clearMessage();
+  }
+
+  function showLoggedOut() {
+    authLoading.hidden = true;
+    appWrap.hidden = true;
+    authGate.hidden = false;
+    accountArea.classList.remove("show");
+  }
+
+  function showLoggedIn(user) {
+    authLoading.hidden = true;
+    authGate.hidden = true;
+    appWrap.hidden = false;
+    accountArea.classList.add("show");
+    const name = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Jogador";
+    accountUser.textContent = "👤 " + name;
+    accountUser.title = user?.email || name;
+  }
+
+  tabLogin.addEventListener("click", () => setMode("login"));
+  tabSignup.addEventListener("click", () => setMode("signup"));
+
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    clearMessage();
+    const button = document.getElementById("loginSubmit");
+    button.disabled = true;
+    button.textContent = "Entrando...";
+    try {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      if (data.user) showLoggedIn(data.user);
+    } catch (err) {
+      setMessage(friendlyError(err.message));
+    } finally {
+      button.disabled = false;
+      button.textContent = "Entrar no GeoQuest";
+    }
+  });
+
+  signupForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    clearMessage();
+    const button = document.getElementById("signupSubmit");
+    button.disabled = true;
+    button.textContent = "Criando conta...";
+    try {
+      const displayName = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName },
+          emailRedirectTo: SITE_URL
+        }
+      });
+      if (error) throw error;
+
+      if (data.session && data.user) {
+        setMessage("Conta criada! Você já está conectado.", "success");
+        setTimeout(() => showLoggedIn(data.user), 550);
+      } else {
+        setMessage("Conta criada! Confira seu e-mail e clique no link de confirmação. Depois volte aqui e faça login.", "success");
+        signupForm.reset();
+      }
+    } catch (err) {
+      setMessage(friendlyError(err.message));
+    } finally {
+      button.disabled = false;
+      button.textContent = "Criar minha conta";
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await db.auth.signOut();
+    setMode("login");
+    showLoggedOut();
+  });
+
+  db.auth.onAuthStateChange((_event, session) => {
+    if (session?.user) showLoggedIn(session.user);
+    else showLoggedOut();
+  });
+
+  (async () => {
+    try {
+      const { data } = await db.auth.getSession();
+      if (data.session?.user) showLoggedIn(data.session.user);
+      else showLoggedOut();
+    } catch (_err) {
+      showLoggedOut();
+      setMessage("Não foi possível verificar sua sessão. Tente atualizar a página.");
+    }
+  })();
+})();
+</script>
 
 <script>
 (() => {
