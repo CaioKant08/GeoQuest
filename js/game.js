@@ -1,5 +1,4 @@
 (() => {
-  const levels = window.KANT_LEVELS;
   const bank = window.KANT_QUESTIONS;
   
 
@@ -89,7 +88,7 @@
     const q=questions[idx];
     $("#topic").textContent=q.topic;
     $("#counter").textContent=`Questão ${idx+1} de ${questions.length}`;
-    $("#levelLabel").textContent=`Nível ${q.level+1} — ${levels[q.level]}`;
+    $("#levelLabel").textContent=`Nível ${q.level+1}`;
     if(q.image){
       $("#visual").innerHTML="";
       const img=document.createElement("img");

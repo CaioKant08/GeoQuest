@@ -1,11 +1,3 @@
-window.KANT_LEVELS = [
-    "Salgado do Douglas",
-    "Noooob",
-    "Walace Lords",
-    "Vanessa",
-    "Até a Vanessa tem medo de você"
-  ];
-
 window.KANT_QUESTIONS = [
     {level:0,topic:"Plano cartesiano",visual:"Ponto A = (−4, 3)",q:"Em qual quadrante está o ponto A(−4, 3)?",opts:["1º quadrante","2º quadrante","3º quadrante","4º quadrante"],a:1,exp:"Como x < 0 e y > 0, o ponto está no 2º quadrante."},
     {level:0,topic:"Plano cartesiano",visual:"A = (3, −2)",q:"A abscissa do ponto A(3, −2) é:",opts:["−3","−2","2","3"],a:3,exp:"A abscissa é a coordenada x. Portanto, x = 3."},
