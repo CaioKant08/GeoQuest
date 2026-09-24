@@ -1,0 +1,1 @@
+window.KANT_CONFIG = {"SUPABASE_URL": "https://qymrelopegrdxwaltrrw.supabase.co", "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_hUelJ8J29VXjihF7B13F0w_LI6Vb7rj", "SITE_URL": "https://caiokant08.github.io/GeoQuest/"};
