@@ -10,5 +10,3 @@ Arquivos principais:
 - `js/game.js`: funcionamento das partidas
 - `assets/`: logo e imagens usadas pelas questões
 
-## Publicação
-Suba toda esta estrutura para a raiz do repositório do GitHub Pages, mantendo os nomes das pastas.
