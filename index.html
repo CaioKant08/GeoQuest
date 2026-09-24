@@ -5,7 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
 <link href="assets/kant-symbol.png" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=2.5.0" rel="stylesheet"/>
+<link href="css/styles.css?v=2.7.0" rel="stylesheet"/>
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
@@ -71,7 +71,7 @@
 <header class="topbar kant-header">
 <div aria-label="Kant" class="kant-brand">
 <div aria-hidden="true" class="kant-brand-symbol" style="width:56px;height:56px;overflow:hidden;display:grid;place-items:center;flex:0 0 56px">
-      <img src="assets/kant-symbol.png?v=2.5.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
+      <img src="assets/kant-symbol.png?v=2.7.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
     </div>
 <div class="kant-wordmark">KANT</div>
 </div>
@@ -161,37 +161,46 @@
 </div>
 </div>
 <div class="modules-grid">
-<article class="module-card green">
+<article class="module-card green module-one-card" id="moduleOneCard">
 <div class="module-top">
 <div class="module-num">1</div>
-<button class="module-arrow" data-mode="campaign" type="button">›</button>
+<button class="module-arrow" data-module-start type="button" aria-label="Continuar Módulo 1">›</button>
 </div>
 <div class="module-heading">
 <h3>Módulo 1</h3>
-<h4>Fundamentos</h4>
-<p>Construa a base: plano cartesiano, leitura de coordenadas, distância entre pontos e os primeiros conceitos essenciais.</p>
+<h4>Fundamentos do Plano Cartesiano</h4>
+<p>Domine distância, ponto médio, baricentro, área e alinhamento antes de avançar para equação da reta.</p>
 </div>
-<div class="module-art">
-<span class="art-label">Base do módulo</span>
-<div class="math-orbit">
-<div class="leaf-sm leaf1"></div>
-<div class="leaf-sm leaf2"></div>
-<div class="leaf-sm leaf3"></div>
-<div class="leaf-sm leaf4"></div>
-<div class="sprout"><i></i></div>
+<div class="module-art module-one-art">
+<span class="art-label">Fundamentos</span>
+<div class="module-one-visual" aria-hidden="true">
+  <div class="axis axis-x"></div><div class="axis axis-y"></div>
+  <span class="plot-point p1"></span><span class="plot-point p2"></span><span class="plot-point p3"></span>
+  <div class="plot-segment s1"></div><div class="plot-segment s2"></div>
 </div>
 </div>
-<div class="module-progress">
-<div class="progress-top"><span>Progresso</span><b>25%</b></div>
-<div class="bar"><span style="width:25%"></span></div>
-<div class="exercise-list">
-<div class="exercise-item done"><span class="exercise-badge">✓</span><span>Exercício 1 — Leitura no plano cartesiano</span></div>
-<div class="exercise-item done"><span class="exercise-badge">✓</span><span>Exercício 2 — Coordenadas e quadrantes</span></div>
-<div class="exercise-item play"><span class="exercise-badge">▶</span><span>Exercício 3 — Distância entre dois pontos</span></div>
-<div class="exercise-item"><span class="exercise-badge" style="background:#eef1ff;color:#4065d6">○</span><span>Exercício 4 — Desafio do módulo</span></div>
+<div class="module-progress module-one-progress">
+<div class="progress-top"><span>Progresso do módulo</span><b id="moduleOneProgressText">0%</b></div>
+<div class="bar"><span id="moduleOneProgressBar" style="width:0%"></span></div>
+<div class="phase-list" id="moduleOnePhaseList">
+<button class="phase-item current" data-module-phase="0" type="button">
+  <span class="phase-badge">1</span><span class="phase-copy"><b>Distância entre pontos</b><small>4 questões • primeira fase</small></span><span class="phase-state">▶</span>
+</button>
+<button class="phase-item locked" data-module-phase="1" type="button" disabled>
+  <span class="phase-badge">2</span><span class="phase-copy"><b>Ponto médio</b><small>3 questões</small></span><span class="phase-state">🔒</span>
+</button>
+<button class="phase-item locked" data-module-phase="2" type="button" disabled>
+  <span class="phase-badge">3</span><span class="phase-copy"><b>Baricentro</b><small>2 questões</small></span><span class="phase-state">🔒</span>
+</button>
+<button class="phase-item locked" data-module-phase="3" type="button" disabled>
+  <span class="phase-badge">4</span><span class="phase-copy"><b>Área no plano cartesiano</b><small>2 questões</small></span><span class="phase-state">🔒</span>
+</button>
+<button class="phase-item locked" data-module-phase="4" type="button" disabled>
+  <span class="phase-badge">5</span><span class="phase-copy"><b>Pontos alinhados</b><small>3 questões • desafio final</small></span><span class="phase-state">🔒</span>
+</button>
 </div>
-<button class="module-btn" data-mode="campaign" type="button">▶ Continuar aprendendo</button>
-<div class="module-note">Pode virar a trilha principal do GeoQuest.</div>
+<button class="module-btn" data-module-start type="button" id="moduleOneContinueBtn">▶ Começar fase 1</button>
+<div class="module-note" id="moduleOneNote">As fases são desbloqueadas em sequência conforme você conclui cada etapa.</div>
 </div>
 </article>
 <article class="module-card yellow">
@@ -276,10 +285,10 @@
 <div class="challenge-grid">
 <article class="challenge-card">
 <div class="challenge-badge">△</div>
-<h3>Campanha</h3>
-<p>Sequência completa de questões com progressão. Ideal para quando você quiser jogar a trilha principal do conteúdo.</p>
-<div class="challenge-meta"><span class="challenge-tag">Progressão completa</span><span class="challenge-tag">5 níveis</span></div>
-<button class="btn primary" data-mode="campaign" type="button">Começar campanha</button>
+<h3>Módulo 1</h3>
+<p>Continue a trilha de Fundamentos do Plano Cartesiano exatamente da fase que você desbloqueou.</p>
+<div class="challenge-meta"><span class="challenge-tag">Progressão completa</span><span class="challenge-tag">5 fases</span></div>
+<button class="btn primary" data-module-start type="button">Continuar Módulo 1</button>
 </article>
 <article class="challenge-card">
 <div class="challenge-badge">∥</div>
@@ -374,6 +383,10 @@
 <div class="question-box">
 <div class="mini-visual" id="visual"></div>
 <div class="question" id="question"></div>
+<div class="hint-area" id="hintArea">
+<button class="btn ghost hint-btn" id="hintBtn" type="button">💡 Ver dica</button>
+<div class="hint-box" id="hintBox" hidden></div>
+</div>
 <div class="options" id="options"></div>
 <div aria-live="polite" class="feedback" id="feedback"></div>
 <div class="game-actions">
@@ -396,7 +409,8 @@
 <div class="result-box"><small>Melhor sequência</small><b id="rStreak">0</b></div>
 </div>
 <div class="cta-row" style="justify-content:center">
-<button class="btn primary" id="againBtn">Jogar novamente</button>
+<button class="btn primary" id="continuePhaseBtn" style="display:none">Próxima fase →</button>
+<button class="btn secondary" id="againBtn">Jogar novamente</button>
 <button class="btn secondary" id="menuBtn">Voltar ao menu</button>
 </div>
 </div>
@@ -448,6 +462,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js"></script><script src="js/platform.js"></script><script src="js/questions.js"></script><script src="js/game.js"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js"></script><script src="js/platform.js"></script><script src="js/questions.js"></script><script src="js/module1.js"></script><script src="js/game.js"></script>
 </body>
 </html>

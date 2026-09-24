@@ -64,6 +64,7 @@
     clearAuthMessage();
   }
   function showLoggedOut(){
+    window.geoquestCurrentUserId=null;
     authLoading.hidden=true;
     appWrap.hidden=true;
     authGate.hidden=false;
@@ -85,6 +86,7 @@
     }
   }
   function showLoggedIn(user){
+    window.geoquestCurrentUserId=user?.id || null;
     authLoading.hidden=true;
     authGate.hidden=true;
     appWrap.hidden=false;
@@ -104,6 +106,7 @@
     paintAvatar(avatarPreview,avatarUrl,name);
     if(typeof syncProfileScreen === "function") syncProfileScreen();
     ensureProfile(user);
+    window.dispatchEvent(new CustomEvent("geoquest:user-ready",{detail:{userId:user?.id || null}}));
   }
 
   if(!window.supabase || !window.supabase.createClient){
