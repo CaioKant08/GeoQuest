@@ -5,7 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
 <link href="assets/kant-symbol.png" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=2.7.0" rel="stylesheet"/>
+<link href="css/styles.css?v=3.0.0" rel="stylesheet"/>
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
@@ -71,7 +71,7 @@
 <header class="topbar kant-header">
 <div aria-label="Kant" class="kant-brand">
 <div aria-hidden="true" class="kant-brand-symbol" style="width:56px;height:56px;overflow:hidden;display:grid;place-items:center;flex:0 0 56px">
-      <img src="assets/kant-symbol.png?v=2.7.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
+      <img src="assets/kant-symbol.png?v=3.0.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
     </div>
 <div class="kant-wordmark">KANT</div>
 </div>
@@ -150,128 +150,44 @@
 <span class="pill-kicker">Sua jornada de aprendizagem</span>
 <h2>Escolha seu próximo passo.</h2>
 <p>
-            Avance por módulos, acumule XP e desbloqueie desafios cada vez mais difíceis.
-            A estrutura já está pronta para receber os exercícios que você for adicionando depois.
+            Estude o conceito, acompanhe um exemplo guiado e depois pratique. A trilha começa pelas coordenadas e avança até distâncias envolvendo retas e circunferências.
           </p>
 </div>
 <div class="landing-stats">
-<div class="tiny-stat"><b>3 módulos</b><span>Base, prática e desafios avançados</span></div>
-<div class="tiny-stat"><b>XP e ranking</b><span>Progressão persistente na conta</span></div>
-<div class="tiny-stat"><b>Desafios rápidos</b><span>Batalha rápida e relâmpago em aba própria</span></div>
+<div class="tiny-stat"><b>6 módulos</b><span>Da base cartesiana à circunferência</span></div>
+<div class="tiny-stat"><b>Teoria + prática</b><span>Conceito curto, exemplo guiado e exercícios</span></div>
+<div class="tiny-stat"><b>Progressão</b><span>70% de acerto libera o próximo módulo</span></div>
 </div>
 </div>
-<div class="modules-grid">
-<article class="module-card green module-one-card" id="moduleOneCard">
-<div class="module-top">
-<div class="module-num">1</div>
-<button class="module-arrow" data-module-start type="button" aria-label="Continuar Módulo 1">›</button>
+<div class="modules-grid learning-modules-grid" id="modulesGrid"></div>
 </div>
-<div class="module-heading">
-<h3>Módulo 1</h3>
-<h4>Fundamentos do Plano Cartesiano</h4>
-<p>Domine distância, ponto médio, baricentro, área e alinhamento antes de avançar para equação da reta.</p>
-</div>
-<div class="module-art module-one-art">
-<span class="art-label">Fundamentos</span>
-<div class="module-one-visual" aria-hidden="true">
-  <div class="axis axis-x"></div><div class="axis axis-y"></div>
-  <span class="plot-point p1"></span><span class="plot-point p2"></span><span class="plot-point p3"></span>
-  <div class="plot-segment s1"></div><div class="plot-segment s2"></div>
-</div>
-</div>
-<div class="module-progress module-one-progress">
-<div class="progress-top"><span>Progresso do módulo</span><b id="moduleOneProgressText">0%</b></div>
-<div class="bar"><span id="moduleOneProgressBar" style="width:0%"></span></div>
-<div class="phase-list" id="moduleOnePhaseList">
-<button class="phase-item current" data-module-phase="0" type="button">
-  <span class="phase-badge">1</span><span class="phase-copy"><b>Distância entre pontos</b><small>4 questões • primeira fase</small></span><span class="phase-state">▶</span>
-</button>
-<button class="phase-item locked" data-module-phase="1" type="button" disabled>
-  <span class="phase-badge">2</span><span class="phase-copy"><b>Ponto médio</b><small>3 questões</small></span><span class="phase-state">🔒</span>
-</button>
-<button class="phase-item locked" data-module-phase="2" type="button" disabled>
-  <span class="phase-badge">3</span><span class="phase-copy"><b>Baricentro</b><small>2 questões</small></span><span class="phase-state">🔒</span>
-</button>
-<button class="phase-item locked" data-module-phase="3" type="button" disabled>
-  <span class="phase-badge">4</span><span class="phase-copy"><b>Área no plano cartesiano</b><small>2 questões</small></span><span class="phase-state">🔒</span>
-</button>
-<button class="phase-item locked" data-module-phase="4" type="button" disabled>
-  <span class="phase-badge">5</span><span class="phase-copy"><b>Pontos alinhados</b><small>3 questões • desafio final</small></span><span class="phase-state">🔒</span>
-</button>
-</div>
-<button class="module-btn" data-module-start type="button" id="moduleOneContinueBtn">▶ Começar fase 1</button>
-<div class="module-note" id="moduleOneNote">As fases são desbloqueadas em sequência conforme você conclui cada etapa.</div>
-</div>
-</article>
-<article class="module-card yellow">
-<div class="module-top">
-<div class="module-num">2</div>
-<button class="module-arrow" data-mode="quick" type="button">›</button>
-</div>
-<div class="module-heading">
-<h3>Módulo 2</h3>
-<h4>Explorando na prática</h4>
-<p>Aprofunde a aplicação: ponto médio, equação da reta e exercícios mais dinâmicos para consolidar a técnica.</p>
-</div>
-<div class="module-art">
-<span class="art-label">Prática guiada</span>
-<div class="math-book">
-<div class="bulb"></div>
-<div class="cube c1"></div>
-<div class="cube c2"></div>
-<div class="cube c3"></div>
-<div class="gear"></div>
-<div class="book"></div>
-</div>
-</div>
-<div class="module-progress">
-<div class="progress-top"><span>Progresso</span><b>10%</b></div>
-<div class="bar"><span style="width:10%"></span></div>
-<div class="exercise-list">
-<div class="exercise-item done"><span class="exercise-badge">✓</span><span>Exercício 1 — Revisão estratégica</span></div>
-<div class="exercise-item play"><span class="exercise-badge">▶</span><span>Exercício 2 — Mãos na massa</span></div>
-<div class="exercise-item muted lock"><span class="exercise-badge">🔒</span><span>Exercício 3 — Projeto prático</span></div>
-<div class="exercise-item muted lock"><span class="exercise-badge">🔒</span><span>Exercício 4 — Desafio do módulo</span></div>
-</div>
-<button class="module-btn" data-mode="quick" type="button">▶ Continuar módulo 2</button>
-<div class="module-note">Bom lugar para encaixar listas temáticas e revisões.</div>
-</div>
-</article>
-<article class="module-card red locked">
-<div class="module-top">
-<div class="module-num">3</div>
-<button class="module-arrow" id="goChallengesFromModule" type="button">›</button>
-</div>
-<div class="module-heading">
-<h3>Módulo 3</h3>
-<h4>Desafios avançados</h4>
-<p>Reserve este espaço para questões estilo ENEM, problemas mais integrados e metas de performance mais altas.</p>
-</div>
-<div class="module-art">
-<span class="art-label">Desbloqueio por progresso</span>
-<div class="math-mountain">
-<div class="peak small"></div>
-<div class="peak small2"></div>
-<div class="peak"></div>
-<div class="flag"></div>
-<div class="dots"><span></span><span></span><span></span><span></span><span></span></div>
-</div>
-</div>
-<div class="module-progress">
-<div class="progress-top"><span>Progresso</span><b>0%</b></div>
-<div class="bar"><span style="width:0%"></span></div>
-<div class="exercise-list">
-<div class="exercise-item muted lock"><span class="exercise-badge">🔒</span><span>Exercício 1 — Estratégias avançadas</span></div>
-<div class="exercise-item muted lock"><span class="exercise-badge">🔒</span><span>Exercício 2 — Projeto final</span></div>
-<div class="exercise-item muted lock"><span class="exercise-badge">🔒</span><span>Exercício 3 — Desafio mestre</span></div>
-<div class="exercise-item muted lock"><span class="exercise-badge">🔒</span><span>Exercício 4 — Certificação</span></div>
-</div>
-<button class="module-btn" id="unlockChallengesBtn" type="button">🔒 Em breve</button>
-<div class="module-note">Por enquanto, use a aba Desafios para concentrar os modos rápidos.</div>
-</div>
-</article>
-</div>
-</div>
+</section>
+<section class="screen" id="moduleStudy">
+  <div class="module-study-shell">
+    <button class="btn ghost study-back" id="studyBackBtn" type="button">← Voltar aos módulos</button>
+    <section class="module-study-hero" id="moduleStudyHero">
+      <div class="study-module-number" id="studyModuleNumber">1</div>
+      <div>
+        <span class="pill-kicker" id="studyKicker">Módulo</span>
+        <h2 id="studyTitle">Título do módulo</h2>
+        <p id="studyDescription"></p>
+      </div>
+    </section>
+    <div class="study-objectives" id="studyObjectives"></div>
+    <div class="theory-heading">
+      <div><span class="pill-kicker">Parte teórica</span><h3>Entenda antes de praticar</h3></div>
+      <p>Leitura curta, fórmula essencial e um exemplo resolvido em cada etapa.</p>
+    </div>
+    <div class="theory-grid" id="theoryGrid"></div>
+    <section class="practice-cta">
+      <div>
+        <span class="pill-kicker">Parte prática</span>
+        <h3>Agora transforme conceito em resolução.</h3>
+        <p id="practiceSummary">8 questões progressivas com feedback imediato.</p>
+      </div>
+      <button class="btn primary practice-start-btn" id="startModulePracticeBtn" type="button">Começar exercícios →</button>
+    </section>
+  </div>
 </section>
 <section class="screen" id="challenges">
 <div class="challenge-shell">
@@ -462,6 +378,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js"></script><script src="js/platform.js"></script><script src="js/questions.js"></script><script src="js/module1.js"></script><script src="js/game.js"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js"></script><script src="js/platform.js"></script><script src="js/modules.js"></script><script src="js/questions.js"></script><script src="js/game.js"></script>
 </body>
 </html>

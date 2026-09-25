@@ -1,12 +1,13 @@
-# Kant — estrutura modular
+# KANT — Geometria Analítica v3.0
 
-Arquivos principais:
+Versão com trilha completa em 6 módulos, integrando teoria curta, exemplos guiados e prática progressiva.
 
-- `index.html`: estrutura das telas
-- `css/styles.css`: todo o visual
-- `js/config.js`: configuração pública do Supabase
-- `js/platform.js`: login, perfil, tema, XP, ranking e navegação
-- `js/questions.js`: banco de questões e níveis
-- `js/game.js`: funcionamento das partidas
-- `assets/`: logo e imagens usadas pelas questões
+## Arquivos principais
+- `index.html` — telas e estrutura
+- `css/styles.css` — design
+- `js/modules.js` — conteúdo teórico + 48 questões novas
+- `js/questions.js` — banco de desafios gerado a partir dos módulos
+- `js/game.js` — navegação, prática e progressão por 70%
+- `js/platform.js` — conta, XP, ranking e perfil
 
+A progressão de módulos é salva localmente por usuário. O XP continua usando o fluxo já existente do Supabase.
