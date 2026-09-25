@@ -1,22 +1,18 @@
-window.KANT_QUESTIONS = [
-    {level:0,topic:"Plano cartesiano",visual:"Ponto A = (−4, 3)",q:"Em qual quadrante está o ponto A(−4, 3)?",opts:["1º quadrante","2º quadrante","3º quadrante","4º quadrante"],a:1,exp:"Como x < 0 e y > 0, o ponto está no 2º quadrante."},
-    {level:0,topic:"Plano cartesiano",visual:"A = (3, −2)",q:"A abscissa do ponto A(3, −2) é:",opts:["−3","−2","2","3"],a:3,exp:"A abscissa é a coordenada x. Portanto, x = 3."},
-    {level:0,topic:"Alinhamento",visual:"A(2, −3)   B(2, 5)",q:"Os pontos A e B formam um segmento:",opts:["horizontal","vertical","inclinado a 45°","paralelo à reta y=x"],a:1,exp:"Os dois pontos têm a mesma abscissa x = 2, então o segmento é vertical."},
-    {level:1,topic:"Ponto médio",visual:"A(−2, 4)  ─────  B(6, 2)",q:"Qual é o ponto médio do segmento AB?",opts:["(2, 3)","(4, 6)","(2, 2)","(3, 2)"],a:0,exp:"M=((−2+6)/2,(4+2)/2)=(2,3)."},
-    {level:1,topic:"Distância entre pontos",visual:"A(1,2)      B(4,6)",q:"Qual é a distância entre A(1,2) e B(4,6)?",opts:["4","5","6","7"],a:1,exp:"d=√[(4−1)²+(6−2)²]=√(9+16)=5."},
-    {level:1,topic:"Ponto médio",visual:"A(−6, −2)      B(4, 8)",q:"O ponto médio de AB é:",opts:["(−1,3)","(−2,4)","(1,5)","(−5,10)"],a:0,exp:"M=((−6+4)/2,(−2+8)/2)=(−1,3)."},
-    {level:2,topic:"Coeficiente angular",visual:"A(1,2)  ↗  B(3,6)",q:"O coeficiente angular da reta que passa por A(1,2) e B(3,6) vale:",opts:["1","2","3","4"],a:1,exp:"m=(6−2)/(3−1)=4/2=2."},
-    {level:2,topic:"Equação da reta",visual:"y = 2x + 3",q:"Na reta y = 2x + 3, o número 3 representa:",opts:["coeficiente angular","raiz da função","ordenada na origem","abscissa na origem"],a:2,exp:"Na forma y=mx+n, n é a ordenada na origem, onde a reta corta o eixo y."},
-    {level:2,topic:"Paralelismo",visual:"r: y=3x−2     s: y=3x+5",q:"As retas r e s são:",opts:["perpendiculares","paralelas distintas","coincidentes","verticais"],a:1,exp:"Elas têm o mesmo coeficiente angular m=3 e termos independentes diferentes."},
-    {level:2,topic:"Perpendicularidade",visual:"r: m = 2",q:"Se uma reta s é perpendicular a uma reta r de coeficiente angular 2, então o coeficiente angular de s é:",opts:["2","−2","1/2","−1/2"],a:3,exp:"Para retas perpendiculares, m₁·m₂ = −1. Logo, 2·m₂=−1 e m₂=−1/2."},
-    {level:3,topic:"Circunferência",visual:"(x−2)² + (y+1)² = 16",q:"Qual é o centro e o raio da circunferência?",opts:["C=(2,−1), r=4","C=(−2,1), r=4","C=(2,1), r=16","C=(−2,−1), r=8"],a:0,exp:"Comparando com (x−a)²+(y−b)²=r²: centro (2,−1) e raio 4."},
-    {level:3,topic:"Circunferência",visual:"Centro C=(0,0), ponto P=(3,4)",q:"A equação da circunferência que passa por P é:",opts:["x²+y²=5","x²+y²=10","x²+y²=25","x²+y²=49"],a:2,exp:"O raio é √(3²+4²)=5. Então r²=25."},
-    {level:3,topic:"Circunferência",visual:"x² + y² − 6x + 8y = 0",q:"Qual é o centro dessa circunferência?",opts:["(3,−4)","(−3,4)","(6,−8)","(−6,8)"],a:0,exp:"Completando quadrados: (x−3)²+(y+4)²=25. Logo, C=(3,−4)."},
-    {level:3,topic:"Questão com imagem",image:"assets/question-image-1.png",q:"No quadrado TUVS da figura, V=(8,6) e S=(6,2). Qual é o comprimento do lado VS?",opts:["2√5","4","2√10","4√2","5"],a:0,exp:"Pela distância entre V e S: d=√[(8−6)²+(6−2)²]=√20=2√5."},
-    {level:4,topic:"Questão com imagem",image:"assets/question-image-1.png",q:"Sabendo que TUVS é um quadrado, V=(8,6) e S=(6,2), quais são as coordenadas do vértice U?",opts:["(4,8)","(4,10)","(6,10)","(10,10)","(2,8)"],a:0,exp:"O vetor de S para V é (2,4). Um vetor perpendicular de mesmo módulo, apontando para cima e à esquerda, é (−4,2). Somando a V: U=(8−4,6+2)=(4,8)."},
-    {level:4,topic:"Questão com imagem",image:"assets/question-image-1.png",q:"No mesmo quadrado, qual é a área da região azul?",opts:["10","16","20","24","40"],a:2,exp:"O lado mede 2√5. Logo, área=(2√5)²=20 unidades quadradas."},
-    {level:4,topic:"Estilo ENEM",visual:"🚲 Ciclovia passando por A(2,3) e B(6,11)",q:"Um novo posto será instalado sobre a mesma reta no ponto de abscissa x=10. Qual deverá ser sua ordenada?",opts:["15","17","18","19","21"],a:3,exp:"m=(11−3)/(6−2)=2. A reta é y=2x−1. Para x=10, y=19."},
-    {level:4,topic:"Estilo ENEM",visual:"📡 Antena em C(2,1), alcance de 5 km",q:"Qual ponto está exatamente na fronteira circular da cobertura?",opts:["(2,5)","(5,5)","(6,4)","(−2,1)","(7,2)"],a:2,exp:"Distância de (6,4) até C(2,1): √(4²+3²)=5."},
-    {level:4,topic:"Estilo ENEM",visual:"🏙️ Ruas modeladas por y = −x + 8 e y = x + 2",q:"As duas ruas se cruzam em qual ponto?",opts:["(2,6)","(3,5)","(4,4)","(5,3)","(6,2)"],a:1,exp:"Igualando: −x+8=x+2 → 2x=6 → x=3. Então y=5."},
-    {level:4,topic:"Estilo ENEM",visual:"📍 A(−1,2), B(5,2), C(2,6)",q:"Considerando AB como base, qual é a área do triângulo ABC?",opts:["9","10","12","15","18"],a:2,exp:"AB=6 e a altura até y=2 é 4. Área = 6·4/2 = 12."}
-  ];
+(() => {
+  const modules = window.KANT_MODULES || [];
+  window.KANT_QUESTIONS = modules.flatMap((module, moduleIndex) =>
+    module.questoes.map((q, questionIndex) => ({
+      id: q.id,
+      level: Math.min(4, Math.floor((moduleIndex * 8 + questionIndex) / 10)),
+      topic: module.titulo,
+      visual: `Módulo ${module.numero} • ${module.subtitulo}`,
+      q: q.enunciado,
+      opts: [...q.alternativas],
+      a: q.correta,
+      exp: q.explicacao,
+      hint: q.dica || "",
+      difficulty: q.dificuldade,
+      sourceModuleId: module.id
+    }))
+  );
+})();
