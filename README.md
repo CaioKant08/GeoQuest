@@ -10,4 +10,4 @@ Versão com trilha completa em 6 módulos, integrando teoria curta, exemplos gui
 - `js/game.js` — navegação, prática e progressão por 70%
 - `js/platform.js` — conta, XP, ranking e perfil
 
-A progressão de módulos é salva localmente por usuário. O XP continua usando o fluxo já existente do Supabase.
+
