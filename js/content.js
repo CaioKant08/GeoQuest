@@ -57,6 +57,33 @@
     "6:4": {formula:"reta tangente ⇔ d(C,r)=raio", exemplo:"Centro (2,3) e reta 4x+3y−2=0 → distância 3, então o raio tangente é 3."}
   };
 
+  const PREVIOUS_EXAMPLES = {
+    "1:1": "O ponto $A(-4,3)$ tem $x<0$ e $y>0$, portanto está no $2^\\circ$ quadrante. Já $B(2,-5)$ tem $x>0$ e $y<0$, logo está no $4^\\circ$ quadrante.",
+    "1:2": "Entre $A(-2,5)$ e $B(4,-3)$:\n$$d=\\sqrt{(4-(-2))^2+(-3-5)^2}$$\n$$d=\\sqrt{6^2+(-8)^2}=\\sqrt{100}=10$$",
+    "1:3": "Para $A(7,-1)$ e $B(-3,11)$:\n$$M=\\left(\\frac{7+(-3)}{2},\\frac{-1+11}{2}\\right)$$\n$$M=(2,5)$$",
+    "1:4": "Se $A(-3,4)$ e $B(5,4)$ têm a mesma ordenada, então:\n$$d=|5-(-3)|=8$$",
+    "2:1": "Para $A(2,3)$ e $B(6,11)$:\n$$m=\\frac{11-3}{6-2}=\\frac{8}{4}=2$$",
+    "2:2": "Partindo de $3x-2y+6=0$:\n$$-2y=-3x-6$$\n$$y=\\frac{3}{2}x+3$$",
+    "2:3": "Com $m=3$ e $P(2,-1)$:\n$$y-(-1)=3(x-2)$$\n$$y=3x-7$$",
+    "2:4": "Na reta $y=2x-6$:\n$$y=0\\Rightarrow x=3\\Rightarrow (3,0)$$\n$$x=0\\Rightarrow y=-6\\Rightarrow (0,-6)$$",
+    "3:1": "Para $r:y=x+1$ e $s:y=-2x+7$:\n$$x+1=-2x+7\\Rightarrow 3x=6\\Rightarrow x=2$$\n$$y=2+1=3$$\nLogo, $r\\cap s=(2,3)$.",
+    "3:2": "As retas $y=3x+2$ e $y=3x-4$ têm o mesmo coeficiente angular $m=3$, mas interceptos diferentes. Portanto, são paralelas distintas.",
+    "3:3": "Se $m_1=\\frac12$, a reta perpendicular deve ter:\n$$\\frac12\\cdot m_2=-1\\Rightarrow m_2=-2$$",
+    "3:4": "Multiplicando $2x-y+3=0$ por $2$, obtemos:\n$$4x-2y+6=0$$\nAs duas equações representam a mesma reta.",
+    "4:1": "Para $A(1,2)$, $B(3,6)$ e $C(5,10)$:\n$$m_{AB}=\\frac{6-2}{3-1}=2\\qquad m_{BC}=\\frac{10-6}{5-3}=2$$\nComo as inclinações são iguais, os três pontos estão alinhados.",
+    "4:2": "Se, após substituir as coordenadas, obtivermos\n$$D=0,$$\nentão os três pontos são colineares.",
+    "4:3": "Para $A(1,1)$, $B(5,1)$ e $C(3,4)$:\n$$D=1(1-4)+5(4-1)+3(1-1)=12$$\n$$A=\\frac{|12|}{2}=6$$",
+    "4:4": "Se um problema pede o valor de um parâmetro para que três pontos fiquem alinhados, podemos impor diretamente:\n$$A=0\\quad\\text{ou}\\quad D=0$$",
+    "5:1": "A menor distância de um ponto $P$ até uma reta $r$ é medida sobre a perpendicular a $r$. Um segmento oblíquo seria maior.",
+    "5:2": "Para $P(2,-1)$ e $r:3x+4y-10=0$:\n$$d=\\frac{|3(2)+4(-1)-10|}{\\sqrt{3^2+4^2}}$$\n$$d=\\frac{8}{5}$$",
+    "5:3": "Do ponto $P(7,-4)$ até a reta vertical $x=2$:\n$$d=|7-2|=5$$",
+    "5:4": "Para $r:3x+4y-2=0$ e $s:3x+4y+18=0$:\n$$d=\\frac{|-2-18|}{\\sqrt{3^2+4^2}}=\\frac{20}{5}=4$$",
+    "6:1": "Com centro $C(2,-3)$ e raio $r=5$:\n$$(x-2)^2+(y+3)^2=25$$",
+    "6:2": "Em $x^2+y^2-6x+4y-12=0$, completando quadrados:\n$$(x-3)^2+(y+2)^2=25$$\nLogo, $C=(3,-2)$ e $r=5$.",
+    "6:3": "Na circunferência de centro $C(1,2)$ e raio $4$, para $P(4,2)$:\n$$d(C,P)=3<4$$\nLogo, $P$ está no interior.",
+    "6:4": "Para centro $C(2,3)$ e reta $4x+3y-2=0$:\n$$d=\\frac{|4(2)+3(3)-2|}{\\sqrt{4^2+3^2}}=3$$\nAssim, uma circunferência de raio $3$ é tangente a essa reta."
+  };
+
   function enhanceLegacyTheory(modules){
     (modules||[]).forEach(module=>{
       const local=defaults.find(d=>Number(d.numero)===Number(module.numero));
@@ -65,7 +92,7 @@
         if(!legacy||!upgraded)return;
         if(String(t.texto||"").trim()===String(LEGACY_TEXTS[key]||"").trim()) t.texto=upgraded.texto;
         if(String(t.formula||"").trim()===String(legacy.formula||"").trim()) t.formula=upgraded.formula;
-        if(String(t.exemplo||"").trim()===String(legacy.exemplo||"").trim()) t.exemplo=upgraded.exemplo;
+        if([legacy.exemplo,PREVIOUS_EXAMPLES[key]].some(old=>String(t.exemplo||"").trim()===String(old||"").trim())) t.exemplo=upgraded.exemplo;
       });
     });
     return modules;
