@@ -131,7 +131,8 @@
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
     const grid=$("#theoryGrid"); grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><span>${t.exemplo}</span>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
     m.teoria.forEach((t,i)=>window.KantMath?.renderFormula(grid.querySelector(`[data-formula-index="${i}"]`),t.formula));
-    grid.querySelectorAll(".theory-card>p,.guided-example span").forEach(el=>window.KantMath?.renderInline(el));
+    grid.querySelectorAll(".theory-card>p").forEach(el=>window.KantMath?.renderTextWithMath(el, el.textContent));
+    grid.querySelectorAll(".guided-example span").forEach(el=>window.KantMath?.renderTextWithMath(el, el.textContent));
     $("#practiceSummary").textContent=`${m.questoes.length} questões progressivas • feedback imediato • 70% libera o próximo módulo.`;
     show("moduleStudy");
   }

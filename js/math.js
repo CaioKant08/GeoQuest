@@ -26,36 +26,65 @@
     ["reta tangente ⇔ d(C,r)=raio", String.raw`\text{reta tangente}\quad\Longleftrightarrow\quad d(C,r)=\text{raio}`]
   ]);
 
-  function formulaToLatex(value){
-    const source=String(value ?? "").trim();
+  function escapeHtml(value){
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function normalizePlainMath(value){
+    return String(value ?? "")
+      .trim()
+      .replaceAll("−", "-")
+      .replaceAll("×", String.raw`\times `)
+      .replaceAll("·", String.raw`\cdot `)
+      .replaceAll("Δ", String.raw`\Delta `)
+      .replaceAll("→", String.raw`\to `)
+      .replaceAll("⇔", String.raw`\Longleftrightarrow `)
+      .replaceAll("⇄", String.raw`\Longleftrightarrow `)
+      .replaceAll("≠", String.raw`\neq `)
+      .replaceAll("∩", String.raw`\cap `)
+      .replaceAll("₀", "_0").replaceAll("₁", "_1").replaceAll("₂", "_2").replaceAll("₃", "_3")
+      .replaceAll("²", "^2").replaceAll("³", "^3");
+  }
+
+  function wrapWithAutoBraces(latex){
+    let text = String(latex ?? "").trim();
+    if(!text) return "";
+    text = text.replace(/√\s*(\([^()]*\)|\[[^\[\]]*\]|[A-Za-z0-9_]+(?:\^[0-9]+)?)/g, (_match, inner) => {
+      const clean = inner.startsWith("(") || inner.startsWith("[") ? inner.slice(1, -1) : inner;
+      return `\\sqrt{${clean}}`;
+    });
+    text = text.replace(/\(([^()]+)\)\s*\/\s*\(([^()]+)\)/g, (_m, left, right) => `\\frac{${left}}{${right}}`);
+    text = text.replace(/\b(-?\d+(?:\.\d+)?)\s*\/\s*(-?\d+(?:\.\d+)?)\b/g, (_m, left, right) => `\\frac{${left}}{${right}}`);
+    text = text.replace(/\|([^|]+)\|/g, (_m, inner) => `\\left|${inner}\\right|`);
+    return text;
+  }
+
+  function expressionToLatex(value){
+    const source = String(value ?? "").trim();
     if(!source) return "";
     if(source.toLowerCase().startsWith("latex:")) return source.slice(6).trim();
     if(LEGACY_FORMULAS.has(source)) return LEGACY_FORMULAS.get(source);
-    // Se o conteúdo já usa comandos LaTeX, não altera.
     if(/\\[a-zA-Z]+|[_^]\{/.test(source)) return source;
-    // Conversão simples para fórmulas novas digitadas no padrão antigo.
-    return source
-      .replaceAll("−","-")
-      .replaceAll("×",String.raw`\times `)
-      .replaceAll("·",String.raw`\cdot `)
-      .replaceAll("Δ",String.raw`\Delta `)
-      .replaceAll("→",String.raw`\to `)
-      .replaceAll("⇔",String.raw`\Longleftrightarrow `)
-      .replaceAll("⇄",String.raw`\Longleftrightarrow `)
-      .replaceAll("≠",String.raw`\neq `)
-      .replaceAll("∩",String.raw`\cap `)
-      .replaceAll("₀","_0").replaceAll("₁","_1").replaceAll("₂","_2").replaceAll("₃","_3")
-      .replaceAll("²","^2").replaceAll("³","^3");
+    return wrapWithAutoBraces(normalizePlainMath(source));
   }
 
-  function renderFormula(el,value){
+  function formulaToLatex(value){
+    return expressionToLatex(value);
+  }
+
+  function renderFormula(el,value,displayMode=true){
     if(!el) return;
     const source=String(value ?? "").trim();
     if(!source){ el.textContent=""; return; }
     const latex=formulaToLatex(source);
     if(window.katex?.render){
       try{
-        window.katex.render(latex,el,{displayMode:true,throwOnError:false,strict:"ignore",trust:false,output:"htmlAndMathml"});
+        window.katex.render(latex,el,{displayMode,throwOnError:false,strict:"ignore",trust:false,output:"htmlAndMathml"});
         el.dataset.mathRendered="true";
         return;
       }catch(err){ console.warn("KANT Math: falha ao renderizar fórmula",err); }
@@ -80,5 +109,59 @@
     }catch(err){ console.warn("KANT Math: falha ao renderizar matemática inline",err); }
   }
 
-  window.KantMath={formulaToLatex,renderFormula,renderInline};
+  function textLooksLikeMath(text){
+    if(!text) return false;
+    const source = String(text).trim();
+    if(!source) return false;
+    if(/^[A-Z]\([^()]+\)$/.test(source)) return true;
+    return /[=√²³₀₁₂₃]|\b[xydmrabcABC]\b|\d\s*\/\s*\d|->|→|⇔|\([^()]*,[^()]*\)/.test(source);
+  }
+
+  function renderTextWithMath(el, value){
+    if(!el) return;
+    const source = String(value ?? "");
+    if(!source.trim()){
+      el.textContent = "";
+      return;
+    }
+    if(/[\\][\[(]|\$\$?|\\begin\{/.test(source)){
+      el.textContent = source;
+      renderInline(el);
+      return;
+    }
+
+    const placeholders = [];
+    const stash = (latex) => {
+      const id = placeholders.length;
+      placeholders.push(latex);
+      return `@@KMATH${id}@@`;
+    };
+
+    let prepared = source;
+    const explicitSegments = [
+      /\b[A-Z]\([^()]+\)/g,
+      /\((?:\s*-?[\dxyabcmrt]+\s*,\s*-?[\dxyabcmrt]+\s*)\)/gi,
+      /(?:^|(?<=[:;]\s)|(?<=\bentão\s)|(?<=\bporque\s)|(?<=\be\s)|(?<=\bem\s)|(?<=\braio\s)|(?<=\bcentro\s)|(?<=\breta\s))(?:[A-DMPXYdmrxyΔ0-9₀₁₂₃^()+\-−|√\/]+\s*=\s*[A-DMPXYdmrxyΔ0-9₀₁₂₃^()+\-−|√\/ ]+(?:\s*[=→⇔]\s*[A-DMPXYdmrxyΔ0-9₀₁₂₃^()+\-−|√\/ ]+)*)/g,
+      /(?:^|(?<=[:;]\s)|(?<=\be\s))(?:[0-9xydmrABCMPD()+\-−^]+\s*=\s*[0-9xydmrABCMPD()+\-−^]+\s*[→⇔]\s*[0-9xydmrABCMPD()+\-−^=\/ ]+)/g
+    ];
+
+    explicitSegments.forEach((regex) => {
+      prepared = prepared.replace(regex, (match) => {
+        const clean = String(match).trim();
+        if(!textLooksLikeMath(clean)) return match;
+        return stash(expressionToLatex(clean));
+      });
+    });
+
+    let html = escapeHtml(prepared).replace(/\n/g, "<br>");
+    html = html.replace(/@@KMATH(\d+)@@/g, (_m, index) => `<span class="kant-inline-math" data-kmath-index="${index}"></span>`);
+    el.innerHTML = html;
+    el.querySelectorAll(".kant-inline-math").forEach((node) => {
+      const latex = placeholders[Number(node.dataset.kmathIndex)] || "";
+      renderFormula(node, latex, false);
+    });
+    renderInline(el);
+  }
+
+  window.KantMath={formulaToLatex,renderFormula,renderInline,renderTextWithMath,expressionToLatex};
 })();
