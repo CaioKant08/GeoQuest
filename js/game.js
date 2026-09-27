@@ -122,6 +122,43 @@
     });
   }
 
+  const MODULE_VIDEO_GUIDES = {
+    1:[
+      {title:"Distância entre 2 pontos",channel:"Equaciona com Paulo Pereira",id:"ZJ5Aqwcx9f4"},
+      {title:"Distância entre dois pontos | Plano Cartesiano | Geometria Analítica",channel:"Gis com Giz",id:"C2vQ9pMkvpU"}
+    ],
+    2:[
+      {title:"Equação reduzida da reta (com exemplos)",channel:"Equaciona com Paulo Pereira",id:"N4QfzVvgH4Y"},
+      {title:"Equação geral da reta",channel:"Equaciona com Paulo Pereira",id:"pRNnguDcR6Y"}
+    ],
+    3:[
+      {title:"Posição relativa de retas — Paralelismo e Perpendicularismo",channel:"Equaciona com Paulo Pereira",id:"toO6S_gbKC4"},
+      {title:"Interseção de duas retas no plano",channel:"Prof. Cláudio Teodista",id:"edppmt9dYmA"}
+    ],
+    4:[
+      {title:"G.A. Alinhamentos de Pontos (c/ macete)",channel:"Equaciona com Paulo Pereira",id:"vMK8ehuAZk8"},
+      {title:"Área de triângulo a partir do cálculo de um determinante",channel:"Prof. Alexandre Soares",id:"Xl-q-o1tiDE"}
+    ],
+    5:[
+      {title:"Distância entre ponto e reta (com exemplos)",channel:"Equaciona com Paulo Pereira",id:"FSfwY1fM4EI"},
+      {title:"Distância entre ponto e reta e entre paralelas",channel:"Pense Matemática com Professor Orestes",id:"2Xgi_O3D9-k"}
+    ],
+    6:[
+      {title:"Equação reduzida da circunferência",channel:"Equaciona com Paulo Pereira",id:"p93CirSoL8A"},
+      {title:"Equação geral da circunferência | Geometria Analítica",channel:"Dicasdemat Sandro Curió",id:"ItWiSvXxsww"}
+    ]
+  };
+
+  function videoGuidePage(module){
+    const videos=MODULE_VIDEO_GUIDES[Number(module.numero)]||[];
+    return `<article class="theory-card theory-page theory-video-page" data-theory-index="${module.teoria.length}" aria-hidden="true">
+      <div class="theory-page-top"><div class="theory-index">05</div><span class="theory-page-count">Etapa 5 de 5</span></div>
+      <div class="video-page-heading"><span class="video-page-kicker">Aprofunde com vídeo</span><h4>Veja o conteúdo por outra abordagem</h4><p>A teoria do KANT continua sendo sua base. Se quiser revisar por uma explicação em vídeo, selecione uma das aulas abaixo. O link abre diretamente no YouTube.</p></div>
+      <div class="study-video-grid">${videos.map(v=>`<a class="study-video-card" href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener noreferrer" aria-label="Abrir ${v.title} no YouTube"><div class="study-video-thumb"><img src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="Miniatura do vídeo ${v.title}" loading="lazy"><span class="study-video-play" aria-hidden="true">▶</span></div><div class="study-video-copy"><small>${v.channel}</small><h5>${v.title}</h5><span>Abrir no YouTube ↗</span></div></a>`).join("")}</div>
+      <div class="video-page-note"><b>Dica de estudo</b><p>Use a videoaula para reforçar um ponto que ainda não ficou claro. Depois, volte ao KANT e faça a prática sem consultar a resolução.</p></div>
+    </article>`;
+  }
+
   function openStudy(moduleId){
     const m=moduleById(moduleId); if(!m)return; const index=modules.findIndex(x=>x.id===moduleId); if(!isUnlocked(index))return;
     studyModuleId=moduleId;
@@ -131,7 +168,7 @@
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
     const grid=$("#theoryGrid");
     grid.classList.add("theory-paged-grid");
-    grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card theory-page" data-theory-index="${i}" aria-hidden="true"><div class="theory-page-top"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><span class="theory-page-count">Etapa ${i+1} de ${m.teoria.length}</span></div><h4>${t.titulo}</h4><p class="theory-explanation">${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
+    grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card theory-page" data-theory-index="${i}" aria-hidden="true"><div class="theory-page-top"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><span class="theory-page-count">Etapa ${i+1} de 5</span></div><h4>${t.titulo}</h4><p class="theory-explanation">${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("")+videoGuidePage(m);
     m.teoria.forEach((t,i)=>{
       window.KantMath?.renderFormula(grid.querySelector(`[data-formula-index="${i}"]`),t.formula);
       const exampleEl=grid.querySelector(`[data-example-index="${i}"]`);
@@ -147,14 +184,15 @@
     if(!pager){
       pager=document.createElement("nav");pager.id="theoryPager";pager.className="theory-pager";pager.setAttribute("aria-label","Navegação da teoria");grid.insertAdjacentElement("afterend",pager);
     }
-    const total=m.teoria.length;
+    const total=m.teoria.length+1;
     let current=0;
     const renderTheoryPage=(nextIndex,scroll=false)=>{
       current=Math.max(0,Math.min(total-1,nextIndex));
       const cards=[...grid.querySelectorAll(".theory-page")];
       cards.forEach((card,i)=>{const active=i===current;card.classList.toggle("active",active);card.hidden=!active;card.setAttribute("aria-hidden",String(!active));});
-      const currentTheory=m.teoria[current];
-      pager.innerHTML=`<button class="theory-nav-btn theory-prev" type="button" ${current===0?"disabled":""}>← Anterior</button><div class="theory-pager-center"><span>${current+1} de ${total}</span><div class="theory-dots">${m.teoria.map((_,i)=>`<button type="button" class="theory-dot ${i===current?"active":""}" data-theory-page="${i}" aria-label="Abrir etapa ${i+1}" aria-current="${i===current?"step":"false"}"></button>`).join("")}</div></div><button class="theory-nav-btn theory-next" type="button">${current===total-1?"Ir para a prática →":`Próximo: ${m.teoria[current+1]?.titulo||"etapa"} →`}</button>`;
+      const currentTheory=current<m.teoria.length?m.teoria[current]:{titulo:"Videoaulas selecionadas"};
+      const pageTitles=[...m.teoria.map(t=>t.titulo),"Videoaulas selecionadas"];
+      pager.innerHTML=`<button class="theory-nav-btn theory-prev" type="button" ${current===0?"disabled":""}>← Anterior</button><div class="theory-pager-center"><span>${current+1} de ${total}</span><div class="theory-dots">${pageTitles.map((_,i)=>`<button type="button" class="theory-dot ${i===current?"active":""}" data-theory-page="${i}" aria-label="Abrir etapa ${i+1}" aria-current="${i===current?"step":"false"}"></button>`).join("")}</div></div><button class="theory-nav-btn theory-next" type="button">${current===total-1?"Ir para a prática →":`Próximo: ${pageTitles[current+1]||"etapa"} →`}</button>`;
       pager.querySelector(".theory-prev")?.addEventListener("click",()=>renderTheoryPage(current-1,true));
       pager.querySelector(".theory-next")?.addEventListener("click",()=>{
         if(current<total-1)renderTheoryPage(current+1,true);
