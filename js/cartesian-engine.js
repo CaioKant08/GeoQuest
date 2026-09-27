@@ -16,7 +16,7 @@
   function makePlane(container,points=[],options={}){
     if(!container)return null;
     container.innerHTML="";
-    const width=680,height=390,margin={l:48,r:30,t:28,b:42};
+    const width=900,height=620,margin={l:64,r:46,t:34,b:58};
     let [xMin,xMax]=options.xRange||niceRange(points.map(p=>p.x),2);
     let [yMin,yMax]=options.yRange||niceRange(points.map(p=>p.y),2);
     if(xMax===xMin)xMax=xMin+1;if(yMax===yMin)yMax=yMin+1;
@@ -31,23 +31,24 @@
     const defs=el("defs"),arrowId=`arrow-${Math.random().toString(36).slice(2)}`;
     const marker=el("marker",{id:arrowId,markerWidth:8,markerHeight:8,refX:6,refY:3,orient:"auto",markerUnits:"strokeWidth"});
     marker.appendChild(el("path",{d:"M0,0 L0,6 L7,3 z",class:"kant-axis-arrow"}));defs.appendChild(marker);svg.appendChild(defs);
-    const xStep=(xMax-xMin)>16?2:1,yStep=(yMax-yMin)>14?2:1;
+    const chooseStep=span=>span>22?3:span>16?2:1;
+    const xStep=chooseStep(xMax-xMin),yStep=chooseStep(yMax-yMin);
     for(let x=Math.ceil(xMin);x<=Math.floor(xMax);x++)svg.appendChild(el("line",{x1:sx(x),y1:oy,x2:sx(x),y2:oy+usedH,class:x===0?"kant-grid-zero":"kant-grid-line"}));
     for(let y=Math.ceil(yMin);y<=Math.floor(yMax);y++)svg.appendChild(el("line",{x1:ox,y1:sy(y),x2:ox+usedW,y2:sy(y),class:y===0?"kant-grid-zero":"kant-grid-line"}));
     const x0=clamp(sx(0),ox,ox+usedW),y0=clamp(sy(0),oy,oy+usedH);
     svg.appendChild(el("line",{x1:ox,y1:y0,x2:ox+usedW+2,y2:y0,class:"kant-axis",'marker-end':`url(#${arrowId})`}));
     svg.appendChild(el("line",{x1:x0,y1:oy+usedH,x2:x0,y2:oy-2,class:"kant-axis",'marker-end':`url(#${arrowId})`}));
-    for(let x=Math.ceil(xMin);x<=Math.floor(xMax);x+=xStep){if(x===0)continue;svg.appendChild(el("text",{x:sx(x),y:Math.min(oy+usedH+19,y0+19),class:"kant-tick",'text-anchor':"middle"},String(x)));}
-    for(let y=Math.ceil(yMin);y<=Math.floor(yMax);y+=yStep){if(y===0)continue;svg.appendChild(el("text",{x:Math.max(ox-9,x0-9),y:sy(y)+4,class:"kant-tick",'text-anchor':"end"},String(y)));}
-    svg.appendChild(el("text",{x:ox+usedW-2,y:y0-10,class:"kant-axis-label",'text-anchor':"end"},"x"));
-    svg.appendChild(el("text",{x:x0+11,y:oy+6,class:"kant-axis-label"},"y"));
+    for(let x=Math.ceil(xMin);x<=Math.floor(xMax);x+=xStep){if(x===0)continue;svg.appendChild(el("text",{x:sx(x),y:Math.min(oy+usedH+24,y0+24),class:"kant-tick",'text-anchor':"middle"},String(x)));}
+    for(let y=Math.ceil(yMin);y<=Math.floor(yMax);y+=yStep){if(y===0)continue;svg.appendChild(el("text",{x:Math.max(ox-12,x0-12),y:sy(y)+5,class:"kant-tick",'text-anchor':"end"},String(y)));}
+    svg.appendChild(el("text",{x:ox+usedW-4,y:y0-14,class:"kant-axis-label",'text-anchor':"end"},"x"));
+    svg.appendChild(el("text",{x:x0+14,y:oy+8,class:"kant-axis-label"},"y"));
     container.appendChild(svg);
     return {svg,sx,sy,width,height,margin,xMin,xMax,yMin,yMax,unit,ox,oy,usedW,usedH};
   }
   function pointLabel(svg,plane,p,opts={}){
     const x=plane.sx(p.x),y=plane.sy(p.y);
-    svg.appendChild(el("circle",{cx:x,cy:y,r:opts.r||6.5,class:opts.special?"kant-point kant-midpoint":"kant-point"}));
-    const dx=opts.dx??(p.x>=0?10:-10),dy=opts.dy??-12,label=opts.text||`${p.label||"P"}(${p.x}, ${p.y})`;
+    svg.appendChild(el("circle",{cx:x,cy:y,r:opts.r||8,class:opts.special?"kant-point kant-midpoint":"kant-point"}));
+    const dx=opts.dx??(p.x>=0?12:-12),dy=opts.dy??-16,label=opts.text||`${p.label||"P"}(${p.x}, ${p.y})`;
     svg.appendChild(el("text",{x:x+dx,y:y+dy,class:"kant-point-label",'text-anchor':dx<0?"end":"start"},label));
   }
   function lineEnds(plane,m,b){
@@ -76,14 +77,14 @@
   function renderDistance(container,opts={}){
     const A=opts.A||{x:-2,y:5,label:"A"},B=opts.B||{x:4,y:-3,label:"B"};const p=makePlane(container,[A,B],opts);if(!p)return;
     drawSegment(p,A,B);p.svg.appendChild(el("line",{x1:p.sx(A.x),y1:p.sy(A.y),x2:p.sx(B.x),y2:p.sy(A.y),class:"kant-guide"}));p.svg.appendChild(el("line",{x1:p.sx(B.x),y1:p.sy(A.y),x2:p.sx(B.x),y2:p.sy(B.y),class:"kant-guide"}));
-    const mx=(p.sx(A.x)+p.sx(B.x))/2,my=(p.sy(A.y)+p.sy(B.y))/2;const g=el("g",{class:"kant-segment-label"});g.appendChild(el("rect",{x:mx-21,y:my-17,width:42,height:26,rx:13,class:"kant-label-bg"}));g.appendChild(el("text",{x:mx,y:my+2,'text-anchor':"middle",class:"kant-distance-label"},opts.distanceLabel||"d?"));p.svg.appendChild(g);
-    pointLabel(p.svg,p,A,{dx:-10,dy:-13});pointLabel(p.svg,p,B,{dx:10,dy:20});
-    p.svg.appendChild(el("text",{x:(p.sx(A.x)+p.sx(B.x))/2,y:p.sy(A.y)-9,class:"kant-delta-label",'text-anchor':"middle"},`Δx = ${Math.abs(B.x-A.x)}`));
-    p.svg.appendChild(el("text",{x:p.sx(B.x)+12,y:(p.sy(A.y)+p.sy(B.y))/2,class:"kant-delta-label"},`Δy = ${Math.abs(B.y-A.y)}`));
+    const mx=(p.sx(A.x)+p.sx(B.x))/2,my=(p.sy(A.y)+p.sy(B.y))/2;const g=el("g",{class:"kant-segment-label"});g.appendChild(el("rect",{x:mx-28,y:my-22,width:56,height:34,rx:17,class:"kant-label-bg"}));g.appendChild(el("text",{x:mx,y:my+4,'text-anchor':"middle",class:"kant-distance-label"},opts.distanceLabel||"d?"));p.svg.appendChild(g);
+    pointLabel(p.svg,p,A,{dx:-14,dy:-16});pointLabel(p.svg,p,B,{dx:14,dy:26});
+    p.svg.appendChild(el("text",{x:(p.sx(A.x)+p.sx(B.x))/2,y:p.sy(A.y)-14,class:"kant-delta-label",'text-anchor':"middle"},`Δx = ${Math.abs(B.x-A.x)}`));
+    p.svg.appendChild(el("text",{x:p.sx(B.x)+16,y:(p.sy(A.y)+p.sy(B.y))/2,class:"kant-delta-label"},`Δy = ${Math.abs(B.y-A.y)}`));
   }
   function renderMidpoint(container,opts={}){
     const A=opts.A||{x:7,y:-1,label:"A"},B=opts.B||{x:-3,y:11,label:"B"},M={x:(A.x+B.x)/2,y:(A.y+B.y)/2,label:"M"};const p=makePlane(container,[A,B,M],opts);if(!p)return;drawSegment(p,A,B);
-    pointLabel(p.svg,p,A,{dx:10,dy:21});pointLabel(p.svg,p,B,{dx:-10,dy:-13});pointLabel(p.svg,p,M,{special:true,dx:12,dy:-13});
+    pointLabel(p.svg,p,A,{dx:14,dy:28});pointLabel(p.svg,p,B,{dx:-14,dy:-16});pointLabel(p.svg,p,M,{special:true,dx:14,dy:-16});
   }
   function renderLines(container,opts={}){
     const pts=opts.points||[];const p=makePlane(container,pts,opts);if(!p)return;(opts.lines||[]).forEach(draw=>drawLine(p,draw));(opts.segments||[]).forEach(([a,b])=>drawSegment(p,pts[a],pts[b],"kant-perpendicular"));pts.forEach((pt,i)=>pointLabel(p.svg,p,pt,opts.pointOptions?.[i]||{}));
@@ -98,12 +99,12 @@
     let H=opts.H;
     if(!H){const m=opts.m??-.75,b=opts.b??2.5;const hp=(P.x+m*(P.y-b))/(1+m*m);H={x:hp,y:m*hp+b,label:"H"};}
     drawSegment(p,P,H,"kant-perpendicular");pointLabel(p.svg,p,P,{dx:10,dy:-13});pointLabel(p.svg,p,H,{special:true,dx:10,dy:20});
-    const mx=(p.sx(P.x)+p.sx(H.x))/2,my=(p.sy(P.y)+p.sy(H.y))/2;p.svg.appendChild(el("text",{x:mx+8,y:my-8,class:"kant-distance-label"},opts.distanceLabel||"d"));
+    const mx=(p.sx(P.x)+p.sx(H.x))/2,my=(p.sy(P.y)+p.sy(H.y))/2;p.svg.appendChild(el("text",{x:mx+10,y:my-12,class:"kant-distance-label"},opts.distanceLabel||"d"));
   }
   function renderCircle(container,opts={}){
     const C=opts.C||{x:2,y:-3,label:"C"},r=opts.r||5,points=[C,...(opts.points||[])];const p=makePlane(container,points,{...opts,xRange:opts.xRange||[C.x-r-2,C.x+r+2],yRange:opts.yRange||[C.y-r-2,C.y+r+2]});if(!p)return;
     p.svg.appendChild(el("circle",{cx:p.sx(C.x),cy:p.sy(C.y),r:r*p.unit,class:"kant-circle"}));
-    drawSegment(p,C,{x:C.x+r,y:C.y},"kant-radius");p.svg.appendChild(el("text",{x:p.sx(C.x+r/2),y:p.sy(C.y)-10,class:"kant-distance-label",'text-anchor':"middle"},`r = ${r}`));pointLabel(p.svg,p,C,{special:true,dx:10,dy:-13});
+    drawSegment(p,C,{x:C.x+r,y:C.y},"kant-radius");p.svg.appendChild(el("text",{x:p.sx(C.x+r/2),y:p.sy(C.y)-14,class:"kant-distance-label",'text-anchor':"middle"},`r = ${r}`));pointLabel(p.svg,p,C,{special:true,dx:10,dy:-13});
     (opts.points||[]).forEach((pt,i)=>pointLabel(p.svg,p,pt,opts.pointOptions?.[i]||{}));
     if(opts.tangent)drawLine(p,opts.tangent);
   }
