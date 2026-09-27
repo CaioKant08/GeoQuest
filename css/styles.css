@@ -4031,3 +4031,52 @@ body.dark .module-card.blue .module-btn{background:linear-gradient(100deg,#2e75b
 body.dark .module-card.purple .module-btn{background:linear-gradient(100deg,#7851b8,#5c3a91)!important}
 body.dark .module-card.orange .module-btn{background:linear-gradient(100deg,#c8752d,#9d5119)!important}
 @media(max-width:760px){body.dark .module-symbol-glow{opacity:.24!important;filter:blur(18px)!important}}
+
+
+/* =========================================================
+   KANT v3.8 — ícones limpos + identidade de cor em bloqueados
+   ========================================================= */
+/* Os símbolos agora não têm barras/linhas decorativas extras. */
+.module-path-lines{display:none!important}
+
+/* Mantém amarelo e vermelho/rosa mesmo com botão bloqueado. */
+.module-card.yellow .module-btn,
+.module-card.locked.yellow .module-btn,
+.module-card.yellow .module-open-btn:disabled{
+  background:linear-gradient(100deg,#f2b516,#d89508)!important;
+  color:#34280b!important;
+  box-shadow:0 16px 30px rgba(219,160,15,.18)!important;
+  opacity:.72!important;
+}
+.module-card.red .module-btn,
+.module-card.locked.red .module-btn,
+.module-card.red .module-open-btn:disabled{
+  background:linear-gradient(100deg,#e94f61,#bc3446)!important;
+  color:#fff!important;
+  box-shadow:0 16px 30px rgba(195,53,72,.18)!important;
+  opacity:.72!important;
+}
+.module-card.locked.yellow .module-num{
+  background:linear-gradient(180deg,#f6c44a,#d8a019)!important;
+  color:#3b2b08!important;
+}
+.module-card.locked.red .module-num{
+  background:linear-gradient(180deg,#ec7180,#c34b5b)!important;
+  color:#fff!important;
+}
+/* Bloqueado continua reconhecível sem apagar a identidade da cor. */
+.module-card.locked.yellow,
+.module-card.locked.red{filter:saturate(.86)!important}
+
+body.dark .module-card.yellow .module-btn,
+body.dark .module-card.locked.yellow .module-btn,
+body.dark .module-card.yellow .module-open-btn:disabled{
+  background:linear-gradient(100deg,#c99212,#9b6c08)!important;
+  color:#fff3c3!important;
+}
+body.dark .module-card.red .module-btn,
+body.dark .module-card.locked.red .module-btn,
+body.dark .module-card.red .module-open-btn:disabled{
+  background:linear-gradient(100deg,#bd4251,#8e2d39)!important;
+  color:#ffe9ec!important;
+}
