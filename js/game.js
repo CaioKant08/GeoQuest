@@ -12,12 +12,12 @@
   function moduleIconSvg(numero){
     const common='viewBox="0 0 64 64" aria-hidden="true"';
     const map={
-      1:`<svg ${common}><circle cx="32" cy="32" r="8" fill="none" stroke="currentColor" stroke-width="4"/><path d="M32 10v14M32 40v14M10 32h14M40 32h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="2.5" fill="currentColor"/></svg>`,
-      2:`<svg ${common}><path d="M14 46L46 14" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><path d="M31 14h15v15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-      3:`<svg ${common}><path d="M21 12v40M43 12v40" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></svg>`,
-      4:`<svg ${common}><path d="M32 10L53 49H11L32 10Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
-      5:`<svg ${common}><circle cx="18" cy="18" r="5" fill="currentColor"/><path d="M14 49L50 17" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M23 27l8 8" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="3 5" opacity=".72"/></svg>`,
-      6:`<svg ${common}><circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="32" cy="32" r="4" fill="currentColor"/><path d="M32 32l14-10" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`
+      1:`<svg ><circle cx="32" cy="32" r="8" fill="none" stroke="currentColor" stroke-width="4"/><path d="M32 10v14M32 40v14M10 32h14M40 32h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="2.5" fill="currentColor"/></svg>`,
+      2:`<svg ><path d="M14 46L46 14" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><path d="M31 14h15v15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 51h38" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".35"/></svg>`,
+      3:`<svg ><path d="M20 12v40M44 12v40" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><path d="M12 22h8M44 42h8" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".45"/></svg>`,
+      4:`<svg ><path d="M32 10L53 49H11L32 10Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M18 43l28-20" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".35"/></svg>`,
+      5:`<svg ><path d="M13 48L49 16" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><circle cx="18" cy="17" r="5" fill="currentColor"/><path d="M18 17l13 14" stroke="currentColor" stroke-width="4" stroke-dasharray="5 5"/><path d="M27 35l5-5 5 5" fill="none" stroke="currentColor" stroke-width="3"/></svg>`,
+      6:`<svg ><circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="32" cy="32" r="4" fill="currentColor"/><path d="M32 32l14-10" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`
     };return map[Number(numero)]||map[1];
   }
 

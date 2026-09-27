@@ -4080,3 +4080,65 @@ body.dark .module-card.red .module-open-btn:disabled{
   background:linear-gradient(100deg,#bd4251,#8e2d39)!important;
   color:#ffe9ec!important;
 }
+
+/* =========================================================
+   KANT v3.8.1 — restaura ícones antigos + halo escuro sem faixa
+   ========================================================= */
+/* Restaurar o botão amarelo com texto branco, como antes */
+.module-card.yellow .module-btn,
+.module-card.locked.yellow .module-btn,
+.module-card.yellow .module-open-btn:disabled,
+body.dark .module-card.yellow .module-btn,
+body.dark .module-card.locked.yellow .module-btn,
+body.dark .module-card.yellow .module-open-btn:disabled{
+  color:#fff !important;
+}
+
+/* Halo do modo escuro: circular e concentrado atrás do ícone, sem faixa/linha horizontal */
+body.dark .module-symbol-shell{
+  overflow:visible !important;
+}
+body.dark .module-symbol-glow{
+  display:block !important;
+  inset:auto !important;
+  left:50% !important;
+  top:50% !important;
+  width:138px !important;
+  height:138px !important;
+  transform:translate(-50%,-50%) !important;
+  border-radius:50% !important;
+  filter:blur(26px) !important;
+  opacity:.28 !important;
+  z-index:-2 !important;
+}
+@media(max-width:760px){
+  body.dark .module-symbol-glow{
+    width:118px !important;
+    height:118px !important;
+    filter:blur(22px) !important;
+    opacity:.24 !important;
+  }
+}
+
+/* Mantém um brilho discreto sem criar corte visual acima do quadrado */
+body.dark .module-symbol-shell::before{
+  box-shadow:0 16px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.03) !important;
+}
+
+/* Reafirma as cores dos módulos 2 e 5, inclusive bloqueados */
+.module-card.yellow .module-num,
+.module-card.locked.yellow .module-num{background:linear-gradient(180deg,#ffbf1f,#e6a100) !important;color:#fff !important;}
+.module-card.red .module-num,
+.module-card.locked.red .module-num{background:linear-gradient(180deg,#ff4e5a,#d92f39) !important;color:#fff !important;}
+.module-card.yellow .module-btn,
+.module-card.locked.yellow .module-btn{background:linear-gradient(90deg,#ffc423,#efaa12) !important;}
+.module-card.red .module-btn,
+.module-card.locked.red .module-btn{background:linear-gradient(90deg,#ff4b61,#d93047) !important;}
+body.dark .module-card.yellow .module-num,
+body.dark .module-card.locked.yellow .module-num{background:linear-gradient(180deg,#e5ae1d,#b9810d) !important;color:#fff !important;}
+body.dark .module-card.red .module-num,
+body.dark .module-card.locked.red .module-num{background:linear-gradient(180deg,#d85566,#a73244) !important;color:#fff !important;}
+body.dark .module-card.yellow .module-btn,
+body.dark .module-card.locked.yellow .module-btn{background:linear-gradient(90deg,#c99212,#9b6c08) !important;}
+body.dark .module-card.red .module-btn,
+body.dark .module-card.locked.red .module-btn{background:linear-gradient(90deg,#bd4251,#8e2d39) !important;}
