@@ -4707,3 +4707,19 @@ body.dark .completed-review-choice{background:linear-gradient(135deg,#12231b,#14
 .guided-example .guided-example-content .katex-display>.katex,.theory-formula .katex-display>.katex{overflow:visible!important;line-height:1.4!important;display:inline-block!important;padding:.12em 0 .18em!important}
 .guided-example .katex-html,.theory-formula .katex-html{overflow:visible!important;padding-top:.08em;padding-bottom:.08em}
 @media(max-width:760px){.completed-review-choice{width:100%;margin:12px 0 16px;flex-direction:column;align-items:stretch}.review-choice-actions,.practice-actions{width:100%;display:grid;grid-template-columns:1fr}.review-choice-actions .btn,.practice-actions .btn{width:100%}}
+
+
+/* KANT v3.9.8 — resolução pedagógica, nova tentativa e resposta sob demanda */
+.answer-reveal-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 4px;padding:12px 14px;border:1px solid #dce5ef;border-radius:16px;background:#f8fafc}
+.answer-reveal-actions[hidden]{display:none!important}
+.show-answer-btn{min-height:42px!important}
+.answer-reveal-note{font-size:.82rem;color:#74839a;line-height:1.45}
+.retry-note{display:inline-block;margin-top:6px;color:#65748b;font-weight:650;line-height:1.55}
+.answer-shown{display:inline-block;padding:10px 12px;border-radius:12px;background:#fff7e6;border:1px solid #f0d8a6;color:#76561d}
+.detailed-resolution{margin-top:16px;padding:18px 20px;border:1px solid #dfe8f1;border-radius:18px;background:#f8fbfd;color:#263445;font-size:1rem;line-height:1.72;white-space:pre-line;text-align:left}
+.detailed-resolution::first-line{font-weight:900;color:#12223a}
+body.dark .answer-reveal-actions{background:#121d2d;border-color:#30425a}
+body.dark .answer-reveal-note,body.dark .retry-note{color:#b7c4d7}
+body.dark .answer-shown{background:#302817;border-color:#665a32;color:#f3dda0}
+body.dark .detailed-resolution{background:#101a29;border-color:#2b4058;color:#e7eef8}
+@media(max-width:640px){.answer-reveal-actions{align-items:stretch}.show-answer-btn{width:100%}.detailed-resolution{padding:16px 14px;font-size:.96rem}}

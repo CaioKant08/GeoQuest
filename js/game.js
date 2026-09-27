@@ -4,22 +4,23 @@
   const $ = (s) => document.querySelector(s);
   const screens = ["home","moduleStudy","challenges","profile","admin","game","results"].reduce((o,id)=>(o[id]=$("#"+id),o),{});
 
-  let mode="quick", questions=[], idx=0, lives=3, xp=0, streak=0, bestStreak=0, score=0, answered=false, lightning=false;
+  let mode="quick", questions=[], idx=0, lives=3, xp=0, streak=0, bestStreak=0, score=0, answered=false, lightning=false, hintUsed=false;
   let timerId=null, endAt=0, runDeadline=0, runDuration=0, lastMode="quick";
   let currentModuleId=null, lastModuleId=null, studyModuleId=null;
 
   const moduleById=(id)=>modules.find(m=>m.id===id);
   const difficultyLabel=(value)=>({facil:"Fácil",media:"Média",desafio:"Desafio"}[String(value||"").toLowerCase()]||value||"Progressiva");
   const allModulesCompleted=()=>modules.length>0&&modules.every(m=>moduleResult(m.id).completed);
+  const challengeAccess=()=>window.kantIsAdmin===true||allModulesCompleted();
   const moduleQuestionPool=(m)=>[...(m?.questoes||[]),...((window.KANT_EXTRA_QUESTIONS||{})[Number(m?.numero)]||[])];
   function challengeQuestionPool(){return modules.flatMap(m=>moduleQuestionPool(m).map(q=>normalizeModuleQuestion(q,m)));}
   function renderChallenges(){
-    const unlocked=allModulesCompleted();
+    const unlocked=challengeAccess();
     [["quickChallengeBtn","quickChallengeStatus","quickUnlockNote"],["lightningChallengeBtn","lightningChallengeStatus","lightningUnlockNote"]].forEach(([btnId,statusId,noteId])=>{
       const btn=document.getElementById(btnId),status=document.getElementById(statusId),note=document.getElementById(noteId);
       if(btn)btn.disabled=!unlocked;
       if(status){status.textContent=unlocked?"Desbloqueado":"Bloqueado";status.classList.toggle("is-ready",unlocked);}
-      if(note)note.textContent=unlocked?"✓ Todos os módulos concluídos. Desafio liberado.":"🔒 Conclua os 6 módulos para desbloquear.";
+      if(note)note.textContent=unlocked?(window.kantIsAdmin===true&&!allModulesCompleted()?"🛡 Acesso ADM liberado para teste.":"✓ Todos os módulos concluídos. Desafio liberado."):"🔒 Conclua os 6 módulos para desbloquear.";
     });
   }
   function moduleIconSvg(numero){
@@ -423,7 +424,7 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     show("moduleStudy");
   }
 
-  function normalizeModuleQuestion(q,m){return {id:q.id,topic:m.titulo,visual:`Módulo ${m.numero} • ${m.subtitulo}`,q:q.enunciado,opts:[...q.alternativas],a:q.correta,exp:q.explicacao,hint:q.dica||"",imageUrl:q.image_url||"",explanationImageUrl:q.explanation_image_url||"",difficulty:q.dificuldade,xpValue:Number(q.xp)||30,moduleQuestion:true,moduleId:m.id};}
+  function normalizeModuleQuestion(q,m){return {id:q.id,topic:m.titulo,visual:`Módulo ${m.numero} • ${m.subtitulo}`,q:q.enunciado,opts:[...q.alternativas],a:q.correta,exp:q.explicacao,hint:q.dica||"",imageUrl:q.image_url||"",explanationImageUrl:q.explanation_image_url||"",difficulty:q.dificuldade,xpValue:Number(q.xp)||30,moduleQuestion:true,moduleId:m.id,moduleNumber:Number(m.numero)||0};}
   function startModule(moduleId,forceFresh=false,extra=false){
     const m=moduleById(moduleId); if(!m)return;
     lastMode=extra?"module-extra":"module";mode=lastMode;currentModuleId=moduleId;lastModuleId=moduleId;
@@ -444,7 +445,7 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     return shuffle(pool).slice(0,24);
   }
   function start(m,forceFresh=false){
-    if((m==="quick"||m==="lightning")&&!allModulesCompleted()){renderChallenges();return;}
+    if((m==="quick"||m==="lightning")&&!challengeAccess()){renderChallenges();return;}
     lastMode=m;mode=m;currentModuleId=null;questions=buildSet(m);idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=(m==="lightning");runDeadline=0;runDuration=0;
     if(lightning){runDuration=120000;runDeadline=performance.now()+runDuration;}
     $("#modeLabel").textContent=m==="campaign"?"Revisão integrada":m==="quick"?"Batalha Rápida":"Desafio Relâmpago";
@@ -453,15 +454,15 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
   }
 
   function updateStats(){$("#lives").textContent=lives+" ❤️";$("#xp").textContent=xp;const mult=(1+streak*.1).toFixed(1).replace(".0","");$("#streak").textContent=`${streak} 🔥 • ${mult}×`;$("#score").textContent=score;const pct=Math.round((idx/questions.length)*100);$("#progressText").textContent=pct+"%";$("#progressBar").style.width=pct+"%";}
-  function resetHint(q){const area=$("#hintArea"),btn=$("#hintBtn"),box=$("#hintBox");if(!area||!btn||!box)return;box.hidden=true;box.textContent="";btn.style.display=q.hint?"inline-flex":"none";btn.disabled=false;btn.textContent="💡 Ver dica";area.style.display=q.hint?"block":"none";}
+  function resetHint(q){const area=$("#hintArea"),btn=$("#hintBtn"),box=$("#hintBox");if(!area||!btn||!box)return;box.hidden=true;box.textContent="";btn.style.display=q.hint?"inline-flex":"none";btn.disabled=false;btn.textContent="💡 Ver dica • −50% XP";area.style.display=q.hint?"block":"none";}
   function render(){
     clearTimer();
     if(idx>=questions.length){finish();return;}
-    answered=false;const q=questions[idx];
+    answered=false;hintUsed=false;const q=questions[idx];
     $("#topic").textContent=q.topic;
     $("#counter").textContent=`Questão ${idx+1} de ${questions.length}`;
     $("#levelLabel").textContent=(mode==="module"||mode==="module-extra")?`${mode==="module-extra"?"Treino extra":"Prática"} • ${difficultyLabel(q.difficulty)}`:`${difficultyLabel(q.difficulty)} • ${Number(q.xpValue)||30} XP base`;
-    $("#visual").textContent=q.visual||"";$("#question").textContent=q.q;$("#feedback").innerHTML="";$("#nextBtn").style.display="none";$("#nextBtn").textContent="Próxima questão →";$("#options").innerHTML="";
+    $("#visual").textContent=q.visual||"";$("#question").textContent=q.q;$("#feedback").innerHTML="";$("#nextBtn").style.display="none";$("#nextBtn").textContent="Próxima questão →";$("#options").innerHTML="";const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
     const media=$("#questionMedia"),expMedia=$("#explanationMedia");if(media){media.innerHTML="";media.hidden=!q.imageUrl;if(q.imageUrl){const img=document.createElement("img");img.src=q.imageUrl;img.alt="Imagem da questão";media.appendChild(img);}}if(expMedia){expMedia.innerHTML="";expMedia.hidden=true;}
     window.KantMath?.renderInline($("#question"));resetHint(q);
     q.opts.forEach((opt,i)=>{const b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+i)+") "+opt;b.addEventListener("click",()=>answer(i,b));$("#options").appendChild(b);window.KantMath?.renderInline(b);});
@@ -471,31 +472,118 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     const base=Number(q.xpValue)||30;
     const streakMultiplier=1+streak*.1;
     const modeMultiplier=mode==="lightning"?1.5:1;
-    return {base,streakMultiplier,modeMultiplier,gain:Math.round(base*streakMultiplier*modeMultiplier)};
+    const hintMultiplier=hintUsed?.5:1;
+    return {base,streakMultiplier,modeMultiplier,hintMultiplier,gain:Math.round(base*streakMultiplier*modeMultiplier*hintMultiplier)};
+  }
+  function plainMathText(value){
+    return String(value||"")
+      .replace(/\\left|\\right/g,"")
+      .replace(/\\cdot/g,"·")
+      .replace(/\\times/g,"×")
+      .replace(/\\Delta/g,"Δ")
+      .replace(/\\sqrt/g,"√")
+      .replace(/\\frac/g,"fração ")
+      .replace(/\$/g,"")
+      .replace(/[{}]/g,"")
+      .replace(/\\/g,"")
+      .replace(/\s+/g," ")
+      .trim();
+  }
+  function resolutionRule(q){
+    const text=(q.q+" "+q.exp+" "+q.hint).toLowerCase();
+    if(/quadrante/.test(text))return "Observe primeiro os sinais das coordenadas: x indica esquerda/direita e y indica baixo/cima. Depois associe essa combinação ao quadrante correto.";
+    if(/ponto médio|ponto medio/.test(text))return "Use M = ((x1 + x2)/2, (y1 + y2)/2). Faça separadamente a média das abscissas e a média das ordenadas.";
+    if(/distância|distancia/.test(text)&&/reta/.test(text)&&!/entre.*ponto/.test(text))return "Se a reta estiver na forma Ax + By + C = 0, use d = |Ax0 + By0 + C| / √(A² + B²). Em retas verticais ou horizontais, a diferença direta das coordenadas costuma ser mais simples.";
+    if(/distância|distancia/.test(text)&&/(ponto|a\(|p\()/.test(text))return "Para dois pontos, calcule Δx e Δy e use d = √[(Δx)² + (Δy)²]. Se os pontos tiverem a mesma coordenada x ou y, basta calcular a diferença na outra coordenada.";
+    if(/coeficiente angular|inclinação|inclinacao|taxa de variação|taxa de variacao/.test(text))return "O coeficiente angular mede quanto y varia quando x varia: m = (y2 − y1)/(x2 − x1). Atenção à ordem: use a mesma ordem no numerador e no denominador.";
+    if(/ponto.?inclinação|ponto.?inclinacao/.test(text))return "Quando conhecemos um ponto (x0,y0) e a inclinação m, use y − y0 = m(x − x0) e depois simplifique apenas se a questão pedir outra forma.";
+    if(/forma reduzida|y=|y =/.test(text)&&/reta/.test(text))return "Compare ou transforme a equação para y = mx + b. Nessa forma, m é a inclinação e b é o ponto em que a reta corta o eixo y.";
+    if(/forma geral/.test(text))return "Leve todos os termos para o mesmo lado até obter Ax + By + C = 0. Depois confira se a nova equação é equivalente à original.";
+    if(/intercepta|eixo x|eixo y/.test(text))return "Para encontrar o intercepto no eixo x, faça y = 0. Para o intercepto no eixo y, faça x = 0. Resolva a equação restante.";
+    if(/interseção|intersecao/.test(text))return "No ponto de interseção, as duas retas têm o mesmo x e o mesmo y. Iguale as expressões (ou resolva o sistema) e depois substitua para encontrar a outra coordenada.";
+    if(/paralela/.test(text))return "Retas paralelas não verticais têm o mesmo coeficiente angular. Depois de manter a inclinação, use o ponto dado para descobrir o termo independente quando necessário.";
+    if(/perpendicular/.test(text))return "Para retas não verticais, inclinações perpendiculares satisfazem m1·m2 = −1. Portanto, a nova inclinação é o inverso com sinal trocado.";
+    if(/coincidente/.test(text))return "Retas coincidentes representam exatamente o mesmo conjunto de pontos. Coloque ambas na mesma forma e compare todos os coeficientes, não apenas a inclinação.";
+    if(/colinear|alinhad/.test(text))return "Três pontos são colineares quando pertencem à mesma reta. Você pode comparar inclinações ou verificar se o determinante associado aos três pontos é zero.";
+    if(/área|area|triângulo|triangulo/.test(text))return "Para triângulos no plano, use base·altura/2 quando base e altura forem fáceis de enxergar; caso contrário, use o determinante. Área zero indica pontos colineares.";
+    if(/circunfer/.test(text)&&/centro|raio|equação|equacao/.test(text))return "Na forma reduzida, (x − a)² + (y − b)² = r²: o centro é C(a,b) e o raio é r. Ao passar para a forma geral, desenvolva os quadrados e reúna os termos semelhantes.";
+    if(/interior|exterior|sobre/.test(text)&&/circunfer/.test(text))return "Calcule a distância do ponto ao centro e compare com o raio: menor que r significa interior, igual a r significa sobre a circunferência e maior que r significa exterior.";
+    return "Identifique os dados fornecidos, escolha a relação matemática adequada e substitua os valores com atenção aos sinais antes de simplificar.";
+  }
+  function detailedResolution(q){
+    const letter=String.fromCharCode(65+Number(q.a||0));
+    const strategy=plainMathText(q.hint)||"Separe os dados do enunciado antes de calcular.";
+    const development=plainMathText(q.exp)||"Faça as substituições indicadas e simplifique passo a passo.";
+    const answer=plainMathText(q.opts?.[q.a]??"");
+    return `RESOLUÇÃO PASSO A PASSO
+
+1. Ideia principal
+${resolutionRule(q)}
+
+2. Como começar
+${strategy}
+
+3. Desenvolvimento
+${development}
+
+4. Conclusão
+A alternativa correta é ${letter}) ${answer}.`;
+  }
+  function renderResolution(q,leadHtml){
+    const fb=$("#feedback");
+    fb.innerHTML=leadHtml;
+    const box=document.createElement("div");box.className="detailed-resolution";box.textContent=detailedResolution(q);fb.appendChild(box);
   }
   const repeatableXpMode=()=>!["module","module-extra"].includes(mode);
   async function answer(choice,btn){
-    if(answered)return;answered=true;clearTimer();const q=questions[idx],opts=[...document.querySelectorAll(".option")];const correct=choice===q.a;if(window.kantRecordAnswer)window.kantRecordAnswer(correct);
-    opts.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});
+    if(answered||btn.disabled)return;
+    clearTimer();
+    const q=questions[idx],opts=[...document.querySelectorAll(".option")],correct=choice===q.a;
+    if(window.kantRecordAnswer)window.kantRecordAnswer(correct);
     if(correct){
-      score++;streak++;bestStreak=Math.max(bestStreak,streak);const calc=xpForCorrect(q);
-      let awarded=true;
+      answered=true;score++;streak++;bestStreak=Math.max(bestStreak,streak);
+      opts.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});
+      const calc=xpForCorrect(q);let awarded=true;
       if(repeatableXpMode()){
         xp+=calc.gain;if(window.geoquestAddXP)window.geoquestAddXP(calc.gain);
       }else if(window.kantAwardQuestionXPOnce){
         const result=await window.kantAwardQuestionXPOnce(q.id,calc.gain);awarded=!!result?.awarded;if(awarded)xp+=calc.gain;
-      }else{
-        xp+=calc.gain;if(window.geoquestAddXP)window.geoquestAddXP(calc.gain);
-      }
-      const bonus=`${calc.streakMultiplier.toFixed(1)}× sequência${calc.modeMultiplier>1?` • ${calc.modeMultiplier.toFixed(1)}× relâmpago`:""}`;
-      $("#feedback").innerHTML=awarded?`<span class="ok"><b>✅ Acertou!</b> +${calc.gain} XP <small>(${bonus})</small></span><br><span class="feedback-explanation">${q.exp}</span>`:`<span class="ok"><b>✅ Acertou!</b> <small>XP desta questão já recebido anteriormente.</small></span><br><span class="xp-repeat-note">Você pode refazer a questão para estudar e manter a sequência, mas questões comuns concedem XP apenas no primeiro acerto.</span><br><span class="feedback-explanation">${q.exp}</span>`;
+      }else{xp+=calc.gain;if(window.geoquestAddXP)window.geoquestAddXP(calc.gain);}
+      const parts=[`${calc.streakMultiplier.toFixed(1)}× sequência`];
+      if(calc.modeMultiplier>1)parts.push(`${calc.modeMultiplier.toFixed(1)}× relâmpago`);
+      if(calc.hintMultiplier<1)parts.push("0,5× por uso da dica");
+      const lead=awarded?`<span class="ok"><b>✅ Acertou!</b> +${calc.gain} XP <small>(${parts.join(" • ")})</small></span>`:`<span class="ok"><b>✅ Acertou!</b> <small>XP desta questão já recebido anteriormente.</small></span><br><span class="xp-repeat-note">Você pode refazer para estudar e manter a sequência, mas questões comuns concedem XP apenas no primeiro acerto.</span>`;
+      renderResolution(q,lead);
+      const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
+      if($("#hintBtn"))$("#hintBtn").disabled=true;
+      $("#nextBtn").style.display="inline-block";
     }else{
-      lives=Math.max(0,lives-1);streak=0;btn.classList.add("wrong");
-      $("#feedback").innerHTML=`<span class="no"><b>❌ Resposta incorreta.</b>${lives===0?" Suas vidas acabaram: esta tentativa precisa recomeçar do início.":""}</span><br><span class="feedback-explanation">${q.exp}</span>`;
+      lives=Math.max(0,lives-1);streak=0;btn.classList.add("wrong");btn.disabled=true;
+      if(lives===0){
+        answered=true;opts.forEach(b=>b.disabled=true);
+        $("#feedback").innerHTML='<span class="no"><b>❌ Suas vidas acabaram.</b> A tentativa termina aqui e deve recomeçar desde a primeira questão.</span>';
+        const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
+        $("#nextBtn").style.display="inline-block";$("#nextBtn").textContent="Recomeçar do início ↻";
+        if($("#hintBtn"))$("#hintBtn").disabled=true;
+      }else{
+        $("#feedback").innerHTML=`<span class="no"><b>❌ Essa alternativa não está correta.</b></span><br><span class="retry-note">Você ainda tem ${lives} ${lives===1?"vida":"vidas"}. Tente outra alternativa ou, se preferir encerrar a questão, use “Mostrar resposta”.</span>`;
+        const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=false;
+        if(lightning&&runDeadline>performance.now())startRunTimer();
+      }
     }
+    const expMedia=$("#explanationMedia");if(expMedia){expMedia.innerHTML="";expMedia.hidden=true;}
+    updateStats();if(mode==="module"&&answered)recordModuleCheckpoint(true);
+  }
+  function revealAnswer(){
+    if(answered||idx>=questions.length)return;
+    const q=questions[idx],opts=[...document.querySelectorAll(".option")];
+    answered=true;streak=0;clearTimer();
+    opts.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});
+    renderResolution(q,'<span class="answer-shown"><b>👁 Resposta revelada.</b> Esta questão não concede XP porque a resposta foi mostrada.</span>');
     const expMedia=$("#explanationMedia");if(expMedia){expMedia.innerHTML="";expMedia.hidden=!q.explanationImageUrl;if(q.explanationImageUrl){const img=document.createElement("img");img.src=q.explanationImageUrl;img.alt="Imagem da explicação";expMedia.appendChild(img);}}
-    window.KantMath?.renderInline($("#feedback"));if($("#hintBtn"))$("#hintBtn").disabled=true;$("#nextBtn").style.display="inline-block";if(lives===0)$("#nextBtn").textContent="Recomeçar do início ↻";updateStats();if(mode==="module")recordModuleCheckpoint(true);
-    if(lightning&&lives>0&&runDeadline>performance.now())startRunTimer();
+    const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
+    if($("#hintBtn"))$("#hintBtn").disabled=true;
+    $("#nextBtn").style.display="inline-block";updateStats();if(mode==="module")recordModuleCheckpoint(true);
   }
   function startRunTimer(){
     if(!lightning)return;$("#timerWrap").style.display="block";if(!runDeadline){runDuration=120000;runDeadline=performance.now()+runDuration;}tickRunTimer();
@@ -561,7 +649,8 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
   $("#studyBackBtn")?.addEventListener("click",()=>show("home"));$("#startModulePracticeBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId));$("#startModuleExtraBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId,true,true));
   function resetRunState(){clearTimer();idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=false;runDeadline=0;runDuration=0;currentModuleId=null;}
   function leaveRun(){clearTimer();if(mode==="module"&&currentModuleId)Promise.resolve(recordModuleCheckpoint(answered)).catch(()=>{});show("home");if(window.geoquestFlushXP)Promise.resolve(window.geoquestFlushXP()).catch(()=>{});resetRunState();}
-  $("#nextBtn")?.addEventListener("click",next);$("#hintBtn")?.addEventListener("click",()=>{if(answered)return;const q=questions[idx];if(!q?.hint)return;const box=$("#hintBox"),btn=$("#hintBtn");box.textContent=q.hint;box.hidden=false;window.KantMath?.renderInline(box);btn.textContent="💡 Dica aberta";btn.disabled=true;});
+  $("#nextBtn")?.addEventListener("click",next);$("#hintBtn")?.addEventListener("click",()=>{if(answered)return;const q=questions[idx];if(!q?.hint)return;if(!hintUsed){const ok=window.confirm("Abrir a dica reduz pela metade o XP que esta questão pode conceder. Deseja ver a dica mesmo assim?");if(!ok)return;hintUsed=true;}const box=$("#hintBox"),btn=$("#hintBtn");box.textContent=q.hint;box.hidden=false;window.KantMath?.renderInline(box);btn.textContent="💡 Dica aberta • XP pela metade";btn.disabled=true;});
+  $("#showAnswerBtn")?.addEventListener("click",revealAnswer);
   $("#restartBtn")?.addEventListener("click",(e)=>{e.preventDefault();restartCurrent();});$("#backBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});$("#quitRunBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});
   $("#continuePhaseBtn")?.addEventListener("click",()=>{if(!lastModuleId)return;const i=modules.findIndex(m=>m.id===lastModuleId);if(i>=0&&i<modules.length-1)openStudy(modules[i+1].id);});$("#extraPracticeBtn")?.addEventListener("click",()=>{if(lastModuleId)startModule(lastModuleId,true,true);});$("#againBtn")?.addEventListener("click",()=>{if((lastMode==="module"||lastMode==="module-extra")&&lastModuleId)startModule(lastModuleId,true,lastMode==="module-extra");else start(lastMode,true);});$("#menuBtn")?.addEventListener("click",()=>show("home"));$("#lightningToggle")?.addEventListener("click",()=>{});
   function refreshContent(){
