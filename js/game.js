@@ -37,6 +37,9 @@
     const xpText=document.getElementById("globalXpText")?.textContent||"0 XP";
     if(profileXp) profileXp.textContent=xpText;
     if(profileXpMetric) profileXpMetric.textContent=xpText;
+    const levelBar=document.getElementById("profileLevelBar"), levelProgressText=document.getElementById("profileLevelProgressText"), globalBar=document.getElementById("globalXpBar"), globalNext=document.getElementById("globalXpNext");
+    if(levelBar && globalBar) levelBar.style.width=globalBar.style.width||"0%";
+    if(levelProgressText && globalNext) levelProgressText.textContent=globalNext.textContent||"0 / 1000 XP";
     renderProfileProgress();
     if(window.kantLoadPerformanceStats)window.kantLoadPerformanceStats();
   }

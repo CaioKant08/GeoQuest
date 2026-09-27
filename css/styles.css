@@ -3556,3 +3556,215 @@ body.dark .profile-module-row{background:#141c27;border-color:#263244}body.dark 
 body.dark .profile-module-copy b,body.dark .profile-module-score b{color:#eaf1fa!important}body.dark .profile-module-track{background:#263243}body.dark .profile-focus-card{background:linear-gradient(135deg,#16271f,#182331)!important}body.dark .profile-focus-icon{background:#1d372a}
 @media(max-width:900px){.profile-metrics-grid{grid-template-columns:repeat(2,1fr)}.profile-identity-card{grid-template-columns:auto 1fr}.profile-level-badge{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between}.profile-level-badge small{display:none}}
 @media(max-width:620px){.performance-greeting-main{align-items:flex-start}.home-greeting-avatar{width:54px;height:54px;flex-basis:54px;border-radius:18px}.profile-identity-card{grid-template-columns:1fr;text-align:center;padding:22px}.profile-identity-avatar{margin:0 auto;width:96px;height:96px}.profile-identity-actions{display:flex;justify-content:center}.profile-level-badge{text-align:left}.profile-metrics-grid{grid-template-columns:1fr 1fr;gap:10px}.profile-metric-card{padding:14px 12px;gap:9px}.profile-metric-icon{width:38px;height:38px;border-radius:13px}.profile-metric-card b{font-size:1.15rem}.profile-progress-card{padding:20px 16px}.profile-section-heading{align-items:flex-start;flex-direction:column}.profile-module-row{grid-template-columns:36px minmax(0,1fr) 54px;padding:9px}.profile-focus-card{padding:18px}.learning-module-art .art-label{max-width:calc(100% - 24px)!important;padding:7px 12px!important}}
+
+
+/* KANT v3.5 — perfil e desempenho refinados */
+.performance-gauge-card{
+  padding:20px 22px 18px!important;
+  border-radius:30px!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(246,250,255,.88))!important;
+}
+.performance-gauge-label{
+  background:transparent!important;
+  padding:0!important;
+  margin-bottom:12px!important;
+  font-size:.66rem!important;
+  color:#7f8da4!important;
+}
+.performance-gauge{
+  width:142px!important;
+  height:142px!important;
+  overflow:visible!important;
+  display:grid!important;
+  place-items:center!important;
+  position:relative!important;
+  border-radius:50%;
+  filter:drop-shadow(0 12px 22px rgba(31,52,88,.08));
+}
+.performance-gauge::before{
+  width:142px!important;
+  height:142px!important;
+  inset:0!important;
+  border-radius:50%!important;
+  background:conic-gradient(#20bd72 0deg calc(var(--gauge-deg) * 2),#ef6171 calc(var(--gauge-deg) * 2) 360deg)!important;
+}
+.performance-gauge::after{
+  width:104px!important;
+  height:104px!important;
+  left:19px!important;
+  top:19px!important;
+  border-radius:50%!important;
+  background:linear-gradient(180deg,#fff,#f8fbff)!important;
+  box-shadow:inset 0 0 0 1px rgba(218,228,241,.75);
+}
+.performance-gauge-inner{
+  top:auto!important;
+  inset:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex-direction:column!important;
+}
+.performance-gauge-inner b{font-size:1.7rem!important;letter-spacing:-.04em}
+.performance-gauge-inner span{margin-top:4px!important}
+.performance-gauge-legend{
+  margin-top:12px!important;
+  gap:8px!important;
+}
+.performance-gauge-legend span{
+  padding:6px 9px;
+  border-radius:999px;
+  background:#f4f7fb;
+  border:1px solid #e5ebf3;
+}
+
+/* Stat cards mais vivos, principalmente no dark mode */
+.performance-stat{position:relative;overflow:hidden}
+.performance-stat::after{content:"";position:absolute;right:-18px;bottom:-24px;width:72px;height:72px;border-radius:50%;opacity:.12;filter:blur(1px)}
+.stat-total::after{background:#4d86ff}.stat-correct::after{background:#22d681}.stat-wrong::after{background:#ff6477}
+body.dark .performance-stat{background:#121a25!important;border-color:#263344!important}
+body.dark .stat-total{box-shadow:inset 0 0 0 1px rgba(83,137,255,.08)!important}
+body.dark .stat-correct{box-shadow:inset 0 0 0 1px rgba(38,220,132,.08)!important}
+body.dark .stat-wrong{box-shadow:inset 0 0 0 1px rgba(255,97,119,.08)!important}
+body.dark .stat-total .performance-stat-icon{background:rgba(70,125,255,.14)!important;color:#6f9cff!important;box-shadow:0 0 24px rgba(80,130,255,.14)}
+body.dark .stat-correct .performance-stat-icon{background:rgba(35,210,125,.14)!important;color:#45e394!important;box-shadow:0 0 24px rgba(35,210,125,.13)}
+body.dark .stat-wrong .performance-stat-icon{background:rgba(255,85,107,.14)!important;color:#ff7487!important;box-shadow:0 0 24px rgba(255,85,107,.12)}
+body.dark .stat-total b{color:#8eb0ff!important}
+body.dark .stat-correct b{color:#54e6a0!important}
+body.dark .stat-wrong b{color:#ff8796!important}
+body.dark .performance-gauge-card{background:linear-gradient(145deg,#151e2a,#111923)!important;border-color:#283646!important}
+body.dark .performance-gauge::before{background:conic-gradient(#35d98b 0deg calc(var(--gauge-deg) * 2),#ff6579 calc(var(--gauge-deg) * 2) 360deg)!important}
+body.dark .performance-gauge::after{background:linear-gradient(180deg,#141d28,#101720)!important;box-shadow:inset 0 0 0 1px #293646}
+body.dark .performance-gauge-legend span{background:#101822;border-color:#283544;color:#9eacc0!important}
+
+/* Identidade do perfil */
+.profile-identity-card{
+  grid-template-columns:auto minmax(0,1fr) minmax(230px,280px)!important;
+  padding:30px 34px!important;
+  gap:28px!important;
+  border-radius:34px!important;
+  background:
+    radial-gradient(circle at 8% 12%,rgba(34,190,111,.10),transparent 27%),
+    radial-gradient(circle at 96% 12%,rgba(71,120,255,.10),transparent 28%),
+    linear-gradient(145deg,#fbfffd 0%,#f7fbff 52%,#f5f8ff 100%)!important;
+}
+.profile-identity-avatar{
+  width:132px!important;height:132px!important;border-radius:36px!important;
+  box-shadow:0 18px 38px rgba(35,60,102,.12)!important;
+}
+.profile-identity-copy h2{font-size:2.35rem!important}
+.profile-identity-actions{display:flex!important;gap:10px!important;flex-wrap:wrap!important}
+.profile-identity-actions .btn{min-height:46px!important}
+.profile-level-badge{
+  min-width:0!important;
+  padding:22px 22px 20px!important;
+  border-radius:26px!important;
+  background:linear-gradient(145deg,rgba(234,250,241,.96),rgba(237,244,255,.98))!important;
+  border:1px solid #d7e7df!important;
+  box-shadow:0 14px 30px rgba(39,67,108,.07);
+}
+.profile-level-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.profile-level-top small{margin:0!important}
+.profile-level-top>span{font-size:.68rem;color:#8190a6;font-weight:800}
+.profile-level-badge b{font-size:1.7rem!important;margin-top:10px!important}
+.profile-level-badge>span{font-size:.9rem!important}
+.profile-level-track{height:9px;border-radius:999px;background:#e4ebf2;margin-top:14px;overflow:hidden}
+.profile-level-track>span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#17b96d,#4f86ff);transition:width .35s ease}
+
+/* Nickname modal */
+.nickname-card{max-width:520px!important}
+.nickname-card .field{margin-top:18px}
+.nickname-actions{display:flex;justify-content:flex-end;margin-top:16px}
+
+/* Corrige nome do usuário no dropdown escuro */
+body.dark .profile-menu-head b,
+body.dark #menuUserName{color:#f3f7fc!important}
+body.dark .profile-menu-head small,
+body.dark #menuUserEmail{color:#9aa9bd!important}
+
+/* Perfil no tema escuro */
+body.dark .profile-identity-card{
+  background:
+    radial-gradient(circle at 8% 8%,rgba(38,210,126,.10),transparent 30%),
+    radial-gradient(circle at 96% 0%,rgba(80,125,255,.10),transparent 30%),
+    linear-gradient(145deg,#151e29,#111925)!important;
+  border-color:#293646!important;
+}
+body.dark .profile-level-badge{
+  background:linear-gradient(145deg,#162820,#172235)!important;
+  border-color:#2c3e4d!important;
+}
+body.dark .profile-level-track{background:#273443!important}
+body.dark .profile-level-track>span{background:linear-gradient(90deg,#35d98b,#6a91ff)!important}
+
+@media(max-width:900px){
+  .profile-identity-card{grid-template-columns:auto 1fr!important}
+  .profile-level-badge{grid-column:1/-1!important}
+}
+@media(max-width:620px){
+  .profile-identity-card{grid-template-columns:1fr!important;padding:24px 20px!important;text-align:center!important}
+  .profile-identity-avatar{width:116px!important;height:116px!important;margin:0 auto!important}
+  .profile-identity-actions{justify-content:center!important}
+  .profile-level-badge{text-align:left!important}
+  .profile-level-top>span{font-size:.64rem}
+  .performance-gauge{width:132px!important;height:132px!important}
+  .performance-gauge::before{width:132px!important;height:132px!important}
+  .performance-gauge::after{width:96px!important;height:96px!important;left:18px!important;top:18px!important}
+}
+
+
+/* KANT v3.5.1 — correção definitiva dos rótulos dos módulos */
+.learning-module-art{
+  position:relative !important;
+  display:grid !important;
+  grid-template-rows:56px 1fr !important;
+  align-items:center !important;
+  justify-items:center !important;
+  padding:10px 18px 14px !important;
+  box-sizing:border-box !important;
+  overflow:visible !important;
+}
+.learning-module-art .art-label{
+  position:relative !important;
+  top:auto !important;
+  left:auto !important;
+  right:auto !important;
+  transform:none !important;
+  align-self:start !important;
+  justify-self:center !important;
+  width:calc(100% - 12px) !important;
+  max-width:420px !important;
+  min-height:40px !important;
+  margin:0 !important;
+  padding:8px 14px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  white-space:normal !important;
+  line-height:1.16 !important;
+  text-wrap:balance !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+  z-index:12 !important;
+}
+.learning-module-art .module-symbol-shell{
+  grid-row:2 !important;
+  margin:2px 0 0 !important;
+  align-self:center !important;
+  justify-self:center !important;
+}
+@media(max-width:760px){
+  .learning-module-art{
+    grid-template-rows:62px 1fr !important;
+    padding:10px 14px 12px !important;
+  }
+  .learning-module-art .art-label{
+    width:calc(100% - 8px) !important;
+    max-width:none !important;
+    min-height:42px !important;
+    padding:8px 12px !important;
+    font-size:.72rem !important;
+  }
+}

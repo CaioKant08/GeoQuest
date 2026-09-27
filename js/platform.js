@@ -37,6 +37,12 @@
   const tabSignup = document.getElementById("tabSignup");
   const loginForm = document.getElementById("loginForm");
   const signupForm = document.getElementById("signupForm");
+  const nicknameModal = document.getElementById("nicknameModal");
+  const closeNicknameModal = document.getElementById("closeNicknameModal");
+  const nicknameInput = document.getElementById("nicknameInput");
+  const saveNicknameBtn = document.getElementById("saveNicknameBtn");
+  const nicknameStatus = document.getElementById("nicknameStatus");
+  const profileChangeNicknameBtn = document.getElementById("profileChangeNicknameBtn");
 
   function showAuthMessage(text,type="error"){
     authMessage.textContent=text;
@@ -628,6 +634,46 @@
     }catch(err){
       setSettingsStatus(err?.message || "Não foi possível remover a foto.","err");
     }
+  });
+
+  function openNicknameModal(){
+    profileMenu?.classList.remove("open");
+    if(nicknameInput) nicknameInput.value=(currentProfile?.display_name || accountUser?.textContent || "").trim();
+    if(nicknameStatus){nicknameStatus.textContent="";nicknameStatus.className="settings-status";}
+    nicknameModal?.classList.add("open");
+    nicknameModal?.setAttribute("aria-hidden","false");
+    setTimeout(()=>nicknameInput?.focus(),50);
+  }
+  function closeNickname(){
+    nicknameModal?.classList.remove("open");
+    nicknameModal?.setAttribute("aria-hidden","true");
+  }
+  profileChangeNicknameBtn?.addEventListener("click",openNicknameModal);
+  closeNicknameModal?.addEventListener("click",closeNickname);
+  nicknameModal?.addEventListener("click",e=>{if(e.target===nicknameModal)closeNickname();});
+  nicknameInput?.addEventListener("keydown",e=>{if(e.key==="Enter")saveNicknameBtn?.click();});
+  saveNicknameBtn?.addEventListener("click",async()=>{
+    const name=(nicknameInput?.value||"").trim();
+    if(name.length<2){if(nicknameStatus){nicknameStatus.textContent="Use pelo menos 2 caracteres.";nicknameStatus.className="settings-status err";}return;}
+    saveNicknameBtn.disabled=true; saveNicknameBtn.textContent="Salvando...";
+    if(nicknameStatus){nicknameStatus.textContent="";nicknameStatus.className="settings-status";}
+    try{
+      const {data:{user},error:userError}=await db.auth.getUser();
+      if(userError||!user)throw userError||new Error("Usuário não encontrado.");
+      const {data:updateData,error:updateError}=await db.auth.updateUser({data:{display_name:name}});
+      if(updateError)throw updateError;
+      const {error:profileError}=await db.from("profiles").update({display_name:name,updated_at:new Date().toISOString()}).eq("id",user.id);
+      if(profileError)throw profileError;
+      if(currentProfile)currentProfile.display_name=name;
+      accountUser.textContent=name; accountUser.title=user.email||name;
+      if(menuUserName)menuUserName.textContent=name;
+      if(typeof syncProfileScreen==="function")syncProfileScreen();
+      renderPerformanceStats(currentProfile||{});
+      if(nicknameStatus){nicknameStatus.textContent="Nickname atualizado.";nicknameStatus.className="settings-status ok";}
+      setTimeout(closeNickname,600);
+    }catch(err){
+      if(nicknameStatus){nicknameStatus.textContent=err?.message||"Não foi possível alterar o nickname.";nicknameStatus.className="settings-status err";}
+    }finally{saveNicknameBtn.disabled=false;saveNicknameBtn.textContent="Salvar nickname";}
   });
 
   document.getElementById("logoutBtn")?.addEventListener("click",async()=>{

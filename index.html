@@ -4,13 +4,13 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
-<link href="assets/kant-symbol.png?v=3.4.0" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=3.4.0" rel="stylesheet"/>
+<link href="assets/kant-symbol.png?v=3.5.0" rel="icon" type="image/png"/>
+<link href="css/styles.css?v=3.5.1" rel="stylesheet"/>
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
 <div>
-<img alt="Kant" src="assets/kant-symbol.png?v=3.4.0" style="width:72px;height:72px;object-fit:contain;margin-bottom:10px"/>
+<img alt="Kant" src="assets/kant-symbol.png?v=3.5.0" style="width:72px;height:72px;object-fit:contain;margin-bottom:10px"/>
 <div>Conectando ao KANT...</div>
 </div>
 </div>
@@ -19,7 +19,7 @@
 <div class="card auth-shell">
 <div class="auth-intro">
 <div class="auth-brand">
-<img alt="Kant" src="assets/kant-symbol.png?v=3.4.0"/>
+<img alt="Kant" src="assets/kant-symbol.png?v=3.5.0"/>
 <div><b>KANT</b><span>Geometria Analítica</span></div>
 </div>
 <h2>Entre, jogue e evolua.</h2>
@@ -71,7 +71,7 @@
 <header class="topbar kant-header">
 <div aria-label="Kant" class="kant-brand">
 <div aria-hidden="true" class="kant-brand-symbol" style="width:56px;height:56px;overflow:hidden;display:grid;place-items:center;flex:0 0 56px">
-      <img src="assets/kant-symbol.png?v=3.4.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
+      <img src="assets/kant-symbol.png?v=3.5.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
     </div>
 <div class="kant-wordmark">KANT</div>
 </div>
@@ -245,12 +245,14 @@
       <p id="profileEmailLarge">—</p>
       <div class="profile-identity-actions">
         <button class="btn secondary profile-photo-btn" id="profileChangePhotoBtn" type="button">Alterar foto</button>
+        <button class="btn secondary profile-nickname-btn" id="profileChangeNicknameBtn" type="button">Alterar nickname</button>
       </div>
     </div>
     <div class="profile-level-badge">
-      <small>NÍVEL ATUAL</small>
+      <div class="profile-level-top"><small>NÍVEL ATUAL</small><span id="profileLevelProgressText">0 / 1000 XP</span></div>
       <b id="profileLevelMirror">Nível 1</b>
       <span id="profileXpMirror">0 XP</span>
+      <div class="profile-level-track"><span id="profileLevelBar"></span></div>
     </div>
   </section>
 
@@ -489,7 +491,27 @@
 </div>
 <div aria-live="polite" class="settings-status" id="settingsStatus"></div>
 </div>
-</div><div aria-hidden="true" class="ranking-modal" id="rankingModal">
+</div>
+<div aria-hidden="true" class="settings-modal" id="nicknameModal">
+  <div aria-labelledby="nicknameTitle" aria-modal="true" class="settings-card nickname-card" role="dialog">
+    <div class="settings-head">
+      <div>
+        <h3 id="nicknameTitle">Alterar nickname</h3>
+        <p>Esse nome aparece no seu perfil, no ranking e no topo do KANT.</p>
+      </div>
+      <button aria-label="Fechar" class="icon-btn" id="closeNicknameModal" type="button">×</button>
+    </div>
+    <div class="field">
+      <label for="nicknameInput">Novo nickname</label>
+      <input id="nicknameInput" maxlength="30" minlength="2" placeholder="Ex.: CaioKant" type="text">
+    </div>
+    <div class="nickname-actions">
+      <button class="btn primary" id="saveNicknameBtn" type="button">Salvar nickname</button>
+    </div>
+    <div aria-live="polite" class="settings-status" id="nicknameStatus"></div>
+  </div>
+</div>
+<div aria-hidden="true" class="ranking-modal" id="rankingModal">
 <div aria-labelledby="rankingTitle" aria-modal="true" class="ranking-card" role="dialog">
 <div class="ranking-head">
 <div>
@@ -506,6 +528,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.4.0"></script><script src="js/platform.js?v=3.4.0"></script><script src="js/modules.js?v=3.4.0"></script><script src="js/questions.js?v=3.4.0"></script><script src="js/content.js?v=3.4.0"></script><script src="js/admin.js?v=3.4.0"></script><script src="js/game.js?v=3.4.0"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.5.1"></script><script src="js/platform.js?v=3.5.1"></script><script src="js/modules.js?v=3.5.1"></script><script src="js/questions.js?v=3.5.1"></script><script src="js/content.js?v=3.5.1"></script><script src="js/admin.js?v=3.5.1"></script><script src="js/game.js?v=3.5.1"></script>
 </body>
 </html>
