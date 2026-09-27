@@ -5,7 +5,8 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
 <link href="assets/kant-symbol.png?v=3.5.0" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=3.8.2" rel="stylesheet"/>
+<link href="css/styles.css?v=3.8.5" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
@@ -348,7 +349,7 @@
               <div class="admin-form-grid compact"><label><span>Ordem</span><input id="adminTheoryPosition" min="1" type="number"></label><label class="admin-check"><input id="adminTheoryPublished" type="checkbox"><span>Visível</span></label></div>
               <label><span>Título</span><input id="adminTheoryTitle" required type="text"></label>
               <label><span>Texto</span><textarea id="adminTheoryText" required rows="5"></textarea></label>
-              <label><span>Fórmula / resumo</span><input id="adminTheoryFormula" type="text"></label>
+              <label><span>Fórmula / resumo <small class="admin-field-hint">(aceita LaTeX)</small></span><input id="adminTheoryFormula" type="text" placeholder="Ex.: d=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}"></label>
               <div class="admin-image-field">
                 <label><span>Imagem da fórmula / resumo (opcional)</span><input accept="image/png,image/jpeg,image/webp" id="adminFormulaImage" type="file"></label>
                 <div class="admin-image-preview" id="adminFormulaImagePreview"><span>Sem imagem</span></div>
@@ -542,6 +543,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.8.2"></script><script src="js/platform.js?v=3.8.2"></script><script src="js/modules.js?v=3.8.2"></script><script src="js/questions.js?v=3.8.2"></script><script src="js/content.js?v=3.8.2"></script><script src="js/admin.js?v=3.8.2"></script><script src="js/game.js?v=3.8.2"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script><script src="js/math.js?v=3.8.5"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.8.5"></script><script src="js/platform.js?v=3.8.5"></script><script src="js/modules.js?v=3.8.5"></script><script src="js/questions.js?v=3.8.5"></script><script src="js/content.js?v=3.8.5"></script><script src="js/admin.js?v=3.8.5"></script><script src="js/game.js?v=3.8.5"></script>
 </body>
 </html>

@@ -22,13 +22,13 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Distância entre dois pontos",
         "texto": "As diferenças horizontal e vertical formam os catetos de um triângulo retângulo. Por isso, a fórmula da distância é o Teorema de Pitágoras escrito em coordenadas.",
-        "formula": "d = √[(x₂ − x₁)² + (y₂ − y₁)²]",
+        "formula": "latex:d=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}",
         "exemplo": "Entre A(−2,5) e B(4,−3): d = √(6² + (−8)²) = 10."
       },
       {
         "titulo": "Ponto médio",
         "texto": "O ponto médio divide o segmento em duas partes de mesmo comprimento. Suas coordenadas são as médias aritméticas das coordenadas dos extremos.",
-        "formula": "M = ((x₁+x₂)/2, (y₁+y₂)/2)",
+        "formula": "latex:M=\\left(\\frac{x_1+x_2}{2},\\frac{y_1+y_2}{2}\\right)",
         "exemplo": "Para A(7,−1) e B(−3,11), M = (2,5)."
       },
       {
@@ -178,7 +178,7 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Coeficiente angular",
         "texto": "O coeficiente angular mede a taxa de variação de y em relação a x. Ele indica se a reta cresce, decresce ou é horizontal. Retas verticais não têm coeficiente angular definido.",
-        "formula": "m = (y₂−y₁)/(x₂−x₁) = Δy/Δx",
+        "formula": "latex:m=\\frac{y_2-y_1}{x_2-x_1}=\\frac{\\Delta y}{\\Delta x}",
         "exemplo": "A(2,3) e B(6,11): m=(11−3)/(6−2)=2."
       },
       {
@@ -514,7 +514,7 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Área de triângulo",
         "texto": "A área de um triângulo no plano cartesiano é metade do módulo do mesmo determinante usado para testar colinearidade.",
-        "formula": "A = |D|/2",
+        "formula": "latex:A=\\frac{|D|}{2}",
         "exemplo": "A(1,1), B(5,1), C(3,4) → A=6."
       },
       {
@@ -670,7 +670,7 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Fórmula ponto–reta",
         "texto": "Para usar a fórmula, a reta deve estar na forma geral Ax+By+C=0. O valor absoluto impede resultado negativo.",
-        "formula": "d = |Ax₀+By₀+C| / √(A²+B²)",
+        "formula": "latex:d=\\frac{|Ax_0+By_0+C|}{\\sqrt{A^2+B^2}}",
         "exemplo": "P(2,−1) e 3x+4y−10=0 → d=8/5."
       },
       {
@@ -682,7 +682,7 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Retas paralelas",
         "texto": "Para duas retas paralelas com os mesmos coeficientes A e B, a distância depende apenas da diferença entre os termos constantes.",
-        "formula": "d = |C₁−C₂| / √(A²+B²)",
+        "formula": "latex:d=\\frac{|C_1-C_2|}{\\sqrt{A^2+B^2}}",
         "exemplo": "3x+4y−2=0 e 3x+4y+18=0 → d=20/5=4."
       }
     ],

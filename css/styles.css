@@ -4259,3 +4259,51 @@ body.dark .learning-module-art .module-symbol-shell{
     margin-top:6px !important;
   }
 }
+
+/* KANT Math — fórmulas tipográficas com KaTeX */
+.theory-formula{
+  font-family:inherit;
+  font-weight:600;
+  font-size:1rem;
+  text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:58px;
+  white-space:normal;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+.theory-formula .katex-display{
+  margin:0;
+  width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:2px 0;
+}
+.theory-formula .katex{
+  font-size:1.2em;
+  color:inherit;
+}
+.theory-formula .katex-display > .katex{
+  white-space:nowrap;
+}
+.guided-example .katex,
+.question .katex,
+.option .katex,
+.feedback .katex,
+.hint-box .katex{
+  font-size:1.04em;
+}
+.admin-field-hint{
+  font:inherit;
+  font-size:.72rem;
+  font-weight:700;
+  color:var(--muted);
+  text-transform:none;
+  letter-spacing:0;
+}
+@media (max-width:640px){
+  .theory-formula{padding:13px 12px;min-height:54px;}
+  .theory-formula .katex{font-size:1.06em;}
+}
