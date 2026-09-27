@@ -109,6 +109,7 @@
 
     const profile=await ensureProfile(user);
     window.kantCurrentProfile=profile;
+    Promise.resolve(loadPerformanceStats()).catch(()=>{});
     window.kantIsAdmin=profile?.role==="admin";
     document.body.classList.toggle("kant-admin-user",window.kantIsAdmin);
     const adminButton=document.getElementById("navAdmin");
@@ -204,6 +205,43 @@
     renderGlobalXP(xp);
     if(typeof syncProfileScreen === "function") syncProfileScreen();
   }
+
+  function renderPerformanceStats(stats={}){
+    const answered=Math.max(0,Number(stats.total_answered)||0);
+    const correct=Math.max(0,Number(stats.total_correct)||0);
+    const wrong=Math.max(0,Number(stats.total_wrong)||0);
+    const accuracy=answered?Math.round((correct/answered)*100):0;
+    const name=(currentProfile?.display_name || document.getElementById("accountUser")?.textContent || "Jogador").trim();
+    const map={homeGreetingName:name,homeTotalAnswered:answered.toLocaleString("pt-BR"),homeTotalCorrect:correct.toLocaleString("pt-BR"),homeTotalWrong:wrong.toLocaleString("pt-BR"),homeAccuracyPct:accuracy+"%"};
+    Object.entries(map).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=value;});
+    const gauge=document.getElementById("homeAccuracyGauge");
+    if(gauge)gauge.style.setProperty("--gauge-deg",(Math.max(0,Math.min(100,accuracy))*1.8)+"deg");
+  }
+
+  async function loadPerformanceStats(){
+    const {data:{user}}=await db.auth.getUser();
+    if(!user){renderPerformanceStats();return null;}
+    try{
+      const {data,error}=await db.from("profiles").select("total_answered,total_correct,total_wrong").eq("id",user.id).single();
+      if(error)throw error;
+      if(currentProfile)Object.assign(currentProfile,data||{});
+      renderPerformanceStats(data||{});
+      return data;
+    }catch(err){console.warn("Estatísticas indisponíveis:",err?.message||err);renderPerformanceStats(currentProfile||{});return null;}
+  }
+  window.kantLoadPerformanceStats=loadPerformanceStats;
+
+  let answerStatsQueue=Promise.resolve();
+  window.kantRecordAnswer=function(correct){
+    answerStatsQueue=answerStatsQueue.then(async()=>{
+      const {data,error}=await db.rpc("record_answer_result",{p_correct:!!correct});
+      if(error)throw error;
+      const row=Array.isArray(data)?data[0]:data;
+      if(row){if(currentProfile)Object.assign(currentProfile,row);renderPerformanceStats(row);}else await loadPerformanceStats();
+      return row;
+    }).catch(err=>{console.warn("Resposta não contabilizada:",err?.message||err);return null;});
+    return answerStatsQueue;
+  };
 
   window.geoquestAddXP=function(amount){
     const gain=Math.max(0,Math.round(Number(amount)||0));
@@ -393,7 +431,7 @@
     }catch(err){
       showAuthMessage(friendlyError(err.message));
     }finally{
-      btn.disabled=false; btn.textContent="Entrar no GeoQuest";
+      btn.disabled=false; btn.textContent="Entrar no KANT";
     }
   });
 

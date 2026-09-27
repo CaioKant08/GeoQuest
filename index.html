@@ -5,13 +5,13 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
 <link href="assets/kant-symbol.png?v=3.2.2" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=3.2.2" rel="stylesheet"/>
+<link href="css/styles.css?v=3.3.0" rel="stylesheet"/>
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
 <div>
 <img alt="Kant" src="assets/kant-symbol.png?v=3.2.2" style="width:72px;height:72px;object-fit:contain;margin-bottom:10px"/>
-<div>Conectando ao GeoQuest...</div>
+<div>Conectando ao KANT...</div>
 </div>
 </div>
 <div class="wrap" hidden="" id="authGate">
@@ -20,10 +20,10 @@
 <div class="auth-intro">
 <div class="auth-brand">
 <img alt="Kant" src="assets/kant-symbol.png?v=3.2.2"/>
-<div><b>GeoQuest</b><span>Geometria Analítica</span></div>
+<div><b>KANT</b><span>Geometria Analítica</span></div>
 </div>
 <h2>Entre, jogue e evolua.</h2>
-<p>Sua conta vai identificar seu progresso no GeoQuest. Depois, o mesmo usuário poderá ter XP, posição no ranking e histórico de desempenho.</p>
+<p>Sua conta identifica seu progresso no KANT. O mesmo usuário mantém XP, posição no ranking e histórico de desempenho.</p>
 <div class="auth-points">
 <div class="auth-point"><strong>01</strong> Uma conta por jogador</div>
 <div class="auth-point"><strong>02</strong> Acesso em celular e computador</div>
@@ -44,11 +44,11 @@
 <label for="loginPassword">Senha</label>
 <input autocomplete="current-password" id="loginPassword" minlength="8" placeholder="Sua senha" required="" type="password"/>
 </div>
-<button class="btn primary auth-submit" id="loginSubmit" type="submit">Entrar no GeoQuest</button>
+<button class="btn primary auth-submit" id="loginSubmit" type="submit">Entrar no KANT</button>
 </form>
 <form class="auth-form" hidden="" id="signupForm">
 <div class="field">
-<label for="signupName">Nome no GeoQuest</label>
+<label for="signupName">Nome no KANT</label>
 <input autocomplete="nickname" id="signupName" maxlength="30" minlength="2" placeholder="Ex.: Caio" required="" type="text"/>
 </div>
 <div class="field">
@@ -148,20 +148,24 @@
 <main>
 <section class="screen active" id="home">
 <div class="landing">
-<div class="landing-intro">
-<div class="landing-copy">
-<span class="pill-kicker">Sua jornada de aprendizagem</span>
-<h2>Escolha seu próximo passo.</h2>
-<p>
-            Estude o conceito, acompanhe um exemplo guiado e depois pratique. A trilha começa pelas coordenadas e avança até distâncias envolvendo retas e circunferências.
-          </p>
+<section class="performance-dashboard" id="performanceDashboard">
+<div class="performance-greeting">
+<span class="performance-eyebrow">SEU DESEMPENHO</span>
+<h2>Olá, <span id="homeGreetingName">Jogador</span>.</h2>
+<p>Este resumo considera todas as questões que você já respondeu, inclusive quando refaz um módulo.</p>
 </div>
-<div class="landing-stats">
-<div class="tiny-stat"><b>6 módulos</b><span>Da base cartesiana à circunferência</span></div>
-<div class="tiny-stat"><b>Teoria + prática</b><span>Conceito curto, exemplo guiado e exercícios</span></div>
-<div class="tiny-stat"><b>Progressão</b><span>70% de acerto libera o próximo módulo</span></div>
+<div class="performance-stats">
+<article class="performance-stat stat-total"><span class="performance-stat-icon">∑</span><div><small>QUESTÕES RESPONDIDAS</small><b id="homeTotalAnswered">0</b></div></article>
+<article class="performance-stat stat-correct"><span class="performance-stat-icon">✓</span><div><small>ACERTOS</small><b id="homeTotalCorrect">0</b></div></article>
+<article class="performance-stat stat-wrong"><span class="performance-stat-icon">×</span><div><small>ERROS</small><b id="homeTotalWrong">0</b></div></article>
 </div>
-</div>
+<article class="performance-gauge-card">
+<div class="performance-gauge-label">APROVEITAMENTO</div>
+<div class="performance-gauge" id="homeAccuracyGauge" style="--gauge-deg:0deg"><div class="performance-gauge-inner"><b id="homeAccuracyPct">0%</b><span>de acerto</span></div></div>
+<div class="performance-gauge-legend"><span><i class="legend-good"></i> Acertos</span><span><i class="legend-bad"></i> Erros</span></div>
+</article>
+</section>
+<div class="modules-section-head"><div><span>TRILHA DE APRENDIZAGEM</span><h3>Continue de onde parou</h3></div></div>
 <div class="modules-grid learning-modules-grid" id="modulesGrid"></div>
 </div>
 </section>
@@ -449,7 +453,7 @@
 <div class="settings-head">
 <div>
 <h3 id="settingsTitle">Alterar foto de perfil</h3>
-<p>Escolha a imagem que vai aparecer no seu perfil e, depois, no ranking do GeoQuest.</p>
+<p>Escolha a imagem que vai aparecer no seu perfil e também no ranking do KANT.</p>
 </div>
 <button aria-label="Fechar" class="icon-btn" id="closeSettings" type="button">×</button>
 </div>
@@ -475,7 +479,7 @@
 <div aria-labelledby="rankingTitle" aria-modal="true" class="ranking-card" role="dialog">
 <div class="ranking-head">
 <div>
-<span class="ranking-kicker">GeoQuest</span>
+<span class="ranking-kicker">KANT</span>
 <h3 id="rankingTitle">Ranking de XP</h3>
 <p>Classificação geral dos jogadores pelo XP acumulado.</p>
 </div>
@@ -488,6 +492,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.2.2"></script><script src="js/platform.js?v=3.2.2"></script><script src="js/modules.js?v=3.2.2"></script><script src="js/questions.js?v=3.2.2"></script><script src="js/content.js?v=3.2.2"></script><script src="js/admin.js?v=3.2.2"></script><script src="js/game.js?v=3.2.2"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.3.0"></script><script src="js/platform.js?v=3.3.0"></script><script src="js/modules.js?v=3.3.0"></script><script src="js/questions.js?v=3.3.0"></script><script src="js/content.js?v=3.3.0"></script><script src="js/admin.js?v=3.3.0"></script><script src="js/game.js?v=3.3.0"></script>
 </body>
 </html>
