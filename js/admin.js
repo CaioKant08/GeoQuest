@@ -9,6 +9,68 @@
   const isSuperAdmin=()=>window.kantIsSuperAdmin===true;
   const protectedAdminEmail="caiokvalcanti@gmail.com";
 
+
+  function localModuleFallbacks(){
+    const source=Array.isArray(window.KANT_MODULES)&&window.KANT_MODULES.length
+      ? window.KANT_MODULES
+      : (Array.isArray(window.KANT_DEFAULT_MODULES)?window.KANT_DEFAULT_MODULES:[]);
+    return source.map((m,index)=>(
+      {id:m.id||`local-module-${index+1}`,
+       numero:Number(m.numero)||index+1,
+       titulo:m.titulo||`Módulo ${index+1}`,
+       subtitulo:m.subtitulo||"",
+       cor:m.cor||"green",
+       icone:m.icone||"•",
+       descricao:m.descricao||"",
+       objetivos:Array.isArray(m.objetivos)?m.objetivos:[],
+       published:m.published!==false,
+       position:Number(m.position)||Number(m.numero)||index+1,
+       teoria:Array.isArray(m.teoria)?m.teoria:[],
+       questoes:Array.isArray(m.questoes)?m.questoes:[],
+       __localFallback:true})
+    );
+  }
+
+  function normalizeLocalTheory(rows,moduleId){
+    return (rows||[]).map((r,index)=>(
+      {id:r.id||`${moduleId}-theory-${index+1}`,
+       module_id:moduleId,
+       position:Number(r.position)||index+1,
+       titulo:r.titulo||"",
+       texto:r.texto||"",
+       formula:r.formula||"",
+       exemplo:r.exemplo||"",
+       image_url:r.image_url||"",
+       formula_image_url:r.formula_image_url||"",
+       example_image_url:r.example_image_url||"",
+       published:r.published!==false,
+       __localFallback:true})
+    );
+  }
+
+  function normalizeLocalQuestions(rows,moduleId){
+    return (rows||[]).map((r,index)=>(
+      {id:r.id||`${moduleId}-question-${index+1}`,
+       module_id:moduleId,
+       position:Number(r.position)||index+1,
+       dificuldade:r.dificuldade||"media",
+       xp:Number(r.xp)||0,
+       enunciado:r.enunciado||"",
+       alternativas:Array.isArray(r.alternativas)?r.alternativas:["","","",""],
+       correta:Number(r.correta)||0,
+       dica:r.dica||"",
+       explicacao:r.explicacao||"",
+       image_url:r.image_url||"",
+       explanation_image_url:r.explanation_image_url||"",
+       published:r.published!==false,
+       __localFallback:true})
+    );
+  }
+
+  function getModuleRecord(id){
+    return state.modules.find(m=>m.id===id)||null;
+  }
+
   function status(message,type="ok"){
     const el=$("#adminStatus"); if(!el)return;
     el.textContent=message||"";
@@ -89,14 +151,27 @@
 
   async function loadModules(preferredId=null){
     await requireAdmin();
-    const {data,error}=await db().from("modules")
-      .select("id,numero,titulo,subtitulo,cor,icone,descricao,objetivos,published,position,updated_at")
-      .order("position",{ascending:true}).order("numero",{ascending:true});
-    if(error) throw error;
-    state.modules=data||[];
+    let rows=[];
+    let usedFallback=false;
+    try{
+      const {data,error}=await db().from("modules")
+        .select("id,numero,titulo,subtitulo,cor,icone,descricao,objetivos,published,position,updated_at")
+        .order("position",{ascending:true}).order("numero",{ascending:true});
+      if(error) throw error;
+      rows=data||[];
+    }catch(err){
+      console.warn("KANT Admin: falha ao carregar módulos do banco, usando fallback local.",err);
+      usedFallback=true;
+    }
+    if(!rows.length){
+      rows=localModuleFallbacks();
+      usedFallback=true;
+    }
+    state.modules=rows;
     if(preferredId && state.modules.some(m=>m.id===preferredId)) state.selectedModuleId=preferredId;
     if(!state.selectedModuleId || !state.modules.some(m=>m.id===state.selectedModuleId)) state.selectedModuleId=state.modules[0]?.id||null;
     renderModuleList();
+    if(usedFallback) status("Lista de módulos carregada com fallback local. Se algo não aparecer no banco, ainda dá para revisar a estrutura.","ok");
     if(state.selectedModuleId) await selectModule(state.selectedModuleId,false);
     else clearModuleForm();
   }
@@ -109,7 +184,9 @@
       const btn=document.createElement("button");
       btn.type="button";
       btn.className="admin-module-item"+(m.id===state.selectedModuleId?" active":"");
-      btn.innerHTML=`<span class="admin-module-order">${esc(m.numero)}</span><span><b>${esc(m.titulo)}</b><small>${m.published?"Publicado":"Rascunho"} • ${esc(m.subtitulo||"")}</small></span><i>${m.published?"●":"○"}</i>`;
+      const subtitle=[m.published?"Publicado":"Rascunho", m.subtitulo||""].filter(Boolean).join(" • ");
+      const marker=m.__localFallback?"Local":"●";
+      btn.innerHTML=`<span class="admin-module-order">${esc(m.numero)}</span><span><b>${esc(m.titulo||"Módulo sem título")}</b><small>${esc(subtitle||"Sem subtítulo")}</small></span><i>${esc(marker)}</i>`;
       btn.addEventListener("click",()=>selectModule(m.id));
       box.appendChild(btn);
     });
@@ -122,13 +199,14 @@
     if($("#adminModuleNumero")) $("#adminModuleNumero").value=(state.modules.length+1);
     if($("#adminModulePosition")) $("#adminModulePosition").value=(state.modules.length+1);
     if($("#adminDeleteModule")) $("#adminDeleteModule").disabled=true;
+    renderModuleList();
     renderTheory([]); renderQuestions([]);
   }
 
   async function selectModule(id,rerender=true){
     state.selectedModuleId=id;
     if(rerender)renderModuleList();
-    const m=state.modules.find(x=>x.id===id); if(!m)return;
+    const m=getModuleRecord(id); if(!m)return;
     $("#adminModuleId").value=m.id;
     $("#adminModuleNumero").value=m.numero??"";
     $("#adminModulePosition").value=m.position??m.numero??"";
@@ -184,11 +262,26 @@
   }
 
   async function loadTheory(moduleId){
+    const localModule=getModuleRecord(moduleId);
+    if(localModule?.__localFallback){
+      state.theory=normalizeLocalTheory(localModule.teoria,moduleId);
+      renderTheory(state.theory);
+      return;
+    }
     const {data,error}=await db().from("theory_blocks")
       .select("id,module_id,position,titulo,texto,formula,exemplo,image_url,formula_image_url,example_image_url,published")
       .eq("module_id",moduleId).order("position",{ascending:true});
-    if(error){status(error.message,"err");return;}
-    state.theory=data||[]; renderTheory(state.theory);
+    if(error){
+      if(localModule?.teoria?.length){
+        state.theory=normalizeLocalTheory(localModule.teoria,moduleId);
+        renderTheory(state.theory);
+        return;
+      }
+      status(error.message,"err");
+      return;
+    }
+    state.theory=(data&&data.length)?data:normalizeLocalTheory(localModule?.teoria,moduleId);
+    renderTheory(state.theory);
   }
 
   function renderTheory(rows){
@@ -233,11 +326,26 @@
   async function deleteTheory(id){if(!confirm("Excluir este bloco teórico?"))return;const {error}=await db().from("theory_blocks").delete().eq("id",id);if(error)return status(error.message,"err");await loadTheory(state.selectedModuleId);await refreshPublicContent();}
 
   async function loadQuestions(moduleId){
+    const localModule=getModuleRecord(moduleId);
+    if(localModule?.__localFallback){
+      state.questions=normalizeLocalQuestions(localModule.questoes,moduleId);
+      renderQuestions(state.questions);
+      return;
+    }
     const {data,error}=await db().from("questions")
       .select("id,module_id,position,dificuldade,xp,enunciado,alternativas,correta,dica,explicacao,image_url,explanation_image_url,published")
       .eq("module_id",moduleId).order("position",{ascending:true});
-    if(error){status(error.message,"err");return;}
-    state.questions=data||[];renderQuestions(state.questions);
+    if(error){
+      if(localModule?.questoes?.length){
+        state.questions=normalizeLocalQuestions(localModule.questoes,moduleId);
+        renderQuestions(state.questions);
+        return;
+      }
+      status(error.message,"err");
+      return;
+    }
+    state.questions=(data&&data.length)?data:normalizeLocalQuestions(localModule?.questoes,moduleId);
+    renderQuestions(state.questions);
   }
   function renderQuestions(rows){
     const box=$("#adminQuestionList");if(!box)return;box.innerHTML="";
