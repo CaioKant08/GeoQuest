@@ -122,6 +122,178 @@
     });
   }
 
+
+
+  const SIMPLE_THEORY = {
+    1:{
+      "Coordenadas cartesianas":`Imagine o plano cartesiano como um mapa com duas ruas que se cruzam no centro. A rua horizontal é o eixo $x$ e a vertical é o eixo $y$. O ponto onde elas se encontram é a origem, $O(0,0)$.
+
+Para localizar $P(x,y)$, olhe primeiro para $x$: vá para a direita se for positivo e para a esquerda se for negativo. Depois olhe para $y$: suba se for positivo e desça se for negativo.
+
+A ordem importa. O ponto $P(2,5)$ não é o mesmo que $P(5,2)$. Pense sempre: **primeiro horizontal, depois vertical**.`,
+      "Distância entre dois pontos":`A distância entre dois pontos é simplesmente o tamanho do segmento que liga um ao outro.
+
+Para descobrir esse tamanho, observe quanto mudamos na horizontal e quanto mudamos na vertical. Essas duas mudanças formam os lados de um triângulo retângulo. A distância que queremos é a diagonal desse triângulo.
+
+Por isso usamos Pitágoras: calculamos $\\Delta x$, calculamos $\\Delta y$ e depois fazemos $d=\\sqrt{(\\Delta x)^2+(\\Delta y)^2}$.
+
+Se os pontos estiverem na mesma linha horizontal ou vertical, a conta fica ainda mais simples: basta calcular a diferença entre as coordenadas que mudaram.`,
+      "Ponto médio":`O ponto médio é o ponto que fica exatamente no meio de dois pontos.
+
+Para achar sua coordenada $x$, fazemos a média dos dois valores de $x$. Para achar sua coordenada $y$, fazemos a média dos dois valores de $y$.
+
+É como encontrar o número que fica no meio de dois números, só que fazemos isso duas vezes: uma para a horizontal e outra para a vertical.
+
+Se $M$ for realmente o ponto médio de $A$ e $B$, então a distância de $A$ até $M$ será igual à distância de $M$ até $B$.`,
+      "Aplicações":`Antes de usar uma fórmula grande, olhe o desenho.
+
+Se dois pontos têm o mesmo $y$, eles estão na mesma altura. Então a distância é apenas a diferença entre os valores de $x$.
+
+Se têm o mesmo $x$, eles estão na mesma linha vertical. Então usamos apenas a diferença entre os valores de $y$.
+
+Essa observação simples economiza contas e ajuda a entender vários problemas que aparecem depois, como distância até retas horizontais e verticais.`
+    },
+    2:{
+      "Coeficiente angular":`O coeficiente angular, chamado de $m$, diz quanto uma reta sobe ou desce quando caminhamos para a direita.
+
+Se $m=2$, por exemplo, cada vez que $x$ aumenta 1, o valor de $y$ aumenta 2. Se $m=-3$, quando $x$ aumenta 1, $y$ diminui 3.
+
+Por isso: $m>0$ significa reta crescente; $m<0$ significa reta decrescente; $m=0$ significa reta horizontal.
+
+Para calcular, fazemos “quanto $y$ mudou” dividido por “quanto $x$ mudou”: $m=\\frac{\\Delta y}{\\Delta x}$. Uma reta vertical não tem $m$ definido porque teríamos divisão por zero.`,
+      "Forma geral e reduzida":`Uma mesma reta pode ser escrita de jeitos diferentes.
+
+Na forma reduzida, $y=mx+b$, conseguimos enxergar duas informações rapidamente: $m$ mostra a inclinação e $b$ mostra onde a reta corta o eixo $y$.
+
+Na forma geral, escrevemos $Ax+By+C=0$. Essa forma é muito útil em contas de distância entre ponto e reta.
+
+As duas formas podem representar exatamente a mesma reta. Então aprender a passar de uma para outra é como aprender a escrever a mesma informação em dois formatos diferentes.`,
+      "Forma ponto–inclinação":`Use esta forma quando o problema já entrega duas coisas: um ponto da reta e sua inclinação $m$.
+
+A fórmula é $y-y_0=m(x-x_0)$. O par $(x_0,y_0)$ é o ponto conhecido.
+
+Faça assim: coloque $x_0$, $y_0$ e $m$ na fórmula; depois resolva os parênteses e organize a equação.
+
+A ideia é simples: $m$ diz para onde a reta aponta, e o ponto diz por onde ela precisa passar. Essas duas informações já determinam a reta.`,
+      "Dois pontos e interceptos":`Dois pontos diferentes são suficientes para determinar uma única reta.
+
+Primeiro calcule a inclinação entre eles. Depois use um dos pontos na forma ponto–inclinação para construir a equação.
+
+Há uma exceção importante: se os dois pontos têm o mesmo $x$, a reta é vertical e sua equação é $x=k$.
+
+Para descobrir onde uma reta corta o eixo $x$, faça $y=0$. Para descobrir onde corta o eixo $y$, faça $x=0$. Esses pontos são chamados de interceptos.`
+    },
+    3:{
+      "Interseção":`Quando duas retas se cruzam, existe um ponto que pertence às duas ao mesmo tempo. Esse é o ponto de interseção.
+
+Para encontrá-lo, precisamos achar valores de $x$ e $y$ que façam as duas equações serem verdadeiras ao mesmo tempo. Por isso resolvemos um sistema.
+
+Se as duas equações estiverem como $y=...$, podemos igualar os lados direitos, descobrir $x$ e depois substituir para encontrar $y$.
+
+Uma solução significa que as retas se cruzam uma vez. Nenhuma solução indica paralelas distintas. Infinitas soluções indicam que são a mesma reta.`,
+      "Paralelas e coincidentes":`Retas paralelas apontam na mesma direção e nunca se encontram. Na forma $y=mx+b$, elas têm o mesmo valor de $m$, mas valores diferentes de $b$.
+
+Retas coincidentes também têm a mesma direção, mas na verdade são a mesma reta desenhada duas vezes. Nesse caso, todos os pontos são comuns.
+
+Então não basta ver que os coeficientes angulares são iguais. Depois disso, compare os outros coeficientes para decidir se são paralelas diferentes ou a mesma reta.`,
+      "Perpendicularidade":`Duas retas são perpendiculares quando se cruzam formando um ângulo reto, de $90^\\circ$.
+
+Para retas comuns, se uma tem inclinação $m_1$, a outra deve ter uma inclinação que satisfaça $m_1m_2=-1$.
+
+Um jeito prático é inverter a fração e trocar o sinal. Por exemplo: se $m=\\frac12$, a perpendicular tem $m=-2$.
+
+Também existe o caso mais fácil de visualizar: uma reta horizontal e uma reta vertical são perpendiculares.`,
+      "Quadro de decisão":`Para classificar duas retas sem se perder, siga uma ordem.
+
+Primeiro descubra as inclinações. Se forem diferentes, as retas se cruzam em um único ponto. Se forem iguais, compare o restante das equações: podem ser paralelas distintas ou coincidentes.
+
+Se o produto das inclinações for $-1$, as retas são perpendiculares.
+
+A ideia é não decorar casos soltos. Faça sempre a mesma sequência de perguntas e a classificação aparece naturalmente.`
+    },
+    4:{
+      "Pontos colineares":`Pontos colineares são pontos que cabem sobre uma mesma reta.
+
+Uma maneira de testar isso é comparar as inclinações. Calcule a inclinação de $A$ para $B$ e depois de $B$ para $C$. Se forem iguais, os três pontos seguem a mesma direção.
+
+Esse método funciona bem na maioria dos casos, mas exige cuidado quando aparece uma reta vertical. Por isso também existe o teste pelo determinante.`,
+      "Determinante e alinhamento":`O determinante é uma forma mais geral de verificar se três pontos estão alinhados.
+
+Colocamos as coordenadas dos três pontos na expressão do determinante e calculamos o resultado.
+
+Se o resultado for $0$, os pontos estão na mesma reta. Se o resultado for diferente de $0$, eles formam um triângulo de verdade.
+
+A vantagem é que esse método também funciona quando a reta é vertical, sem precisar dividir por nada.`,
+      "Área de triângulo":`As coordenadas dos três vértices são suficientes para calcular a área de um triângulo.
+
+Primeiro calculamos o mesmo determinante usado no teste de alinhamento. Depois pegamos o valor absoluto e dividimos por 2.
+
+Por isso a fórmula é $A=\\frac{|D|}{2}$.
+
+Se o determinante der zero, a área também será zero. Isso significa que os três pontos ficaram alinhados e não formaram um triângulo com área.`,
+      "Ligação conceitual":`Colinearidade e área são duas formas de olhar para a mesma situação.
+
+Se três pontos estão alinhados, o “triângulo” fica completamente achatado. Então sua área é zero. Ao mesmo tempo, o determinante também é zero.
+
+Por isso, quando uma questão traz uma letra ou parâmetro, podemos usar $D=0$ para descobrir quando os pontos ficam alinhados, ou usar $\\frac{|D|}{2}$ para impor uma área específica.`
+    },
+    5:{
+      "Ideia geométrica":`A distância de um ponto até uma reta é o menor caminho possível entre eles.
+
+Esse menor caminho não vai em qualquer direção: ele encontra a reta formando um ângulo de $90^\\circ$.
+
+Por isso desenhamos um segmento perpendicular saindo do ponto e chegando à reta. O comprimento desse segmento é a distância procurada.
+
+Essa ideia é importante porque explica a fórmula e também aparece na distância entre retas paralelas e na tangência de circunferências.`,
+      "Fórmula ponto–reta":`Para calcular diretamente a distância de $P(x_0,y_0)$ até a reta $Ax+By+C=0$, usamos uma fórmula pronta.
+
+No numerador, substitua o ponto na expressão $Ax+By+C$ e use o valor absoluto. No denominador, calcule $\\sqrt{A^2+B^2}$.
+
+Depois é só dividir.
+
+O valor absoluto é necessário porque uma distância nunca pode ser negativa. Antes de começar, confira se a reta realmente está escrita na forma geral.`,
+      "Casos simples":`Algumas distâncias podem ser resolvidas sem a fórmula grande.
+
+Se a reta é vertical, como $x=2$, basta olhar a diferença horizontal entre o $x$ do ponto e o número 2.
+
+Se a reta é horizontal, como $y=5$, basta olhar a diferença vertical entre o $y$ do ponto e o número 5.
+
+Em resumo: reta vertical → compare $x$; reta horizontal → compare $y$.`,
+      "Retas paralelas":`Duas retas paralelas ficam sempre à mesma distância uma da outra.
+
+Se elas estiverem escritas como $Ax+By+C_1=0$ e $Ax+By+C_2=0$, com os mesmos $A$ e $B$, podemos calcular essa distância usando a diferença entre $C_1$ e $C_2$.
+
+O cuidado principal é garantir que os coeficientes $A$ e $B$ estejam realmente iguais nas duas equações. Se não estiverem, primeiro precisamos multiplicar ou dividir uma das equações para deixá-las na mesma escala.`
+    },
+    6:{
+      "Definição e forma reduzida":`Uma circunferência é formada por todos os pontos que estão à mesma distância de um centro.
+
+Se o centro é $C(a,b)$ e o raio é $r$, qualquer ponto $P(x,y)$ da borda está exatamente a distância $r$ do centro.
+
+Da fórmula da distância nasce a equação $(x-a)^2+(y-b)^2=r^2$.
+
+Para ler o centro, preste atenção aos sinais: $(x-2)^2$ dá coordenada $2$, enquanto $(y+3)^2$ significa $y-(-3)$, então a coordenada é $-3$.`,
+      "Forma geral":`A forma geral da circunferência aparece quando abrimos os quadrados da forma reduzida.
+
+Nela, o centro e o raio ficam escondidos dentro da expressão. Para encontrá-los novamente, precisamos reorganizar os termos e completar quadrados.
+
+O objetivo é transformar a equação de volta em algo como $(x-a)^2+(y-b)^2=r^2$.
+
+Quando chegamos nessa forma, conseguimos ler diretamente o centro $C(a,b)$ e o raio $r$.`,
+      "Posição de um ponto":`Para saber se um ponto está dentro, em cima ou fora de uma circunferência, compare sua distância até o centro com o raio.
+
+Se a distância for menor que $r$, o ponto está dentro. Se for igual a $r$, o ponto está exatamente sobre a circunferência. Se for maior, está fora.
+
+Podemos comparar também os valores ao quadrado, $d^2$ e $r^2$, para evitar calcular raízes desnecessárias.`,
+      "Tangência":`Uma reta tangente encosta na circunferência em apenas um ponto.
+
+Nesse ponto de contato, o raio é perpendicular à reta. Isso cria um jeito simples de testar tangência: calcule a distância do centro até a reta.
+
+Se essa distância for exatamente igual ao raio, a reta é tangente. Se for menor, a reta atravessa a circunferência em dois pontos. Se for maior, ela não toca a circunferência.`
+    }
+  };
+  function simpleTheoryText(moduleNumber,title){return SIMPLE_THEORY[Number(moduleNumber)]?.[title]||"";}
+
   const MODULE_VIDEO_GUIDES = {
     1:[
       {title:"Distância entre 2 pontos",channel:"Equaciona com Paulo Pereira",id:"ZJ5Aqwcx9f4"},
@@ -168,13 +340,27 @@
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
     const grid=$("#theoryGrid");
     grid.classList.add("theory-paged-grid");
-    grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card theory-page" data-theory-index="${i}" aria-hidden="true"><div class="theory-page-top"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><span class="theory-page-count">Etapa ${i+1} de 5</span></div><h4>${t.titulo}</h4><p class="theory-explanation">${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("")+videoGuidePage(m);
+    grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card theory-page" data-theory-index="${i}" aria-hidden="true"><div class="theory-page-top"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><span class="theory-page-count">Etapa ${i+1} de 5</span></div><div class="theory-title-row"><h4>${t.titulo}</h4><button type="button" class="simplify-theory-btn" data-simplify-index="${i}" aria-pressed="false"><span class="simplify-icon" aria-hidden="true">✨</span><span class="simplify-label">Simplificar explicação</span></button></div><div class="simple-mode-note" data-simple-note="${i}" hidden><b>Versão simples</b><span>Mesma ideia, explicada com palavras mais diretas.</span></div><p class="theory-explanation" data-explanation-index="${i}">${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("")+videoGuidePage(m);
     m.teoria.forEach((t,i)=>{
       window.KantMath?.renderFormula(grid.querySelector(`[data-formula-index="${i}"]`),t.formula);
       const exampleEl=grid.querySelector(`[data-example-index="${i}"]`);
       window.KantMath?.renderTextWithMath(exampleEl,t.exemplo,{allowLatexPrefix:true});
     });
     grid.querySelectorAll(".theory-explanation").forEach((el,i)=>window.KantMath?.renderTextWithMath(el,m.teoria[i]?.texto||el.textContent));
+    grid.querySelectorAll("[data-simplify-index]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const i=Number(btn.dataset.simplifyIndex),theory=m.teoria[i],el=grid.querySelector(`[data-explanation-index="${i}"]`),note=grid.querySelector(`[data-simple-note="${i}"]`);
+        if(!theory||!el)return;
+        const isSimple=btn.getAttribute("aria-pressed")!=="true";
+        const simple=simpleTheoryText(m.numero,theory.titulo);
+        btn.setAttribute("aria-pressed",String(isSimple));
+        btn.classList.toggle("is-simple",isSimple);
+        const label=btn.querySelector(".simplify-label");if(label)label.textContent=isSimple?"Ver explicação completa":"Simplificar explicação";
+        if(note)note.hidden=!isSimple;
+        el.classList.toggle("is-simple",isSimple);
+        window.KantMath?.renderTextWithMath(el,isSimple&&simple?simple:theory.texto);
+      });
+    });
     if(window.KantCartesian){
       const cards=[...grid.querySelectorAll(".theory-card")];
       m.teoria.forEach((t,i)=>window.KantCartesian.renderForTheoryCard(cards[i],m,t));
