@@ -83,6 +83,9 @@
 <button class="nav-link" id="navChallenges" type="button">
 <span aria-hidden="true" class="nav-icon nav-math"><svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 7h6" stroke="currentColor" stroke-linecap="round" stroke-width="2.3"></path><path d="M8 4v6" stroke="currentColor" stroke-linecap="round" stroke-width="2.3"></path><path d="M5 17h6" stroke="currentColor" stroke-linecap="round" stroke-width="2.3"></path><path d="M15 12h6" stroke="currentColor" stroke-linecap="round" stroke-width="2.3"></path><circle cx="18" cy="8" fill="currentColor" r="1.4"></circle><circle cx="18" cy="16" fill="currentColor" r="1.4"></circle></svg></span><span>Desafios</span>
 </button>
+<button class="nav-link" id="navLaboratory" type="button">
+<span aria-hidden="true" class="nav-icon nav-lab"><svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 4v4.7l-4.4 7.1A2 2 0 0 0 6.3 19h11.4a2 2 0 0 0 1.7-3.2L15 8.7V4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1"></path><path d="M8 13h8" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path><path d="M10 4h4" stroke="currentColor" stroke-linecap="round" stroke-width="2.1"></path></svg></span><span>Laboratório</span>
+</button>
 <button class="nav-link" id="rankingBtn" type="button">
 <span aria-hidden="true" class="nav-icon nav-ranking"><svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 6.5l1.6 2.1L12 5.5l2.4 3.1L16 6.5l1.3 3H6.7L8 6.5z" fill="currentColor" opacity=".92"></path><path d="M9 10h6v8H9z" fill="currentColor" opacity=".12"></path><path d="M9 10h6v8H9z" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path><path d="M8 18h8" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path><path d="M10 13h4" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path></svg></span><span>Ranking</span>
 </button>
@@ -242,6 +245,66 @@
 <button class="btn primary" data-mode="vestibular" id="vestibularChallengeBtn" type="button" disabled>Jogar Vestibulares</button>
 </article>
 </div>
+</div>
+</section>
+<section class="screen" id="laboratory">
+<div class="lab-shell">
+  <section class="lab-hero card">
+    <div>
+      <span class="pill-kicker">Exploração prática</span>
+      <h2>Laboratório KANT</h2>
+      <p>Teste pontos, retas e relações geométricas em um plano cartesiano interativo. É uma versão enxuta, focada exatamente no conteúdo da sua prova.</p>
+    </div>
+    <div class="lab-hero-actions">
+      <button class="btn secondary" id="labPresetBtn" type="button">🎲 Gerar exemplo</button>
+      <button class="btn ghost" id="labResetBtn" type="button">Limpar</button>
+    </div>
+  </section>
+  <div class="lab-layout">
+    <aside class="lab-sidebar card">
+      <div class="lab-section-head"><span>Ferramentas</span><h3>O que você quer investigar?</h3></div>
+      <div class="lab-tool-list" id="labToolList">
+        <button class="lab-tool active" data-tool="distance" type="button"><b>Distância</b><small>Entre dois pontos</small></button>
+        <button class="lab-tool" data-tool="midpoint" type="button"><b>Ponto médio</b><small>Média das coordenadas</small></button>
+        <button class="lab-tool" data-tool="line2pts" type="button"><b>Reta por 2 pontos</b><small>Monte a equação da reta</small></button>
+        <button class="lab-tool" data-tool="lineeq" type="button"><b>Reta por equação</b><small>Visualize y = mx + b</small></button>
+        <button class="lab-tool" data-tool="intersection" type="button"><b>Interseção</b><small>Ponto comum entre duas retas</small></button>
+      </div>
+      <div class="lab-form-wrap">
+        <form class="lab-form active" data-form="distance">
+          <div class="lab-form-grid"><label><span>x₁</span><input id="labDistX1" type="number" step="any" value="-2"></label><label><span>y₁</span><input id="labDistY1" type="number" step="any" value="5"></label><label><span>x₂</span><input id="labDistX2" type="number" step="any" value="4"></label><label><span>y₂</span><input id="labDistY2" type="number" step="any" value="-3"></label></div>
+          <button class="btn primary" data-action="run-distance" type="button">Calcular distância</button>
+        </form>
+        <form class="lab-form" data-form="midpoint" hidden>
+          <div class="lab-form-grid"><label><span>x₁</span><input id="labMidX1" type="number" step="any" value="7"></label><label><span>y₁</span><input id="labMidY1" type="number" step="any" value="-1"></label><label><span>x₂</span><input id="labMidX2" type="number" step="any" value="-3"></label><label><span>y₂</span><input id="labMidY2" type="number" step="any" value="11"></label></div>
+          <button class="btn primary" data-action="run-midpoint" type="button">Calcular ponto médio</button>
+        </form>
+        <form class="lab-form" data-form="line2pts" hidden>
+          <div class="lab-form-grid"><label><span>x₁</span><input id="labLine2X1" type="number" step="any" value="2"></label><label><span>y₁</span><input id="labLine2Y1" type="number" step="any" value="3"></label><label><span>x₂</span><input id="labLine2X2" type="number" step="any" value="6"></label><label><span>y₂</span><input id="labLine2Y2" type="number" step="any" value="11"></label></div>
+          <button class="btn primary" data-action="run-line2pts" type="button">Gerar reta</button>
+        </form>
+        <form class="lab-form" data-form="lineeq" hidden>
+          <div class="lab-form-grid two"><label><span>m</span><input id="labEqM" type="number" step="any" value="2"></label><label><span>b</span><input id="labEqB" type="number" step="any" value="3"></label></div>
+          <button class="btn primary" data-action="run-lineeq" type="button">Desenhar reta</button>
+        </form>
+        <form class="lab-form" data-form="intersection" hidden>
+          <div class="lab-form-grid two"><label><span>m₁</span><input id="labIntM1" type="number" step="any" value="1"></label><label><span>b₁</span><input id="labIntB1" type="number" step="any" value="1"></label><label><span>m₂</span><input id="labIntM2" type="number" step="any" value="-2"></label><label><span>b₂</span><input id="labIntB2" type="number" step="any" value="7"></label></div>
+          <button class="btn primary" data-action="run-intersection" type="button">Encontrar interseção</button>
+        </form>
+      </div>
+      <div class="lab-note">Dica: você pode usar o laboratório antes ou depois de resolver uma questão para enxergar melhor a geometria.</div>
+    </aside>
+    <section class="lab-workspace">
+      <article class="card lab-plane-card">
+        <div class="lab-section-head"><span>Plano cartesiano</span><h3>Visualização</h3></div>
+        <div class="lab-plane" id="labPlane"></div>
+      </article>
+      <article class="card lab-output-card">
+        <div class="lab-section-head"><span>Leitura matemática</span><h3>Resultados</h3></div>
+        <div class="lab-output" id="labOutput"></div>
+      </article>
+    </section>
+  </div>
 </div>
 </section>
 <section class="screen" id="profile">
@@ -556,6 +619,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script><script src="js/math.js?v=3.10.0"></script><script src="js/cartesian-engine.js?v=3.10.0"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.10.0"></script><script src="js/platform.js?v=3.10.0"></script><script src="js/modules.js?v=3.10.0"></script><script src="js/questions.js?v=3.10.0"></script><script src="js/variants.js?v=3.10.0"></script><script src="js/vestibular.js?v=3.10.0"></script><script src="js/content.js?v=3.10.0"></script><script src="js/admin.js?v=3.10.0"></script><script src="js/game.js?v=3.10.0"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script><script src="js/math.js?v=3.10.0"></script><script src="js/cartesian-engine.js?v=3.10.0"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.10.0"></script><script src="js/platform.js?v=3.10.0"></script><script src="js/modules.js?v=3.10.0"></script><script src="js/questions.js?v=3.10.0"></script><script src="js/variants.js?v=3.10.0"></script><script src="js/vestibular.js?v=3.10.0"></script><script src="js/content.js?v=3.10.0"></script><script src="js/admin.js?v=3.10.0"></script><script src="js/laboratory.js?v=3.11.0"></script><script src="js/game.js?v=3.11.0"></script>
 </body>
 </html>

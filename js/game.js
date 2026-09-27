@@ -2,7 +2,7 @@
   let modules = window.KANT_MODULES || [];
   let bank = window.KANT_QUESTIONS || [];
   const $ = (s) => document.querySelector(s);
-  const screens = ["home","moduleStudy","challenges","profile","admin","game","results"].reduce((o,id)=>(o[id]=$("#"+id),o),{});
+  const screens = ["home","moduleStudy","challenges","laboratory","profile","admin","game","results"].reduce((o,id)=>(o[id]=$("#"+id),o),{});
 
   let mode="quick", questions=[], idx=0, lives=3, xp=0, streak=0, bestStreak=0, score=0, answered=false, lightning=false, hintUsed=false;
   let timerId=null, endAt=0, runDeadline=0, runDuration=0, lastMode="quick";
@@ -60,8 +60,8 @@
   }
 
   function setNavActive(name){
-    const map={home:"navHome",challenges:"navChallenges",profile:"navProfile",admin:"navAdmin"};
-    ["navHome","navChallenges","navProfile","navAdmin"].forEach(id=>document.getElementById(id)?.classList.remove("active"));
+    const map={home:"navHome",challenges:"navChallenges",laboratory:"navLaboratory",profile:"navProfile",admin:"navAdmin"};
+    ["navHome","navChallenges","navLaboratory","navProfile","navAdmin"].forEach(id=>document.getElementById(id)?.classList.remove("active"));
     if(map[name]) document.getElementById(map[name])?.classList.add("active");
   }
   function syncProfileScreen(){
@@ -540,7 +540,7 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     $("#topic").textContent=q.topic||q.source||"Geometria Analítica";
     $("#counter").textContent=`Questão ${idx+1} de ${questions.length}`;
     $("#levelLabel").textContent=(mode==="module"||mode==="module-extra")?`${mode==="module-extra"?"Treino extra":"Prática"} • ${difficultyLabel(q.difficulty)}`:mode==="vestibular"?`Vestibular • 45 XP base • 2× XP`:`${difficultyLabel(q.difficulty)} • ${Number(q.xpValue)||30} XP base`;
-    $("#visual").textContent=q.visual||"";$("#question").textContent=q.q;$("#feedback").innerHTML="";$("#nextBtn").style.display="none";$("#nextBtn").textContent="Próxima questão →";$("#options").innerHTML="";const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
+    const visual=$("#visual"),hasVisual=!!String(q.visual||"").trim();if(visual){visual.textContent=q.visual||"";visual.hidden=!hasVisual;}$("#question").textContent=q.q;$("#feedback").innerHTML="";$("#nextBtn").style.display="none";$("#nextBtn").textContent="Próxima questão →";$("#options").innerHTML="";const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
     const media=$("#questionMedia"),expMedia=$("#explanationMedia");if(media){media.innerHTML="";media.hidden=!q.imageUrl;if(q.imageUrl){const img=document.createElement("img");img.src=q.imageUrl;img.alt="Imagem da questão";media.appendChild(img);}}if(expMedia){expMedia.innerHTML="";expMedia.hidden=true;}
     window.KantMath?.renderInline($("#question"));resetHint(q);
     q.opts.forEach((opt,i)=>{const b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+i)+") "+opt;b.addEventListener("click",()=>answer(i,b));$("#options").appendChild(b);window.KantMath?.renderInline(b);});
@@ -731,7 +731,7 @@ A alternativa correta é ${letter}) ${answer}.`;
 
 
   document.querySelectorAll("[data-mode]").forEach(el=>el.addEventListener("click",()=>start(el.dataset.mode)));
-  document.getElementById("navHome")?.addEventListener("click",()=>show("home"));document.getElementById("navChallenges")?.addEventListener("click",()=>show("challenges"));document.getElementById("navProfile")?.addEventListener("click",()=>show("profile"));document.getElementById("navAdmin")?.addEventListener("click",()=>{if(window.kantIsAdmin)show("admin");});document.getElementById("profileChangePhotoBtn")?.addEventListener("click",()=>document.getElementById("settingsBtn")?.click());
+  document.getElementById("navHome")?.addEventListener("click",()=>show("home"));document.getElementById("navChallenges")?.addEventListener("click",()=>show("challenges"));document.getElementById("navLaboratory")?.addEventListener("click",()=>show("laboratory"));document.getElementById("navProfile")?.addEventListener("click",()=>show("profile"));document.getElementById("navAdmin")?.addEventListener("click",()=>{if(window.kantIsAdmin)show("admin");});document.getElementById("profileChangePhotoBtn")?.addEventListener("click",()=>document.getElementById("settingsBtn")?.click());
   $("#studyBackBtn")?.addEventListener("click",()=>show("home"));$("#startModulePracticeBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId));$("#startModuleExtraBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId,true,true));
   function resetRunState(){clearTimer();idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=false;runDeadline=0;runDuration=0;currentModuleId=null;}
   function leaveRun(){saveActiveRun();clearTimer();if(mode==="module"&&currentModuleId)Promise.resolve(recordModuleCheckpoint(answered)).catch(()=>{});show("home");if(window.geoquestFlushXP)Promise.resolve(window.geoquestFlushXP()).catch(()=>{});resetRunState();}

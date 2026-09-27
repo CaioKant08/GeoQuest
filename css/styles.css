@@ -4776,3 +4776,49 @@ body.dark .mini-visual{
 body.dark .progress{background:#0d1520 !important;border-color:#2e4156 !important;}
 body.dark #counter{font-weight:800;}
 body.dark #levelLabel{opacity:1 !important;}
+
+/* KANT v3.11.0 — Laboratório + remoção do visual vazio */
+.mini-visual[hidden],
+.question-media[hidden],
+.explanation-media[hidden]{display:none !important;}
+
+.lab-shell{display:grid;gap:22px}
+.lab-hero{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:24px 26px}
+.lab-hero h2{margin:4px 0 10px;font-size:clamp(1.8rem,2vw,2.4rem);color:#15294b}
+.lab-hero p{margin:0;color:#5e718f;max-width:860px;line-height:1.65}
+.lab-hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.lab-layout{display:grid;grid-template-columns:minmax(300px,370px) minmax(0,1fr);gap:22px;align-items:start}
+.lab-sidebar,.lab-plane-card,.lab-output-card{padding:22px;border:1px solid #d9e4f1;background:rgba(255,255,255,.94);box-shadow:0 16px 40px rgba(79,108,148,.08)}
+.lab-section-head{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.lab-section-head span{font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6f84a7}
+.lab-section-head h3{margin:0;color:#17345e;font-size:1.16rem}
+.lab-tool-list{display:grid;gap:10px;margin-bottom:16px}
+.lab-tool{border:1px solid #dbe4f0;background:#f7faff;border-radius:18px;padding:14px 16px;text-align:left;display:grid;gap:4px;color:#17345e;transition:.2s ease;cursor:pointer}
+.lab-tool b{font-size:1rem}
+.lab-tool small{color:#6780a4}
+.lab-tool.active{border-color:#9ec7ac;background:linear-gradient(180deg,#effaf2,#f8fcf9);box-shadow:0 10px 24px rgba(28,128,73,.10);transform:translateY(-1px)}
+.lab-form-wrap{display:grid}
+.lab-form{display:grid;gap:12px}
+.lab-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lab-form-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.lab-form label{display:grid;gap:6px}
+.lab-form label span{font-size:.88rem;font-weight:700;color:#4f6484}
+.lab-form input{border:1px solid #d6dfeb;background:#fff;border-radius:14px;padding:12px 14px;font-size:1rem;color:#17345e;outline:none}
+.lab-form input:focus{border-color:#90b4ff;box-shadow:0 0 0 4px rgba(89,134,255,.12)}
+.lab-note{margin-top:16px;padding:14px 16px;border-radius:16px;background:#f5f8fd;border:1px dashed #d4deec;color:#60728f;line-height:1.55}
+.lab-workspace{display:grid;gap:22px}
+.lab-plane{min-height:620px;border:1px solid #d7e2ef;border-radius:24px;padding:16px;background:linear-gradient(180deg,#fdfefe,#f7fbff);display:grid;place-items:center;overflow:hidden}
+.lab-plane .kant-cartesian-svg{width:100%;height:auto;max-width:100%}
+.lab-output{display:grid;gap:12px;min-height:210px}
+.lab-output-title{font-size:1.1rem;font-weight:900;color:#16325c}
+.lab-output-body{color:#3d506d;line-height:1.72;font-size:1rem;white-space:pre-line}
+body.dark .lab-sidebar,body.dark .lab-plane-card,body.dark .lab-output-card,body.dark .lab-hero{background:rgba(19,29,44,.9);border-color:#2a3d55;box-shadow:0 18px 38px rgba(0,0,0,.28)}
+body.dark .lab-hero h2,body.dark .lab-section-head h3,body.dark .lab-output-title,body.dark .lab-tool,body.dark .lab-form input{color:#eef4ff}
+body.dark .lab-hero p,body.dark .lab-note,body.dark .lab-output-body,body.dark .lab-form label span,body.dark .lab-tool small,body.dark .lab-section-head span{color:#b8c8df}
+body.dark .lab-tool{background:#121d2b;border-color:#2a3e58}
+body.dark .lab-tool.active{background:linear-gradient(180deg,#10261a,#13291e);border-color:#286b47;box-shadow:0 12px 28px rgba(24,145,76,.14)}
+body.dark .lab-form input{background:#0e1723;border-color:#31465d}
+body.dark .lab-note{background:#101925;border-color:#304560}
+body.dark .lab-plane{background:linear-gradient(180deg,#0e1724,#111d2d);border-color:#31465d}
+@media (max-width: 1100px){.lab-layout{grid-template-columns:1fr}.lab-plane{min-height:520px}}
+@media (max-width: 720px){.lab-hero{padding:20px;align-items:flex-start;flex-direction:column}.lab-form-grid,.lab-form-grid.two{grid-template-columns:1fr}.lab-plane{min-height:420px}}
