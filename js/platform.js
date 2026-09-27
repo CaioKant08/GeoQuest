@@ -212,8 +212,11 @@
     const wrong=Math.max(0,Number(stats.total_wrong)||0);
     const accuracy=answered?Math.round((correct/answered)*100):0;
     const name=(currentProfile?.display_name || document.getElementById("accountUser")?.textContent || "Jogador").trim();
-    const map={homeGreetingName:name,homeTotalAnswered:answered.toLocaleString("pt-BR"),homeTotalCorrect:correct.toLocaleString("pt-BR"),homeTotalWrong:wrong.toLocaleString("pt-BR"),homeAccuracyPct:accuracy+"%"};
+    const motivation=answered===0?"Sua trilha começa com uma questão. Faça a primeira e construa seu ritmo.":accuracy>=85?"Excelente consistência. Continue refinando o que você já domina.":accuracy>=70?"Você está construindo uma base forte. Mantenha a sequência.":accuracy>=50?"Cada erro está mostrando exatamente onde vale revisar agora.":"Seu progresso começa na repetição. Revise, tente de novo e acompanhe a evolução.";
+    const map={homeGreetingName:name,homeTotalAnswered:answered.toLocaleString("pt-BR"),homeTotalCorrect:correct.toLocaleString("pt-BR"),homeTotalWrong:wrong.toLocaleString("pt-BR"),homeAccuracyPct:accuracy+"%",homeMotivationalText:motivation,profileAnsweredMetric:answered.toLocaleString("pt-BR"),profileAccuracyMetric:accuracy+"%"};
     Object.entries(map).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=value;});
+    const homeAvatar=document.getElementById("homeGreetingAvatar");
+    if(homeAvatar){homeAvatar.innerHTML="";if(currentProfile?.avatar_url){const img=document.createElement("img");img.src=currentProfile.avatar_url;img.alt="Foto de perfil";homeAvatar.appendChild(img);}else{homeAvatar.textContent=(name||"K").trim().charAt(0).toUpperCase()||"K";}}
     const gauge=document.getElementById("homeAccuracyGauge");
     if(gauge)gauge.style.setProperty("--gauge-deg",(Math.max(0,Math.min(100,accuracy))*1.8)+"deg");
   }

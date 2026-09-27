@@ -29,12 +29,30 @@
   function syncProfileScreen(){
     const largeAvatar=document.getElementById("profileAvatarLarge"), headerAvatar=document.getElementById("headerAvatar");
     const profileName=document.getElementById("profileNameLarge"), profileEmail=document.getElementById("profileEmailLarge");
-    const profileLevel=document.getElementById("profileLevelMirror"), profileXp=document.getElementById("profileXpMirror");
+    const profileLevel=document.getElementById("profileLevelMirror"), profileXp=document.getElementById("profileXpMirror"), profileXpMetric=document.getElementById("profileXpMetric");
     if(largeAvatar && headerAvatar){ const img=headerAvatar.querySelector("img"); if(img){largeAvatar.innerHTML=""; const clone=document.createElement("img"); clone.src=img.src; clone.alt="Avatar do jogador"; largeAvatar.appendChild(clone);} else largeAvatar.textContent=headerAvatar.textContent||"K"; }
     if(profileName) profileName.textContent=document.getElementById("accountUser")?.textContent||"Jogador";
     if(profileEmail) profileEmail.textContent=document.getElementById("menuUserEmail")?.textContent||"—";
     if(profileLevel) profileLevel.textContent=document.getElementById("globalLevel")?.textContent||"Nível 1";
-    if(profileXp) profileXp.textContent=document.getElementById("globalXpText")?.textContent||"0 XP";
+    const xpText=document.getElementById("globalXpText")?.textContent||"0 XP";
+    if(profileXp) profileXp.textContent=xpText;
+    if(profileXpMetric) profileXpMetric.textContent=xpText;
+    renderProfileProgress();
+    if(window.kantLoadPerformanceStats)window.kantLoadPerformanceStats();
+  }
+  function renderProfileProgress(){
+    const list=document.getElementById("profileModuleProgressList"); if(!list)return;
+    const progress=getProgress(); let completed=0, firstOpen=null;
+    list.innerHTML="";
+    modules.forEach((m,i)=>{const r=progress[m.id]||{best:0,completed:false};if(r.completed)completed++;if(firstOpen===null&&!r.completed&&isUnlocked(i))firstOpen=m;
+      const best=Number(r.best)||0;const pct=r.completed?100:(r.currentTotal?Math.round((Number(r.currentAnswered)||0)/Number(r.currentTotal)*100):0);
+      const row=document.createElement("div");row.className="profile-module-row";row.innerHTML=`<span class="profile-module-number">${m.numero}</span><div class="profile-module-copy"><b>${m.titulo}</b><div class="profile-module-track"><span style="width:${Math.max(0,Math.min(100,pct))}%"></span></div></div><div class="profile-module-score"><b>${best?best+"%":"—"}</b><small>melhor</small></div>`;list.appendChild(row);
+    });
+    const metric=document.getElementById("profileModulesMetric");if(metric)metric.textContent=`${completed}/${modules.length}`;
+    const summary=document.getElementById("profileProgressSummary");if(summary)summary.textContent=completed===modules.length?"Trilha principal concluída":`${completed} de ${modules.length} módulos concluídos`;
+    const goal=document.getElementById("profileNextGoal"),goalText=document.getElementById("profileNextGoalText");
+    if(completed===modules.length){if(goal)goal.textContent="Reforce o que você já conquistou";if(goalText)goalText.textContent="Revise os módulos e tente superar seus melhores resultados.";}
+    else if(firstOpen){if(goal)goal.textContent=`Módulo ${firstOpen.numero} — ${firstOpen.titulo}`;if(goalText)goalText.textContent="Estude a teoria, faça a prática e busque pelo menos 70% para seguir.";}
   }
   function show(name){
     Object.values(screens).forEach(x=>x?.classList.remove("active")); screens[name]?.classList.add("active"); setNavActive(name);

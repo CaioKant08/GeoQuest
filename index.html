@@ -4,13 +4,13 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
-<link href="assets/kant-symbol.png?v=3.2.2" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=3.3.0" rel="stylesheet"/>
+<link href="assets/kant-symbol.png?v=3.4.0" rel="icon" type="image/png"/>
+<link href="css/styles.css?v=3.4.0" rel="stylesheet"/>
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
 <div>
-<img alt="Kant" src="assets/kant-symbol.png?v=3.2.2" style="width:72px;height:72px;object-fit:contain;margin-bottom:10px"/>
+<img alt="Kant" src="assets/kant-symbol.png?v=3.4.0" style="width:72px;height:72px;object-fit:contain;margin-bottom:10px"/>
 <div>Conectando ao KANT...</div>
 </div>
 </div>
@@ -19,7 +19,7 @@
 <div class="card auth-shell">
 <div class="auth-intro">
 <div class="auth-brand">
-<img alt="Kant" src="assets/kant-symbol.png?v=3.2.2"/>
+<img alt="Kant" src="assets/kant-symbol.png?v=3.4.0"/>
 <div><b>KANT</b><span>Geometria Analítica</span></div>
 </div>
 <h2>Entre, jogue e evolua.</h2>
@@ -71,7 +71,7 @@
 <header class="topbar kant-header">
 <div aria-label="Kant" class="kant-brand">
 <div aria-hidden="true" class="kant-brand-symbol" style="width:56px;height:56px;overflow:hidden;display:grid;place-items:center;flex:0 0 56px">
-      <img src="assets/kant-symbol.png?v=3.2.2" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
+      <img src="assets/kant-symbol.png?v=3.4.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
     </div>
 <div class="kant-wordmark">KANT</div>
 </div>
@@ -151,8 +151,13 @@
 <section class="performance-dashboard" id="performanceDashboard">
 <div class="performance-greeting">
 <span class="performance-eyebrow">SEU DESEMPENHO</span>
-<h2>Olá, <span id="homeGreetingName">Jogador</span>.</h2>
-<p>Este resumo considera todas as questões que você já respondeu, inclusive quando refaz um módulo.</p>
+<div class="performance-greeting-main">
+  <div class="home-greeting-avatar" id="homeGreetingAvatar">K</div>
+  <div class="performance-greeting-copy">
+    <h2>Olá, <span id="homeGreetingName">Jogador</span>.</h2>
+    <p id="homeMotivationalText">Cada questão resolvida deixa a próxima um pouco mais fácil.</p>
+  </div>
+</div>
 </div>
 <div class="performance-stats">
 <article class="performance-stat stat-total"><span class="performance-stat-icon">∑</span><div><small>QUESTÕES RESPONDIDAS</small><b id="homeTotalAnswered">0</b></div></article>
@@ -231,46 +236,55 @@
 </div>
 </section>
 <section class="screen" id="profile">
-<div class="profile-shell">
-<div class="profile-hero">
-<span class="pill-kicker">Perfil do jogador</span>
-<h2>Área de perfil pronta para crescer.</h2>
-<p>
-            Por enquanto, esta aba funciona como base visual. Depois você pode colocar estatísticas, histórico de runs, medalhas, preferências, evolução por módulo e qualquer outra informação do jogador.
-          </p>
-</div>
-<div class="profile-grid">
-<div class="profile-card">
-<h3>Seu perfil</h3>
-<div class="profile-user">
-<div class="profile-user-main">
-<div class="profile-big-avatar" id="profileAvatarLarge">K</div>
-<div class="profile-user-info">
-<b id="profileNameLarge">Jogador</b>
-<span id="profileEmailLarge">—</span>
-</div>
-</div>
-</div>
-<div class="profile-photo-actions">
-<button class="btn secondary profile-photo-btn" id="profileChangePhotoBtn" type="button">Alterar foto de perfil</button>
-</div>
-<div class="profile-lines" style="margin-top:20px">
-<div class="profile-line"><span>Nível atual</span><b id="profileLevelMirror">Nível 1</b></div>
-<div class="profile-line"><span>XP acumulado</span><b id="profileXpMirror">0 XP</b></div>
-</div>
-</div>
-<div class="profile-card">
-<h3>Espaços reservados</h3>
-<div class="profile-placeholder">
-<b>Conquistas e histórico</b>
-<p>Este bloco pode receber em breve medalhas, sequência máxima, quantidade de partidas, melhor desempenho por modo e evolução em cada módulo.</p>
-</div>
-<div class="profile-placeholder" style="margin-top:16px">
-<b>Planejamento futuro</b>
-<p>Também dá para colocar aqui progresso por conteúdo, calendário de estudo, recompensas, avatar customizado e preferências da conta.</p>
-</div>
-</div>
-</div>
+<div class="profile-shell profile-v34">
+  <section class="profile-identity-card">
+    <div class="profile-identity-avatar" id="profileAvatarLarge">K</div>
+    <div class="profile-identity-copy">
+      <span class="pill-kicker">Seu espaço no KANT</span>
+      <h2 id="profileNameLarge">Jogador</h2>
+      <p id="profileEmailLarge">—</p>
+      <div class="profile-identity-actions">
+        <button class="btn secondary profile-photo-btn" id="profileChangePhotoBtn" type="button">Alterar foto</button>
+      </div>
+    </div>
+    <div class="profile-level-badge">
+      <small>NÍVEL ATUAL</small>
+      <b id="profileLevelMirror">Nível 1</b>
+      <span id="profileXpMirror">0 XP</span>
+    </div>
+  </section>
+
+  <section class="profile-metrics-grid">
+    <article class="profile-metric-card metric-xp">
+      <span class="profile-metric-icon">★</span>
+      <div><small>EXPERIÊNCIA</small><b id="profileXpMetric">0 XP</b><span>XP acumulado na sua jornada</span></div>
+    </article>
+    <article class="profile-metric-card metric-answers">
+      <span class="profile-metric-icon">✓</span>
+      <div><small>QUESTÕES</small><b id="profileAnsweredMetric">0</b><span>respostas registradas</span></div>
+    </article>
+    <article class="profile-metric-card metric-accuracy">
+      <span class="profile-metric-icon">%</span>
+      <div><small>APROVEITAMENTO</small><b id="profileAccuracyMetric">0%</b><span>taxa geral de acertos</span></div>
+    </article>
+    <article class="profile-metric-card metric-modules">
+      <span class="profile-metric-icon">◆</span>
+      <div><small>TRILHA</small><b id="profileModulesMetric">0/6</b><span>módulos concluídos</span></div>
+    </article>
+  </section>
+
+  <section class="profile-progress-card">
+    <div class="profile-section-heading">
+      <div><span class="profile-section-kicker">SUA EVOLUÇÃO</span><h3>Progresso na trilha</h3></div>
+      <span class="profile-progress-summary" id="profileProgressSummary">Comece pelo Módulo 1</span>
+    </div>
+    <div class="profile-module-progress-list" id="profileModuleProgressList"></div>
+  </section>
+
+  <section class="profile-focus-card">
+    <div class="profile-focus-icon">◎</div>
+    <div><span class="profile-section-kicker">PRÓXIMO OBJETIVO</span><h3 id="profileNextGoal">Continue sua trilha</h3><p id="profileNextGoalText">Abra um módulo e avance no seu ritmo.</p></div>
+  </section>
 </div>
 </section>
 <section class="screen" id="admin">
@@ -492,6 +506,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.3.0"></script><script src="js/platform.js?v=3.3.0"></script><script src="js/modules.js?v=3.3.0"></script><script src="js/questions.js?v=3.3.0"></script><script src="js/content.js?v=3.3.0"></script><script src="js/admin.js?v=3.3.0"></script><script src="js/game.js?v=3.3.0"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.4.0"></script><script src="js/platform.js?v=3.4.0"></script><script src="js/modules.js?v=3.4.0"></script><script src="js/questions.js?v=3.4.0"></script><script src="js/content.js?v=3.4.0"></script><script src="js/admin.js?v=3.4.0"></script><script src="js/game.js?v=3.4.0"></script>
 </body>
 </html>
