@@ -4723,3 +4723,20 @@ body.dark .answer-reveal-note,body.dark .retry-note{color:#b7c4d7}
 body.dark .answer-shown{background:#302817;border-color:#665a32;color:#f3dda0}
 body.dark .detailed-resolution{background:#101a29;border-color:#2b4058;color:#e7eef8}
 @media(max-width:640px){.answer-reveal-actions{align-items:stretch}.show-answer-btn{width:100%}.detailed-resolution{padding:16px 14px;font-size:.96rem}}
+
+
+/* KANT v3.9.9 — Vestibulares + banco sem repetição */
+.challenge-card-vestibular{position:relative;overflow:hidden;background:linear-gradient(145deg,#ffffff 0%,#f8f5ff 100%);border-color:#ddd4fb}
+.challenge-card-vestibular::after{content:"";position:absolute;right:-48px;bottom:-62px;width:170px;height:170px;border-radius:50%;background:rgba(112,76,182,.08);pointer-events:none}
+.challenge-card-vestibular .challenge-badge{background:#efe9ff;color:#6948b4}
+.challenge-card-vestibular .challenge-tag{background:#f3efff;border-color:#ded5fb;color:#62459a}
+body.dark .challenge-card-vestibular{background:linear-gradient(145deg,#152033 0%,#201a35 100%);border-color:#493d69}
+body.dark .challenge-card-vestibular .challenge-badge{background:#302550;color:#cfc0ff}
+body.dark .challenge-card-vestibular .challenge-tag{background:#29203e;border-color:#4f416d;color:#d7caff}
+.resolution-title{font-weight:900;font-size:.78rem;letter-spacing:.07em;color:#708096;margin-bottom:12px}
+.resolution-rich{font-size:1.03rem;line-height:1.78;color:#263445}
+.resolution-rich .katex{font-size:1.14em}
+.resolution-rich .katex-display{margin:.75em 0;padding:.2em 0;overflow-y:visible!important}
+body.dark .resolution-title{color:#aab9ce}body.dark .resolution-rich{color:#e7eef7}
+#questionMedia img{max-width:min(100%,760px);max-height:620px;object-fit:contain;border-radius:18px;border:1px solid #e5ebf3;background:#fff;padding:8px}
+body.dark #questionMedia img{border-color:#33465e;background:#f8fafc}

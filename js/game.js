@@ -9,19 +9,43 @@
   let currentModuleId=null, lastModuleId=null, studyModuleId=null;
 
   const moduleById=(id)=>modules.find(m=>m.id===id);
-  const difficultyLabel=(value)=>({facil:"Fácil",media:"Média",desafio:"Desafio"}[String(value||"").toLowerCase()]||value||"Progressiva");
+  const difficultyLabel=(value)=>({facil:"Fácil",media:"Média",desafio:"Desafio",vestibular:"Vestibular"}[String(value||"").toLowerCase()]||value||"Progressiva");
   const allModulesCompleted=()=>modules.length>0&&modules.every(m=>moduleResult(m.id).completed);
   const challengeAccess=()=>window.kantIsAdmin===true||allModulesCompleted();
+  const vestibularAccess=()=>window.kantIsAdmin===true||!!moduleResult(modules[2]?.id).completed;
+  const vestibularBank=()=>window.KANT_VESTIBULAR_QUESTIONS||[];
+  function challengeUsedKey(kind){return `geoquest:${identity()}:challenge-used:${kind}:v1`;}
+  function getChallengeUsed(kind){try{return new Set(JSON.parse(localStorage.getItem(challengeUsedKey(kind))||"[]"));}catch(_e){return new Set();}}
+  function saveChallengeUsed(kind,set){try{localStorage.setItem(challengeUsedKey(kind),JSON.stringify([...set]));}catch(_e){}}
+  function markChallengeUsed(kind,id){if(!["quick","lightning","vestibular"].includes(kind)||!id)return;const used=getChallengeUsed(kind);used.add(String(id));saveChallengeUsed(kind,used);}
+  function remainingChallengePool(kind){const pool=kind==="vestibular"?vestibularBank():challengeQuestionPool();const used=getChallengeUsed(kind);return pool.filter(q=>!used.has(String(q.id)));}
+  function challengeRemaining(kind){return remainingChallengePool(kind).length;}
   const moduleQuestionPool=(m)=>[...(m?.questoes||[]),...((window.KANT_EXTRA_QUESTIONS||{})[Number(m?.numero)]||[])];
   function challengeQuestionPool(){return modules.flatMap(m=>moduleQuestionPool(m).map(q=>normalizeModuleQuestion(q,m)));}
   function renderChallenges(){
     const unlocked=challengeAccess();
-    [["quickChallengeBtn","quickChallengeStatus","quickUnlockNote"],["lightningChallengeBtn","lightningChallengeStatus","lightningUnlockNote"]].forEach(([btnId,statusId,noteId])=>{
+    const quickRemaining=challengeRemaining("quick"), lightningRemaining=challengeRemaining("lightning");
+    [["quickChallengeBtn","quickChallengeStatus","quickUnlockNote","quick",quickRemaining],["lightningChallengeBtn","lightningChallengeStatus","lightningUnlockNote","lightning",lightningRemaining]].forEach(([btnId,statusId,noteId,kind,remaining])=>{
       const btn=document.getElementById(btnId),status=document.getElementById(statusId),note=document.getElementById(noteId);
-      if(btn)btn.disabled=!unlocked;
-      if(status){status.textContent=unlocked?"Desbloqueado":"Bloqueado";status.classList.toggle("is-ready",unlocked);}
-      if(note)note.textContent=unlocked?(window.kantIsAdmin===true&&!allModulesCompleted()?"🛡 Acesso ADM liberado para teste.":"✓ Todos os módulos concluídos. Desafio liberado."):"🔒 Conclua os 6 módulos para desbloquear.";
+      const exhausted=remaining<=0;
+      if(btn)btn.disabled=!unlocked||exhausted;
+      if(status){status.textContent=exhausted?"Banco concluído":unlocked?"Desbloqueado":"Bloqueado";status.classList.toggle("is-ready",unlocked&&!exhausted);}
+      if(note){
+        if(exhausted)note.textContent=`✓ Você já resolveu todas as ${challengeQuestionPool().length} questões disponíveis neste desafio.`;
+        else if(unlocked)note.textContent=`${window.kantIsAdmin===true&&!allModulesCompleted()?"🛡 Acesso ADM liberado para teste.":"✓ Todos os módulos concluídos."} ${remaining} questões inéditas restantes neste modo.`;
+        else note.textContent="🔒 Conclua os 6 módulos para desbloquear.";
+      }
     });
+    const vUnlocked=vestibularAccess(), vRemaining=challengeRemaining("vestibular"), vTotal=vestibularBank().length;
+    const vBtn=document.getElementById("vestibularChallengeBtn"),vStatus=document.getElementById("vestibularChallengeStatus"),vNote=document.getElementById("vestibularUnlockNote");
+    const vExhausted=vRemaining<=0&&vTotal>0;
+    if(vBtn)vBtn.disabled=!vUnlocked||vExhausted||!vTotal;
+    if(vStatus){vStatus.textContent=vExhausted?"Banco concluído":vUnlocked?"Desbloqueado":"Bloqueado";vStatus.classList.toggle("is-ready",vUnlocked&&!vExhausted);}
+    if(vNote){
+      if(vExhausted)vNote.textContent=`✓ Banco concluído: você já resolveu as ${vTotal} questões de vestibulares.`;
+      else if(vUnlocked)vNote.textContent=`${window.kantIsAdmin===true&&!moduleResult(modules[2]?.id).completed?"🛡 Acesso ADM liberado para teste.":"✓ Módulo 3 concluído."} ${vRemaining} de ${vTotal} questões inéditas restantes.`;
+      else vNote.textContent="🔒 Conclua o Módulo 3 para desbloquear.";
+    }
   }
   function moduleIconSvg(numero){
     const common='viewBox="0 0 64 64" aria-hidden="true"';
@@ -439,16 +463,19 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     show("game");render();
   }
   function buildSet(m){
-    const pool=challengeQuestionPool();
-    if(m==="quick")return shuffle(pool).slice(0,10);
-    if(m==="lightning")return shuffle(pool).slice(0,5);
-    return shuffle(pool).slice(0,24);
+    if(m==="quick")return shuffle(remainingChallengePool("quick")).slice(0,10);
+    if(m==="lightning")return shuffle(remainingChallengePool("lightning")).slice(0,5);
+    if(m==="vestibular")return shuffle(remainingChallengePool("vestibular")).slice(0,10);
+    return shuffle(challengeQuestionPool()).slice(0,24);
   }
   function start(m,forceFresh=false){
     if((m==="quick"||m==="lightning")&&!challengeAccess()){renderChallenges();return;}
-    lastMode=m;mode=m;currentModuleId=null;questions=buildSet(m);idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=(m==="lightning");runDeadline=0;runDuration=0;
+    if(m==="vestibular"&&!vestibularAccess()){renderChallenges();return;}
+    const nextSet=buildSet(m);
+    if(["quick","lightning","vestibular"].includes(m)&&!nextSet.length){renderChallenges();window.alert("Banco concluído: não há mais questões inéditas disponíveis neste desafio.");return;}
+    lastMode=m;mode=m;currentModuleId=null;questions=nextSet;idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=(m==="lightning");runDeadline=0;runDuration=0;
     if(lightning){runDuration=120000;runDeadline=performance.now()+runDuration;}
-    $("#modeLabel").textContent=m==="campaign"?"Revisão integrada":m==="quick"?"Batalha Rápida":"Desafio Relâmpago";
+    $("#modeLabel").textContent=m==="campaign"?"Revisão integrada":m==="quick"?"Batalha Rápida":m==="lightning"?"Desafio Relâmpago":"Desafio Vestibulares";
     $("#lightningToggle").style.display="none";
     show("game");render();
   }
@@ -459,9 +486,9 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     clearTimer();
     if(idx>=questions.length){finish();return;}
     answered=false;hintUsed=false;const q=questions[idx];
-    $("#topic").textContent=q.topic;
+    $("#topic").textContent=q.topic||q.source||"Geometria Analítica";
     $("#counter").textContent=`Questão ${idx+1} de ${questions.length}`;
-    $("#levelLabel").textContent=(mode==="module"||mode==="module-extra")?`${mode==="module-extra"?"Treino extra":"Prática"} • ${difficultyLabel(q.difficulty)}`:`${difficultyLabel(q.difficulty)} • ${Number(q.xpValue)||30} XP base`;
+    $("#levelLabel").textContent=(mode==="module"||mode==="module-extra")?`${mode==="module-extra"?"Treino extra":"Prática"} • ${difficultyLabel(q.difficulty)}`:mode==="vestibular"?`Vestibular • 45 XP base • 2× XP`:`${difficultyLabel(q.difficulty)} • ${Number(q.xpValue)||30} XP base`;
     $("#visual").textContent=q.visual||"";$("#question").textContent=q.q;$("#feedback").innerHTML="";$("#nextBtn").style.display="none";$("#nextBtn").textContent="Próxima questão →";$("#options").innerHTML="";const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
     const media=$("#questionMedia"),expMedia=$("#explanationMedia");if(media){media.innerHTML="";media.hidden=!q.imageUrl;if(q.imageUrl){const img=document.createElement("img");img.src=q.imageUrl;img.alt="Imagem da questão";media.appendChild(img);}}if(expMedia){expMedia.innerHTML="";expMedia.hidden=true;}
     window.KantMath?.renderInline($("#question"));resetHint(q);
@@ -471,7 +498,7 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
   function xpForCorrect(q){
     const base=Number(q.xpValue)||30;
     const streakMultiplier=1+streak*.1;
-    const modeMultiplier=mode==="lightning"?1.5:1;
+    const modeMultiplier=mode==="lightning"?1.5:mode==="vestibular"?2:1;
     const hintMultiplier=hintUsed?.5:1;
     return {base,streakMultiplier,modeMultiplier,hintMultiplier,gain:Math.round(base*streakMultiplier*modeMultiplier*hintMultiplier)};
   }
@@ -532,7 +559,12 @@ A alternativa correta é ${letter}) ${answer}.`;
   function renderResolution(q,leadHtml){
     const fb=$("#feedback");
     fb.innerHTML=leadHtml;
-    const box=document.createElement("div");box.className="detailed-resolution";box.textContent=detailedResolution(q);fb.appendChild(box);
+    const box=document.createElement("div");box.className="detailed-resolution";fb.appendChild(box);
+    if(q.resolution){
+      const title=document.createElement("div");title.className="resolution-title";title.textContent="RESOLUÇÃO PASSO A PASSO";box.appendChild(title);
+      const body=document.createElement("div");body.className="resolution-rich";box.appendChild(body);
+      window.KantMath?.renderTextWithMath(body,q.resolution);
+    }else box.textContent=detailedResolution(q);
   }
   const repeatableXpMode=()=>!["module","module-extra"].includes(mode);
   async function answer(choice,btn){
@@ -541,7 +573,7 @@ A alternativa correta é ${letter}) ${answer}.`;
     const q=questions[idx],opts=[...document.querySelectorAll(".option")],correct=choice===q.a;
     if(window.kantRecordAnswer)window.kantRecordAnswer(correct);
     if(correct){
-      answered=true;score++;streak++;bestStreak=Math.max(bestStreak,streak);
+      answered=true;score++;streak++;bestStreak=Math.max(bestStreak,streak);if(["quick","lightning","vestibular"].includes(mode))markChallengeUsed(mode,q.id);
       opts.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});
       const calc=xpForCorrect(q);let awarded=true;
       if(repeatableXpMode()){
@@ -550,7 +582,7 @@ A alternativa correta é ${letter}) ${answer}.`;
         const result=await window.kantAwardQuestionXPOnce(q.id,calc.gain);awarded=!!result?.awarded;if(awarded)xp+=calc.gain;
       }else{xp+=calc.gain;if(window.geoquestAddXP)window.geoquestAddXP(calc.gain);}
       const parts=[`${calc.streakMultiplier.toFixed(1)}× sequência`];
-      if(calc.modeMultiplier>1)parts.push(`${calc.modeMultiplier.toFixed(1)}× relâmpago`);
+      if(calc.modeMultiplier>1)parts.push(mode==="vestibular"?`${calc.modeMultiplier.toFixed(1)}× vestibulares`:`${calc.modeMultiplier.toFixed(1)}× relâmpago`);
       if(calc.hintMultiplier<1)parts.push("0,5× por uso da dica");
       const lead=awarded?`<span class="ok"><b>✅ Acertou!</b> +${calc.gain} XP <small>(${parts.join(" • ")})</small></span>`:`<span class="ok"><b>✅ Acertou!</b> <small>XP desta questão já recebido anteriormente.</small></span><br><span class="xp-repeat-note">Você pode refazer para estudar e manter a sequência, mas questões comuns concedem XP apenas no primeiro acerto.</span>`;
       renderResolution(q,lead);
@@ -560,7 +592,7 @@ A alternativa correta é ${letter}) ${answer}.`;
     }else{
       lives=Math.max(0,lives-1);streak=0;btn.classList.add("wrong");btn.disabled=true;
       if(lives===0){
-        answered=true;opts.forEach(b=>b.disabled=true);
+        answered=true;if(["quick","lightning","vestibular"].includes(mode))markChallengeUsed(mode,q.id);opts.forEach(b=>b.disabled=true);
         $("#feedback").innerHTML='<span class="no"><b>❌ Suas vidas acabaram.</b> A tentativa termina aqui e deve recomeçar desde a primeira questão.</span>';
         const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
         $("#nextBtn").style.display="inline-block";$("#nextBtn").textContent="Recomeçar do início ↻";
@@ -577,7 +609,7 @@ A alternativa correta é ${letter}) ${answer}.`;
   function revealAnswer(){
     if(answered||idx>=questions.length)return;
     const q=questions[idx],opts=[...document.querySelectorAll(".option")];
-    answered=true;streak=0;clearTimer();
+    answered=true;streak=0;clearTimer();if(["quick","lightning","vestibular"].includes(mode))markChallengeUsed(mode,q.id);
     opts.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});
     renderResolution(q,'<span class="answer-shown"><b>👁 Resposta revelada.</b> Esta questão não concede XP porque a resposta foi mostrada.</span>');
     const expMedia=$("#explanationMedia");if(expMedia){expMedia.innerHTML="";expMedia.hidden=!q.explanationImageUrl;if(q.explanationImageUrl){const img=document.createElement("img");img.src=q.explanationImageUrl;img.alt="Imagem da explicação";expMedia.appendChild(img);}}
@@ -625,7 +657,7 @@ A alternativa correta é ${letter}) ${answer}.`;
   async function finish(){
     clearTimer();runDeadline=0;
     $("#rScore").textContent=score;$("#rTotal").textContent=questions.length;$("#rXp").textContent=xp;$("#rStreak").textContent=bestStreak;
-    const rate=questions.length?Math.round(score/questions.length*100):0,continueBtn=$("#continuePhaseBtn"),extraBtn=$("#extraPracticeBtn");
+    const rate=questions.length?Math.round(score/questions.length*100):0,continueBtn=$("#continuePhaseBtn"),extraBtn=$("#extraPracticeBtn");if($("#againBtn"))$("#againBtn").disabled=false;
     if(extraBtn)extraBtn.style.display="none";
     if(mode==="module"){
       const m=moduleById(currentModuleId);await recordModuleResult(currentModuleId,rate);const moduleIndex=modules.findIndex(x=>x.id===currentModuleId),passed=rate>=70,hasNext=moduleIndex<modules.length-1;
@@ -637,8 +669,11 @@ A alternativa correta é ${letter}) ${answer}.`;
       const m=moduleById(currentModuleId);$("#resultMessage").textContent=`Treino extra de ${m?.titulo||"módulo"}: ${rate}% de acertos. Essas questões não alteram o desbloqueio da trilha; servem para ganhar domínio e XP.`;
       if(continueBtn)continueBtn.style.display="none";$("#againBtn").textContent="Refazer treino extra";
     }else{
-      $("#resultMessage").textContent=rate>=85?"Excelente domínio. Você chegou forte nesta rodada.":rate>=65?"Bom desempenho. Vale revisar os erros antes de outra rodada.":"A base está sendo construída. Refaça a rodada e observe as explicações dos erros.";
-      if(continueBtn)continueBtn.style.display="none";$("#againBtn").textContent="Jogar novamente";
+      const remaining=["quick","lightning","vestibular"].includes(mode)?challengeRemaining(mode):null;
+      if(mode==="vestibular")$("#resultMessage").textContent=`${rate}% de acertos. ${remaining>0?`${remaining} questões inéditas de vestibulares ainda não apareceram.`:"Banco de vestibulares concluído: você já passou por todas as 50 questões."}`;
+      else if(mode==="quick"||mode==="lightning")$("#resultMessage").textContent=`${rate}% de acertos. ${remaining>0?`${remaining} questões inéditas ainda restam neste modo.`:`Banco concluído neste desafio: todas as ${challengeQuestionPool().length} questões já apareceram.`}`;
+      else $("#resultMessage").textContent=rate>=85?"Excelente domínio. Você chegou forte nesta rodada.":rate>=65?"Bom desempenho. Vale revisar os erros antes de outra rodada.":"A base está sendo construída. Refaça a rodada e observe as explicações dos erros.";
+      if(continueBtn)continueBtn.style.display="none";$("#againBtn").textContent=remaining===0?"Banco concluído":"Jogar próximas inéditas";$("#againBtn").disabled=remaining===0;
     }
     show("results");if(window.geoquestFlushXP){try{await window.geoquestFlushXP();}catch(_e){}}
   }
