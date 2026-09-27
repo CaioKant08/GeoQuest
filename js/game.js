@@ -98,7 +98,7 @@
     modules.forEach((m,i)=>{
       const result=moduleResult(m.id), unlocked=isUnlocked(i), adminTest=window.kantIsAdmin===true&&window.kantAdminUnlockAll===true;
       const livePct=result.currentTotal?Math.round((Number(result.currentAnswered)||0)/Number(result.currentTotal)*100):0;
-      const pct=result.inProgress?livePct:(result.completed?100:0);
+      const pct=result.completed?100:(result.inProgress?livePct:0);
       const best=Number(result.best)||0;
       const bestClass=best>=85?"best-good":best>=70?"best-ok":best>=50?"best-warn":best>0?"best-bad":"best-none";
       const card=document.createElement("article"); card.className=`module-card learning-card ${m.cor} ${unlocked?"":"locked"}`;
@@ -127,6 +127,7 @@
     studyModuleId=moduleId;
     $("#studyModuleNumber").textContent=m.numero; $("#studyKicker").textContent=`Módulo ${m.numero} • ${m.subtitulo}`; $("#studyTitle").textContent=m.titulo; $("#studyDescription").textContent=m.descricao;
     const hero=$("#moduleStudyHero"); hero.className=`module-study-hero study-${m.cor}`;
+    const practiceCta=document.querySelector("#moduleStudy .practice-cta"); if(practiceCta) practiceCta.className=`practice-cta practice-${m.cor}`;
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
     const grid=$("#theoryGrid"); grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula">${t.formula}</div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><span>${t.exemplo}</span>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
     $("#practiceSummary").textContent=`${m.questoes.length} questões progressivas • feedback imediato • 70% libera o próximo módulo.`;
