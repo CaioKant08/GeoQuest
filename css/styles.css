@@ -4142,3 +4142,40 @@ body.dark .module-card.yellow .module-btn,
 body.dark .module-card.locked.yellow .module-btn{background:linear-gradient(90deg,#c99212,#9b6c08) !important;}
 body.dark .module-card.red .module-btn,
 body.dark .module-card.locked.red .module-btn{background:linear-gradient(90deg,#bd4251,#8e2d39) !important;}
+
+/* =========================================================
+   KANT v3.8.2 — remove a faixa retangular da área do símbolo
+   ========================================================= */
+/* A linha vinha do background do .module-art. A arte deve ser transparente. */
+.module-card .module-art,
+.module-card.green .module-art,
+.module-card.yellow .module-art,
+.module-card.red .module-art,
+.module-card.blue .module-art,
+.module-card.purple .module-art,
+.module-card.orange .module-art,
+.learning-module-art,
+body.dark .module-card .module-art,
+body.dark .module-card.green .module-art,
+body.dark .module-card.yellow .module-art,
+body.dark .module-card.red .module-art,
+body.dark .module-card.blue .module-art,
+body.dark .module-card.purple .module-art,
+body.dark .module-card.orange .module-art,
+body.dark .learning-module-art{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  outline:none !important;
+}
+
+/* Garante que pseudo-elementos da área da arte não criem faixas. */
+.learning-module-art::before,
+.learning-module-art::after,
+.module-card .module-art::before,
+.module-card .module-art::after{
+  content:none !important;
+  display:none !important;
+  background:none !important;
+  box-shadow:none !important;
+}
