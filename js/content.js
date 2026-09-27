@@ -3,6 +3,33 @@
   const defaults = clone(window.KANT_DEFAULT_MODULES || window.KANT_MODULES || []);
 
 
+  const LEGACY_TEXTS = {
+    "1:1": "O plano cartesiano tem dois eixos perpendiculares: x, horizontal, e y, vertical. Um ponto P(x, y) é um par ordenado; trocar a ordem das coordenadas muda o ponto.",
+    "1:2": "As diferenças horizontal e vertical formam os catetos de um triângulo retângulo. Por isso, a fórmula da distância é o Teorema de Pitágoras escrito em coordenadas.",
+    "1:3": "O ponto médio divide o segmento em duas partes de mesmo comprimento. Suas coordenadas são as médias aritméticas das coordenadas dos extremos.",
+    "1:4": "Distância e ponto médio aparecem em classificação de triângulos, diagonais, medianas, centros de segmentos e problemas de equidistância.",
+    "2:1": "O coeficiente angular mede a taxa de variação de y em relação a x. Ele indica se a reta cresce, decresce ou é horizontal. Retas verticais não têm coeficiente angular definido.",
+    "2:2": "Toda reta pode ser escrita na forma geral. Quando B≠0, podemos isolar y e obter a forma reduzida, em que m aparece diretamente.",
+    "2:3": "Se conhecemos um ponto da reta e seu coeficiente angular, a forma ponto–inclinação é o caminho mais direto para montar a equação.",
+    "2:4": "Dois pontos distintos determinam uma única reta. Para localizar os interceptos, faça y=0 para o eixo x e x=0 para o eixo y.",
+    "3:1": "Duas retas concorrentes têm um único ponto em comum. Esse ponto é a solução do sistema formado pelas duas equações.",
+    "3:2": "Retas não verticais paralelas têm o mesmo coeficiente angular. Se também tiverem o mesmo coeficiente linear, são coincidentes.",
+    "3:3": "No caso usual, os coeficientes angulares de retas perpendiculares são inversos opostos. Uma reta vertical é perpendicular a uma horizontal.",
+    "3:4": "Mesmo m e interceptos diferentes: paralelas. Equações equivalentes: coincidentes. Coeficientes diferentes: concorrentes. Produto −1: perpendiculares.",
+    "4:1": "Três pontos são colineares quando pertencem à mesma reta. Podemos comparar coeficientes angulares ou usar um determinante, inclusive em retas verticais.",
+    "4:2": "O determinante de ordem 3 organiza as coordenadas dos três pontos. Se o resultado for zero, a área associada também é zero.",
+    "4:3": "A área de um triângulo no plano cartesiano é metade do módulo do mesmo determinante usado para testar colinearidade.",
+    "4:4": "Colinearidade e área são duas faces do mesmo cálculo: se o determinante é zero, o triângulo “achata” e sua área é zero.",
+    "5:1": "A distância de um ponto a uma reta é o comprimento do segmento perpendicular que liga o ponto à reta. É a menor distância possível.",
+    "5:2": "Para usar a fórmula, a reta deve estar na forma geral Ax+By+C=0. O valor absoluto impede resultado negativo.",
+    "5:3": "Em retas verticais ou horizontais, a distância é apenas a diferença absoluta entre a coordenada do ponto e a constante da reta.",
+    "5:4": "Para duas retas paralelas com os mesmos coeficientes A e B, a distância depende apenas da diferença entre os termos constantes.",
+    "6:1": "Circunferência é o conjunto dos pontos que estão à mesma distância de um centro C(a,b). Essa distância constante é o raio r.",
+    "6:2": "Ao desenvolver a forma reduzida, obtemos uma equação com x² e y². Completando quadrados, recuperamos centro e raio.",
+    "6:3": "Compare a distância do ponto ao centro com o raio. Menor: interior; igual: sobre a circunferência; maior: exterior.",
+    "6:4": "Uma reta é tangente quando toca a circunferência em um único ponto. Isso acontece quando a distância do centro à reta é exatamente igual ao raio."
+  };
+
   const LEGACY_THEORY = {
     "1:1": {formula:"1º: (+,+) • 2º: (−,+) • 3º: (−,−) • 4º: (+,−)", exemplo:"A(−4,3) está no 2º quadrante; B(2,−5), no 4º."},
     "1:2": {formula:"latex:d=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}", exemplo:"Entre $A(-2,5)$ e $B(4,-3)$:\n$$d=\\sqrt{(4-(-2))^2+(-3-5)^2}=\\sqrt{6^2+(-8)^2}=10$$"},
@@ -36,6 +63,7 @@
       (module.teoria||[]).forEach((t,i)=>{
         const key=`${Number(module.numero)}:${i+1}`, legacy=LEGACY_THEORY[key], upgraded=local?.teoria?.[i];
         if(!legacy||!upgraded)return;
+        if(String(t.texto||"").trim()===String(LEGACY_TEXTS[key]||"").trim()) t.texto=upgraded.texto;
         if(String(t.formula||"").trim()===String(legacy.formula||"").trim()) t.formula=upgraded.formula;
         if(String(t.exemplo||"").trim()===String(legacy.exemplo||"").trim()) t.exemplo=upgraded.exemplo;
       });

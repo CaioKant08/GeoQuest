@@ -131,13 +131,13 @@
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
     const grid=$("#theoryGrid");
     grid.classList.add("theory-paged-grid");
-    grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card theory-page" data-theory-index="${i}" aria-hidden="true"><div class="theory-page-top"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><span class="theory-page-count">Etapa ${i+1} de ${m.teoria.length}</span></div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
+    grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card theory-page" data-theory-index="${i}" aria-hidden="true"><div class="theory-page-top"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><span class="theory-page-count">Etapa ${i+1} de ${m.teoria.length}</span></div><h4>${t.titulo}</h4><p class="theory-explanation">${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
     m.teoria.forEach((t,i)=>{
       window.KantMath?.renderFormula(grid.querySelector(`[data-formula-index="${i}"]`),t.formula);
       const exampleEl=grid.querySelector(`[data-example-index="${i}"]`);
       window.KantMath?.renderTextWithMath(exampleEl,t.exemplo,{allowLatexPrefix:true});
     });
-    grid.querySelectorAll(".theory-card>p").forEach((el,i)=>window.KantMath?.renderTextWithMath(el,m.teoria[i]?.texto||el.textContent));
+    grid.querySelectorAll(".theory-explanation").forEach((el,i)=>window.KantMath?.renderTextWithMath(el,m.teoria[i]?.texto||el.textContent));
     if(window.KantCartesian){
       const cards=[...grid.querySelectorAll(".theory-card")];
       m.teoria.forEach((t,i)=>window.KantCartesian.renderForTheoryCard(cards[i],m,t));
