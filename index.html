@@ -5,7 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
 <link href="assets/kant-symbol.png?v=3.5.0" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=3.8.9" rel="stylesheet"/>
+<link href="css/styles.css?v=3.9.6" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
 </head>
 <body>
@@ -200,7 +200,7 @@
       <div>
         <span class="pill-kicker">Parte prática</span>
         <h3>Agora transforme conceito em resolução.</h3>
-        <p id="practiceSummary">8 questões progressivas com feedback imediato.</p>
+        <p id="practiceSummary">8 questões obrigatórias + 12 extras de treino, com feedback imediato.</p>
       </div>
       <button class="btn primary practice-start-btn" id="startModulePracticeBtn" type="button">Começar exercícios →</button>
     </section>
@@ -215,27 +215,30 @@
             Aqui ficam os modos mais diretos da plataforma. Você pode deixar o Início focado na progressão por módulos e usar esta aba para os desafios soltos, relâmpago e revisões rápidas.
           </p>
 </div>
-<div class="challenge-grid">
-<article class="challenge-card">
-<div class="challenge-badge">△</div>
-<h3>Módulo 1</h3>
-<p>Continue a trilha de Fundamentos do Plano Cartesiano exatamente da fase que você desbloqueou.</p>
-<div class="challenge-meta"><span class="challenge-tag">Progressão completa</span><span class="challenge-tag">5 fases</span></div>
-<button class="btn primary" data-module-start type="button">Continuar Módulo 1</button>
-</article>
-<article class="challenge-card">
-<div class="challenge-badge">∥</div>
+<div class="challenge-grid challenge-grid-v396">
+<article class="challenge-card challenge-card-featured" id="quickChallengeCard">
+<div class="challenge-card-top"><div class="challenge-badge">⚔</div><span class="challenge-status" id="quickChallengeStatus">Bloqueado</span></div>
 <h3>Batalha rápida</h3>
-<p>Bloco curto de questões misturadas para revisar sem seguir uma ordem fixa. Ótimo para aquecer e testar domínio.</p>
-<div class="challenge-meta"><span class="challenge-tag">10 questões</span><span class="challenge-tag">Revisão livre</span></div>
-<button class="btn secondary" data-mode="quick" type="button">Jogar batalha rápida</button>
+<p>Revisão misturada com questões dos próprios módulos. O XP base é exatamente o mesmo da questão original, com bônus apenas pela sequência de acertos.</p>
+<div class="challenge-meta"><span class="challenge-tag">10 questões</span><span class="challenge-tag">3 vidas</span><span class="challenge-tag">XP original</span></div>
+<div class="challenge-unlock-note" id="quickUnlockNote">🔒 Conclua os 6 módulos para desbloquear.</div>
+<button class="btn primary" data-mode="quick" id="quickChallengeBtn" type="button" disabled>Jogar batalha rápida</button>
 </article>
-<article class="challenge-card">
-<div class="challenge-badge">⧖</div>
+<article class="challenge-card challenge-card-timed" id="lightningChallengeCard">
+<div class="challenge-card-top"><div class="challenge-badge">⏱</div><span class="challenge-status" id="lightningChallengeStatus">Bloqueado</span></div>
 <h3>Desafio relâmpago</h3>
-<p>Modo com pressão de tempo, bom para velocidade, foco e bônus de XP. Mantém a cara de jogo sem misturar com os módulos.</p>
-<div class="challenge-meta"><span class="challenge-tag">Cronômetro</span><span class="challenge-tag">Bônus de XP</span></div>
-<button class="btn secondary" data-mode="lightning" type="button">Entrar no relâmpago</button>
+<p>Cinco questões dos módulos concluídos para resolver em até dois minutos. Cada acerto recebe <b>1,5×</b> o XP normal antes do bônus de sequência.</p>
+<div class="challenge-meta"><span class="challenge-tag">5 questões</span><span class="challenge-tag">2 minutos</span><span class="challenge-tag">1,5× XP</span></div>
+<div class="challenge-unlock-note" id="lightningUnlockNote">🔒 Conclua os 6 módulos para desbloquear.</div>
+<button class="btn secondary" data-mode="lightning" id="lightningChallengeBtn" type="button" disabled>Entrar no relâmpago</button>
+</article>
+<article class="challenge-card challenge-card-coming">
+<div class="challenge-card-top"><div class="challenge-badge">🎓</div><span class="challenge-status is-coming">Em breve</span></div>
+<h3>Desafio Vestibulares</h3>
+<p>Espaço reservado para questões reais e adaptadas de vestibulares. Você poderá treinar provas específicas sem misturá-las à progressão dos módulos.</p>
+<div class="challenge-meta"><span class="challenge-tag">Vestibulares</span><span class="challenge-tag">Banco próprio</span><span class="challenge-tag">Em construção</span></div>
+<div class="challenge-unlock-note">As questões serão adicionadas posteriormente pelo painel de conteúdo.</div>
+<button class="btn secondary" type="button" disabled>Em breve</button>
 </article>
 </div>
 </div>
@@ -475,6 +478,7 @@
 </div>
 <div class="cta-row" style="justify-content:center">
 <button class="btn primary" id="continuePhaseBtn" style="display:none">Próxima fase →</button>
+<button class="btn primary" id="extraPracticeBtn" style="display:none">Treinar 12 questões extras →</button>
 <button class="btn secondary" id="againBtn">Jogar novamente</button>
 <button class="btn secondary" id="menuBtn">Voltar ao menu</button>
 </div>
@@ -547,6 +551,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script><script src="js/math.js?v=3.8.9"></script><script src="js/cartesian-engine.js?v=3.8.9"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.8.9"></script><script src="js/platform.js?v=3.8.9"></script><script src="js/modules.js?v=3.8.9"></script><script src="js/questions.js?v=3.8.9"></script><script src="js/content.js?v=3.8.9"></script><script src="js/admin.js?v=3.8.9"></script><script src="js/game.js?v=3.8.9"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script><script src="js/math.js?v=3.9.6"></script><script src="js/cartesian-engine.js?v=3.9.6"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.9.6"></script><script src="js/platform.js?v=3.9.6"></script><script src="js/modules.js?v=3.9.6"></script><script src="js/questions.js?v=3.9.6"></script><script src="js/variants.js?v=3.9.6"></script><script src="js/content.js?v=3.9.6"></script><script src="js/admin.js?v=3.9.6"></script><script src="js/game.js?v=3.9.6"></script>
 </body>
 </html>

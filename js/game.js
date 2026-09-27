@@ -5,10 +5,23 @@
   const screens = ["home","moduleStudy","challenges","profile","admin","game","results"].reduce((o,id)=>(o[id]=$("#"+id),o),{});
 
   let mode="quick", questions=[], idx=0, lives=3, xp=0, streak=0, bestStreak=0, score=0, answered=false, lightning=false;
-  let timerId=null, endAt=0, lastMode="quick";
+  let timerId=null, endAt=0, runDeadline=0, runDuration=0, lastMode="quick";
   let currentModuleId=null, lastModuleId=null, studyModuleId=null;
 
   const moduleById=(id)=>modules.find(m=>m.id===id);
+  const difficultyLabel=(value)=>({facil:"Fácil",media:"Média",desafio:"Desafio"}[String(value||"").toLowerCase()]||value||"Progressiva");
+  const allModulesCompleted=()=>modules.length>0&&modules.every(m=>moduleResult(m.id).completed);
+  const moduleQuestionPool=(m)=>[...(m?.questoes||[]),...((window.KANT_EXTRA_QUESTIONS||{})[Number(m?.numero)]||[])];
+  function challengeQuestionPool(){return modules.flatMap(m=>moduleQuestionPool(m).map(q=>normalizeModuleQuestion(q,m)));}
+  function renderChallenges(){
+    const unlocked=allModulesCompleted();
+    [["quickChallengeBtn","quickChallengeStatus","quickUnlockNote"],["lightningChallengeBtn","lightningChallengeStatus","lightningUnlockNote"]].forEach(([btnId,statusId,noteId])=>{
+      const btn=document.getElementById(btnId),status=document.getElementById(statusId),note=document.getElementById(noteId);
+      if(btn)btn.disabled=!unlocked;
+      if(status){status.textContent=unlocked?"Desbloqueado":"Bloqueado";status.classList.toggle("is-ready",unlocked);}
+      if(note)note.textContent=unlocked?"✓ Todos os módulos concluídos. Desafio liberado.":"🔒 Conclua os 6 módulos para desbloquear.";
+    });
+  }
   function moduleIconSvg(numero){
     const common='viewBox="0 0 64 64" aria-hidden="true"';
     const map={
@@ -59,7 +72,10 @@
   }
   function show(name){
     Object.values(screens).forEach(x=>x?.classList.remove("active")); screens[name]?.classList.add("active"); setNavActive(name);
-    if(name==="profile") syncProfileScreen(); if(name==="home"){renderModules();if(window.kantLoadPerformanceStats)window.kantLoadPerformanceStats();} window.scrollTo({top:0,behavior:"smooth"});
+    if(name==="profile") syncProfileScreen();
+    if(name==="challenges") renderChallenges();
+    if(name==="home"){renderModules();if(window.kantLoadPerformanceStats)window.kantLoadPerformanceStats();}
+    window.scrollTo({top:0,behavior:"smooth"});
   }
   function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
@@ -112,7 +128,8 @@
           <div class="learning-steps">
             <div><span>01</span><b>Teoria</b><small>conceitos + fórmulas</small></div>
             <div><span>02</span><b>Exemplo</b><small>resolução guiada</small></div>
-            <div><span>03</span><b>Prática</b><small>${m.questoes.length} questões</small></div>
+            <div><span>03</span><b>Vídeos</b><small>2 aulas no YouTube</small></div>
+            <div><span>04</span><b>Prática</b><small>8 obrigatórias + 12 extras</small></div>
           </div>
           <button class="module-btn module-open-btn" type="button" ${unlocked?"":"disabled"}>${unlocked?(result.inProgress?"▶ Continuar prática":result.completed?"↻ Revisar módulo":"▶ Abrir módulo"):"🔒 Conclua o módulo anterior"}</button>
           <div class="module-note">${adminTest&&!result.completed?"🛡 Modo de teste ADM • módulo liberado somente para você":result.inProgress?`Progresso salvo • ${result.currentAnswered}/${result.currentTotal} questões respondidas`:result.completed?"Módulo concluído. Você pode revisar quando quiser.":unlocked?"Estude a teoria antes de iniciar a prática.":"Desbloqueado ao atingir 70% no módulo anterior."}</div>
@@ -120,6 +137,7 @@
       if(unlocked){ card.querySelectorAll(".module-arrow,.module-open-btn").forEach(btn=>btn.addEventListener("click",()=>openStudy(m.id))); }
       grid.appendChild(card);
     });
+    renderChallenges();
   }
 
 
@@ -390,34 +408,87 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
       pager.dataset.currentTitle=currentTheory?.titulo||"";
     };
     renderTheoryPage(0,false);
-    $("#practiceSummary").textContent=`${m.questoes.length} questões progressivas • feedback imediato • 70% libera o próximo módulo.`;
+    $("#practiceSummary").textContent=`8 questões obrigatórias • 12 questões extras de treino • feedback imediato • 70% libera o próximo módulo.`;
     show("moduleStudy");
   }
 
-  function normalizeModuleQuestion(q,m){return {id:q.id,topic:m.titulo,visual:`Módulo ${m.numero} • ${m.subtitulo}`,q:q.enunciado,opts:[...q.alternativas],a:q.correta,exp:q.explicacao,hint:q.dica||"",imageUrl:q.image_url||"",explanationImageUrl:q.explanation_image_url||"",difficulty:q.dificuldade,xpValue:q.xp,moduleQuestion:true,moduleId:m.id};}
-  function startModule(moduleId){
-    const m=moduleById(moduleId); if(!m)return; lastMode="module";mode="module";currentModuleId=moduleId;lastModuleId=moduleId;questions=m.questoes.map(q=>normalizeModuleQuestion(q,m));
+  function normalizeModuleQuestion(q,m){return {id:q.id,topic:m.titulo,visual:`Módulo ${m.numero} • ${m.subtitulo}`,q:q.enunciado,opts:[...q.alternativas],a:q.correta,exp:q.explicacao,hint:q.dica||"",imageUrl:q.image_url||"",explanationImageUrl:q.explanation_image_url||"",difficulty:q.dificuldade,xpValue:Number(q.xp)||30,moduleQuestion:true,moduleId:m.id};}
+  function startModule(moduleId,forceFresh=false,extra=false){
+    const m=moduleById(moduleId); if(!m)return;
+    lastMode=extra?"module-extra":"module";mode=lastMode;currentModuleId=moduleId;lastModuleId=moduleId;
+    const source=extra?((window.KANT_EXTRA_QUESTIONS||{})[Number(m.numero)]||[]):(m.questoes||[]).slice(0,8);
+    questions=source.map(q=>normalizeModuleQuestion(q,m));
     const saved=moduleResult(moduleId);
-    const canResume=saved.inProgress && saved.currentTotal===questions.length && saved.currentAnswered>0 && saved.currentAnswered<questions.length;
-    idx=canResume?saved.currentAnswered:0; lives=3; xp=0; streak=0; bestStreak=0; score=canResume?saved.currentCorrect:0; answered=false; lightning=false;
-    $("#modeLabel").textContent=`Módulo ${m.numero} • Prática`;$("#lightningToggle").style.display="none";
-    if(!canResume) recordModuleCheckpoint(false);
+    const canResume=!extra&&!forceFresh&&saved.inProgress&&saved.currentTotal===questions.length&&saved.currentAnswered>0&&saved.currentAnswered<questions.length;
+    idx=canResume?saved.currentAnswered:0;lives=3;xp=0;streak=0;bestStreak=0;score=canResume?saved.currentCorrect:0;answered=false;lightning=false;runDeadline=0;runDuration=0;
+    $("#modeLabel").textContent=extra?`Módulo ${m.numero} • Treino extra`:`Módulo ${m.numero} • Prática`;
+    $("#lightningToggle").style.display="none";
+    if(!extra&&!canResume) recordModuleCheckpoint(false);
     show("game");render();
   }
-  function buildSet(m){if(m==="quick"||m==="lightning")return shuffle(bank).slice(0,10);return shuffle(bank).slice(0,24);}
-  function start(m){lastMode=m;mode=m;currentModuleId=null;questions=buildSet(m);idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=(m==="lightning");$("#modeLabel").textContent=m==="campaign"?"Revisão integrada":m==="quick"?"Batalha Rápida":"Desafio Relâmpago";$("#lightningToggle").style.display=m==="lightning"?"none":"inline-block";show("game");render();}
+  function buildSet(m){
+    const pool=challengeQuestionPool();
+    if(m==="quick")return shuffle(pool).slice(0,10);
+    if(m==="lightning")return shuffle(pool).slice(0,5);
+    return shuffle(pool).slice(0,24);
+  }
+  function start(m,forceFresh=false){
+    if((m==="quick"||m==="lightning")&&!allModulesCompleted()){renderChallenges();return;}
+    lastMode=m;mode=m;currentModuleId=null;questions=buildSet(m);idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=(m==="lightning");runDeadline=0;runDuration=0;
+    if(lightning){runDuration=120000;runDeadline=performance.now()+runDuration;}
+    $("#modeLabel").textContent=m==="campaign"?"Revisão integrada":m==="quick"?"Batalha Rápida":"Desafio Relâmpago";
+    $("#lightningToggle").style.display="none";
+    show("game");render();
+  }
 
-  function updateStats(){$("#lives").textContent=lives+" ❤️";$("#xp").textContent=xp;$("#streak").textContent=streak+" 🔥";$("#score").textContent=score;const pct=Math.round((idx/questions.length)*100);$("#progressText").textContent=pct+"%";$("#progressBar").style.width=pct+"%";}
+  function updateStats(){$("#lives").textContent=lives+" ❤️";$("#xp").textContent=xp;const mult=(1+streak*.1).toFixed(1).replace(".0","");$("#streak").textContent=`${streak} 🔥 • ${mult}×`;$("#score").textContent=score;const pct=Math.round((idx/questions.length)*100);$("#progressText").textContent=pct+"%";$("#progressBar").style.width=pct+"%";}
   function resetHint(q){const area=$("#hintArea"),btn=$("#hintBtn"),box=$("#hintBox");if(!area||!btn||!box)return;box.hidden=true;box.textContent="";btn.style.display=q.hint?"inline-flex":"none";btn.disabled=false;btn.textContent="💡 Ver dica";area.style.display=q.hint?"block":"none";}
-  function render(){clearTimer();if(idx>=questions.length){finish();return;}answered=false;const q=questions[idx];$("#topic").textContent=q.topic;$("#counter").textContent=`Questão ${idx+1} de ${questions.length}`;$("#levelLabel").textContent=mode==="module"?`Prática • ${q.difficulty||"progressiva"}`:`Nível ${(q.level??0)+1}`;$("#visual").textContent=q.visual||"";$("#question").textContent=q.q;$("#feedback").innerHTML="";$("#nextBtn").style.display="none";$("#options").innerHTML="";
-    const media=$("#questionMedia"),expMedia=$("#explanationMedia"); if(media){media.innerHTML="";media.hidden=!q.imageUrl;if(q.imageUrl){const img=document.createElement("img");img.src=q.imageUrl;img.alt="Imagem da questão";media.appendChild(img);}} if(expMedia){expMedia.innerHTML="";expMedia.hidden=true;}
-    window.KantMath?.renderInline($("#question"));resetHint(q);q.opts.forEach((opt,i)=>{const b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+i)+") "+opt;b.addEventListener("click",()=>answer(i,b));$("#options").appendChild(b);window.KantMath?.renderInline(b);});updateStats();if(lightning)startTimer();else $("#timerWrap").style.display="none";}
-  function answer(choice,btn){if(answered)return;answered=true;clearTimer();const q=questions[idx],opts=[...document.querySelectorAll(".option")];if(window.kantRecordAnswer)window.kantRecordAnswer(choice===q.a);opts.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});if(choice===q.a){score++;streak++;bestStreak=Math.max(bestStreak,streak);let gain=q.moduleQuestion?(Number(q.xpValue)||0):(100+(q.level||0)*25+Math.min(streak*15,75)+(lightning?100:0));xp+=gain;if(window.geoquestAddXP)window.geoquestAddXP(gain);$("#feedback").innerHTML=`<span class="ok"><b>✅ Acertou!</b> +${gain} XP</span><br><span class="feedback-explanation">${q.exp}</span>`;}else{lives=Math.max(0,lives-1);streak=0;btn.classList.add("wrong");$("#feedback").innerHTML=`<span class="no"><b>❌ Resposta incorreta.</b></span><br><span class="feedback-explanation">${q.exp}</span>`;}const expMedia=$("#explanationMedia");if(expMedia){expMedia.innerHTML="";expMedia.hidden=!q.explanationImageUrl;if(q.explanationImageUrl){const img=document.createElement("img");img.src=q.explanationImageUrl;img.alt="Imagem da explicação";expMedia.appendChild(img);}}window.KantMath?.renderInline($("#feedback"));if($("#hintBtn"))$("#hintBtn").disabled=true;$("#nextBtn").style.display="inline-block";updateStats();if(mode==="module")recordModuleCheckpoint(true);}
-  function timeout(){if(answered)return;answered=true;const q=questions[idx];if(window.kantRecordAnswer)window.kantRecordAnswer(false);lives=Math.max(0,lives-1);streak=0;[...document.querySelectorAll(".option")].forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});$("#feedback").innerHTML=`<span class="no"><b>⏱️ Tempo esgotado.</b></span><br><span class="feedback-explanation">${q.exp}</span>`;const expMedia=$("#explanationMedia");if(expMedia){expMedia.innerHTML="";expMedia.hidden=!q.explanationImageUrl;if(q.explanationImageUrl){const img=document.createElement("img");img.src=q.explanationImageUrl;img.alt="Imagem da explicação";expMedia.appendChild(img);}}window.KantMath?.renderInline($("#feedback"));$("#nextBtn").style.display="inline-block";updateStats();if(mode==="module")recordModuleCheckpoint(true);}
-  function startTimer(){$("#timerWrap").style.display="block";endAt=performance.now()+15000;tick();}
-  function tick(){const rem=Math.max(0,endAt-performance.now());$("#timerText").textContent=(rem/1000).toFixed(1).replace(".",",")+" s";$("#timerBar").style.width=(rem/15000*100)+"%";if(rem<=0){timeout();return;}timerId=requestAnimationFrame(tick);}
+  function render(){
+    clearTimer();
+    if(idx>=questions.length){finish();return;}
+    answered=false;const q=questions[idx];
+    $("#topic").textContent=q.topic;
+    $("#counter").textContent=`Questão ${idx+1} de ${questions.length}`;
+    $("#levelLabel").textContent=(mode==="module"||mode==="module-extra")?`${mode==="module-extra"?"Treino extra":"Prática"} • ${difficultyLabel(q.difficulty)}`:`${difficultyLabel(q.difficulty)} • ${Number(q.xpValue)||30} XP base`;
+    $("#visual").textContent=q.visual||"";$("#question").textContent=q.q;$("#feedback").innerHTML="";$("#nextBtn").style.display="none";$("#nextBtn").textContent="Próxima questão →";$("#options").innerHTML="";
+    const media=$("#questionMedia"),expMedia=$("#explanationMedia");if(media){media.innerHTML="";media.hidden=!q.imageUrl;if(q.imageUrl){const img=document.createElement("img");img.src=q.imageUrl;img.alt="Imagem da questão";media.appendChild(img);}}if(expMedia){expMedia.innerHTML="";expMedia.hidden=true;}
+    window.KantMath?.renderInline($("#question"));resetHint(q);
+    q.opts.forEach((opt,i)=>{const b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+i)+") "+opt;b.addEventListener("click",()=>answer(i,b));$("#options").appendChild(b);window.KantMath?.renderInline(b);});
+    updateStats();if(lightning)startRunTimer();else $("#timerWrap").style.display="none";
+  }
+  function xpForCorrect(q){
+    const base=Number(q.xpValue)||30;
+    const streakMultiplier=1+streak*.1;
+    const modeMultiplier=mode==="lightning"?1.5:1;
+    return {base,streakMultiplier,modeMultiplier,gain:Math.round(base*streakMultiplier*modeMultiplier)};
+  }
+  function answer(choice,btn){
+    if(answered)return;answered=true;clearTimer();const q=questions[idx],opts=[...document.querySelectorAll(".option")];const correct=choice===q.a;if(window.kantRecordAnswer)window.kantRecordAnswer(correct);
+    opts.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});
+    if(correct){
+      score++;streak++;bestStreak=Math.max(bestStreak,streak);const calc=xpForCorrect(q);xp+=calc.gain;if(window.geoquestAddXP)window.geoquestAddXP(calc.gain);
+      const bonus=`${calc.streakMultiplier.toFixed(1)}× sequência${calc.modeMultiplier>1?` • ${calc.modeMultiplier.toFixed(1)}× relâmpago`:""}`;
+      $("#feedback").innerHTML=`<span class="ok"><b>✅ Acertou!</b> +${calc.gain} XP <small>(${bonus})</small></span><br><span class="feedback-explanation">${q.exp}</span>`;
+    }else{
+      lives=Math.max(0,lives-1);streak=0;btn.classList.add("wrong");
+      $("#feedback").innerHTML=`<span class="no"><b>❌ Resposta incorreta.</b>${lives===0?" Suas vidas acabaram: esta tentativa precisa recomeçar do início.":""}</span><br><span class="feedback-explanation">${q.exp}</span>`;
+    }
+    const expMedia=$("#explanationMedia");if(expMedia){expMedia.innerHTML="";expMedia.hidden=!q.explanationImageUrl;if(q.explanationImageUrl){const img=document.createElement("img");img.src=q.explanationImageUrl;img.alt="Imagem da explicação";expMedia.appendChild(img);}}
+    window.KantMath?.renderInline($("#feedback"));if($("#hintBtn"))$("#hintBtn").disabled=true;$("#nextBtn").style.display="inline-block";if(lives===0)$("#nextBtn").textContent="Recomeçar do início ↻";updateStats();if(mode==="module")recordModuleCheckpoint(true);
+    if(lightning&&lives>0&&runDeadline>performance.now())startRunTimer();
+  }
+  function startRunTimer(){
+    if(!lightning)return;$("#timerWrap").style.display="block";if(!runDeadline){runDuration=120000;runDeadline=performance.now()+runDuration;}tickRunTimer();
+  }
+  function tickRunTimer(){const rem=Math.max(0,runDeadline-performance.now());$("#timerText").textContent=Math.ceil(rem/1000)+" s";$("#timerBar").style.width=(rem/runDuration*100)+"%";if(rem<=0){runDeadline=0;clearTimer();finish();return;}timerId=requestAnimationFrame(tickRunTimer);}
   function clearTimer(){if(timerId){cancelAnimationFrame(timerId);timerId=null;}}
-  function next(){idx++;if(lives<=0)lives=3;render();}
+  function restartCurrent(){
+    clearTimer();
+    if((mode==="module"||mode==="module-extra")&&currentModuleId)startModule(currentModuleId,true,mode==="module-extra");
+    else start(mode,true);
+  }
+  function next(){if(lives<=0){restartCurrent();return;}idx++;render();}
+
 
   async function recordModuleCheckpoint(answeredCurrent=false){
     if(mode!=="module"||!currentModuleId||!questions.length)return;
@@ -443,16 +514,36 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     }
     renderModules();
   }
-  async function finish(){clearTimer();$("#rScore").textContent=score;$("#rTotal").textContent=questions.length;$("#rXp").textContent=xp;$("#rStreak").textContent=bestStreak;const rate=questions.length?Math.round(score/questions.length*100):0,continueBtn=$("#continuePhaseBtn");if(mode==="module"){const m=moduleById(currentModuleId);await recordModuleResult(currentModuleId,rate);const moduleIndex=modules.findIndex(x=>x.id===currentModuleId),passed=rate>=70,hasNext=moduleIndex<modules.length-1;$("#resultMessage").textContent=passed?(hasNext?`${m.titulo}: ${rate}% de acertos. Próximo módulo desbloqueado.`:`${m.titulo}: ${rate}% de acertos. Trilha principal concluída!`):`${m.titulo}: ${rate}% de acertos. Você precisa de 70% para liberar o próximo módulo.`;if(continueBtn){continueBtn.style.display=passed&&hasNext?"inline-block":"none";continueBtn.textContent=passed&&hasNext?`Abrir módulo ${moduleIndex+2} →`:"";}$("#againBtn").textContent="Refazer prática";}else{$("#resultMessage").textContent=rate>=85?"Excelente domínio. Você chegou forte nesta rodada.":rate>=65?"Bom desempenho. Vale revisar os erros antes de outra rodada.":"A base está sendo construída. Refaça a rodada e observe as explicações dos erros.";if(continueBtn)continueBtn.style.display="none";$("#againBtn").textContent="Jogar novamente";}show("results");if(window.geoquestFlushXP){try{await window.geoquestFlushXP();}catch(_e){}}}
+  async function finish(){
+    clearTimer();runDeadline=0;
+    $("#rScore").textContent=score;$("#rTotal").textContent=questions.length;$("#rXp").textContent=xp;$("#rStreak").textContent=bestStreak;
+    const rate=questions.length?Math.round(score/questions.length*100):0,continueBtn=$("#continuePhaseBtn"),extraBtn=$("#extraPracticeBtn");
+    if(extraBtn)extraBtn.style.display="none";
+    if(mode==="module"){
+      const m=moduleById(currentModuleId);await recordModuleResult(currentModuleId,rate);const moduleIndex=modules.findIndex(x=>x.id===currentModuleId),passed=rate>=70,hasNext=moduleIndex<modules.length-1;
+      $("#resultMessage").textContent=passed?(hasNext?`${m.titulo}: ${rate}% de acertos. Próximo módulo desbloqueado. Você também liberou 12 exercícios extras para reforço.`:`${m.titulo}: ${rate}% de acertos. Trilha principal concluída! Os 12 exercícios extras continuam disponíveis para treino.`):`${m.titulo}: ${rate}% de acertos. Você precisa de 70% para liberar o próximo módulo, mas pode usar os exercícios extras para reforçar o conteúdo.`;
+      if(continueBtn){continueBtn.style.display=passed&&hasNext?"inline-block":"none";continueBtn.textContent=passed&&hasNext?`Abrir módulo ${moduleIndex+2} →`:"";}
+      if(extraBtn){extraBtn.style.display="inline-block";extraBtn.textContent="Treinar 12 questões extras →";}
+      $("#againBtn").textContent="Refazer 8 obrigatórias";
+    }else if(mode==="module-extra"){
+      const m=moduleById(currentModuleId);$("#resultMessage").textContent=`Treino extra de ${m?.titulo||"módulo"}: ${rate}% de acertos. Essas questões não alteram o desbloqueio da trilha; servem para ganhar domínio e XP.`;
+      if(continueBtn)continueBtn.style.display="none";$("#againBtn").textContent="Refazer treino extra";
+    }else{
+      $("#resultMessage").textContent=rate>=85?"Excelente domínio. Você chegou forte nesta rodada.":rate>=65?"Bom desempenho. Vale revisar os erros antes de outra rodada.":"A base está sendo construída. Refaça a rodada e observe as explicações dos erros.";
+      if(continueBtn)continueBtn.style.display="none";$("#againBtn").textContent="Jogar novamente";
+    }
+    show("results");if(window.geoquestFlushXP){try{await window.geoquestFlushXP();}catch(_e){}}
+  }
+
 
   document.querySelectorAll("[data-mode]").forEach(el=>el.addEventListener("click",()=>start(el.dataset.mode)));
   document.getElementById("navHome")?.addEventListener("click",()=>show("home"));document.getElementById("navChallenges")?.addEventListener("click",()=>show("challenges"));document.getElementById("navProfile")?.addEventListener("click",()=>show("profile"));document.getElementById("navAdmin")?.addEventListener("click",()=>{if(window.kantIsAdmin)show("admin");});document.getElementById("profileChangePhotoBtn")?.addEventListener("click",()=>document.getElementById("settingsBtn")?.click());
   $("#studyBackBtn")?.addEventListener("click",()=>show("home"));$("#startModulePracticeBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId));
-  function resetRunState(){clearTimer();idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=false;currentModuleId=null;}
+  function resetRunState(){clearTimer();idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=false;runDeadline=0;runDuration=0;currentModuleId=null;}
   function leaveRun(){clearTimer();if(mode==="module"&&currentModuleId)Promise.resolve(recordModuleCheckpoint(answered)).catch(()=>{});show("home");if(window.geoquestFlushXP)Promise.resolve(window.geoquestFlushXP()).catch(()=>{});resetRunState();}
   $("#nextBtn")?.addEventListener("click",next);$("#hintBtn")?.addEventListener("click",()=>{if(answered)return;const q=questions[idx];if(!q?.hint)return;const box=$("#hintBox"),btn=$("#hintBtn");box.textContent=q.hint;box.hidden=false;window.KantMath?.renderInline(box);btn.textContent="💡 Dica aberta";btn.disabled=true;});
-  $("#restartBtn")?.addEventListener("click",(e)=>{e.preventDefault();clearTimer();if(mode==="module"&&currentModuleId)startModule(currentModuleId);else start(mode);});$("#backBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});$("#quitRunBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});
-  $("#continuePhaseBtn")?.addEventListener("click",()=>{if(!lastModuleId)return;const i=modules.findIndex(m=>m.id===lastModuleId);if(i>=0&&i<modules.length-1)openStudy(modules[i+1].id);});$("#againBtn")?.addEventListener("click",()=>{if(lastMode==="module"&&lastModuleId)startModule(lastModuleId);else start(lastMode);});$("#menuBtn")?.addEventListener("click",()=>show("home"));$("#lightningToggle")?.addEventListener("click",()=>{if(answered||mode==="module")return;lightning=!lightning;$("#lightningToggle").textContent=lightning?"Desativar Relâmpago":"Ativar Relâmpago";clearTimer();if(lightning)startTimer();else $("#timerWrap").style.display="none";});
+  $("#restartBtn")?.addEventListener("click",(e)=>{e.preventDefault();restartCurrent();});$("#backBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});$("#quitRunBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});
+  $("#continuePhaseBtn")?.addEventListener("click",()=>{if(!lastModuleId)return;const i=modules.findIndex(m=>m.id===lastModuleId);if(i>=0&&i<modules.length-1)openStudy(modules[i+1].id);});$("#extraPracticeBtn")?.addEventListener("click",()=>{if(lastModuleId)startModule(lastModuleId,true,true);});$("#againBtn")?.addEventListener("click",()=>{if((lastMode==="module"||lastMode==="module-extra")&&lastModuleId)startModule(lastModuleId,true,lastMode==="module-extra");else start(lastMode,true);});$("#menuBtn")?.addEventListener("click",()=>show("home"));$("#lightningToggle")?.addEventListener("click",()=>{});
   function refreshContent(){
     modules=window.KANT_MODULES||[];
     bank=window.KANT_QUESTIONS||[];

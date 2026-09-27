@@ -352,7 +352,7 @@
     if(!rows.length){box.innerHTML='<div class="admin-empty">Nenhuma questão neste módulo.</div>';return;}
     rows.forEach((r,i)=>{
       const item=document.createElement("div");item.className="admin-content-row";
-      item.innerHTML=`<div><b>${i+1}. ${esc(r.enunciado)}</b><small>${esc(r.dificuldade)} • ${Number(r.xp)||0} XP • ${r.published?"publicada":"oculta"}</small></div><div class="admin-row-actions"><button type="button" data-action="edit">Editar</button><button type="button" class="danger" data-action="delete">Excluir</button></div>`;
+      const diffLabel=({facil:"Fácil",media:"Média",desafio:"Desafio"}[r.dificuldade]||r.dificuldade); item.innerHTML=`<div><b>${i+1}. ${esc(r.enunciado)}</b><small>${esc(diffLabel)} • ${Number(r.xp)||0} XP • ${r.published?"publicada":"oculta"}</small></div><div class="admin-row-actions"><button type="button" data-action="edit">Editar</button><button type="button" class="danger" data-action="delete">Excluir</button></div>`;
       $("[data-action='edit']",item).onclick=()=>editQuestion(r);$("[data-action='delete']",item).onclick=()=>deleteQuestion(r.id);box.appendChild(item);
     });
   }
