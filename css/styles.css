@@ -4740,3 +4740,39 @@ body.dark .challenge-card-vestibular .challenge-tag{background:#29203e;border-co
 body.dark .resolution-title{color:#aab9ce}body.dark .resolution-rich{color:#e7eef7}
 #questionMedia img{max-width:min(100%,760px);max-height:620px;object-fit:contain;border-radius:18px;border:1px solid #e5ebf3;background:#fff;padding:8px}
 body.dark #questionMedia img{border-color:#33465e;background:#f8fafc}
+
+
+/* KANT v3.10.1 — esconde corretamente mídia vazia das questões */
+.question-media[hidden],
+.explanation-media[hidden]{display:none !important;}
+
+
+/* KANT v3.10.2 — contraste melhor na tela de jogo em modo escuro */
+body.dark .game-card .topic,
+body.dark .side .stat small,
+body.dark .side .progress-label,
+body.dark .side .level-name small,
+body.dark #modeLabel,
+body.dark #counter,
+body.dark #levelLabel,
+body.dark #visual{
+  color:#bfd0e6 !important;
+}
+body.dark .side .stat b,
+body.dark .side .level-name b,
+body.dark #question,
+body.dark .game-card .question{
+  color:#f3f7fc !important;
+}
+body.dark .mini-visual{
+  color:#aebfda !important;
+  border-color:#314257 !important;
+  background:
+    linear-gradient(rgba(108,141,209,.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108,141,209,.10) 1px, transparent 1px),
+    #101925 !important;
+  background-size:24px 24px !important;
+}
+body.dark .progress{background:#0d1520 !important;border-color:#2e4156 !important;}
+body.dark #counter{font-weight:800;}
+body.dark #levelLabel{opacity:1 !important;}

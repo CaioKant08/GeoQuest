@@ -106,6 +106,44 @@
 
   function identity(){return window.geoquestCurrentUserId || document.getElementById("menuUserEmail")?.textContent || "local";}
   function progressKey(){return `geoquest:${identity()}:modules-v3`;}
+  function activeRunKey(){return `geoquest:${identity()}:active-run:v1`;}
+  function clearActiveRun(){try{localStorage.removeItem(activeRunKey());}catch(_e){}}
+  function saveActiveRun(){
+    if(!questions.length||idx>=questions.length||lives<=0){clearActiveRun();return;}
+    const resumeIdx=answered?Math.min(idx+1,questions.length):idx;
+    if(resumeIdx>=questions.length){clearActiveRun();return;}
+    const remainingMs=lightning&&runDeadline?Math.max(0,runDeadline-performance.now()):0;
+    const snapshot={
+      mode,currentModuleId,lastModuleId,questionIds:questions.map(q=>String(q.id)),idx:resumeIdx,lives,xp,streak,bestStreak,score,
+      lightning:!!lightning,remainingMs,hintUsed:answered?false:!!hintUsed,savedAt:Date.now()
+    };
+    try{localStorage.setItem(activeRunKey(),JSON.stringify(snapshot));}catch(_e){}
+  }
+  function readActiveRun(expectedMode,moduleId=null){
+    try{
+      const raw=localStorage.getItem(activeRunKey());if(!raw)return null;
+      const snap=JSON.parse(raw);
+      if(!snap||snap.mode!==expectedMode)return null;
+      if((moduleId||null)!==(snap.currentModuleId||null))return null;
+      if(!Array.isArray(snap.questionIds)||!snap.questionIds.length||Number(snap.lives)<=0)return null;
+      let pool=[];
+      if(expectedMode==="module"||expectedMode==="module-extra"){
+        const m=moduleById(moduleId);if(!m)return null;
+        const source=expectedMode==="module-extra"?((window.KANT_EXTRA_QUESTIONS||{})[Number(m.numero)]||[]):(m.questoes||[]).slice(0,8);
+        pool=source.map(q=>normalizeModuleQuestion(q,m));
+      }else if(expectedMode==="vestibular") pool=vestibularBank();
+      else pool=challengeQuestionPool();
+      const byId=new Map(pool.map(q=>[String(q.id),q]));
+      const restored=snap.questionIds.map(id=>byId.get(String(id))).filter(Boolean);
+      if(restored.length!==snap.questionIds.length)return null;
+      return {...snap,questions:restored};
+    }catch(_e){return null;}
+  }
+  function applyActiveRun(snap){
+    questions=snap.questions;idx=Math.max(0,Math.min(Number(snap.idx)||0,questions.length-1));
+    lives=Math.max(1,Number(snap.lives)||3);xp=Number(snap.xp)||0;streak=Number(snap.streak)||0;bestStreak=Number(snap.bestStreak)||0;score=Number(snap.score)||0;
+    answered=false;hintUsed=!!snap.hintUsed;lightning=!!snap.lightning;runDuration=lightning?120000:0;runDeadline=lightning&&Number(snap.remainingMs)>0?performance.now()+Number(snap.remainingMs):0;
+  }
   function getProgress(){try{return JSON.parse(localStorage.getItem(progressKey())||"{}");}catch(_e){return {};}}
   function saveProgress(p){try{localStorage.setItem(progressKey(),JSON.stringify(p));}catch(_e){}}
   function moduleResult(id){const p=getProgress(); return p[id]||{best:0,completed:false,attempts:0,currentAnswered:0,currentCorrect:0,currentTotal:0,inProgress:false};}
@@ -452,14 +490,20 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
   function startModule(moduleId,forceFresh=false,extra=false){
     const m=moduleById(moduleId); if(!m)return;
     lastMode=extra?"module-extra":"module";mode=lastMode;currentModuleId=moduleId;lastModuleId=moduleId;
-    const source=extra?((window.KANT_EXTRA_QUESTIONS||{})[Number(m.numero)]||[]):(m.questoes||[]).slice(0,8);
-    questions=source.map(q=>normalizeModuleQuestion(q,m));
-    const saved=moduleResult(moduleId);
-    const canResume=!extra&&!forceFresh&&saved.inProgress&&saved.currentTotal===questions.length&&saved.currentAnswered>0&&saved.currentAnswered<questions.length;
-    idx=canResume?saved.currentAnswered:0;lives=3;xp=0;streak=0;bestStreak=0;score=canResume?saved.currentCorrect:0;answered=false;lightning=false;runDeadline=0;runDuration=0;
+    if(forceFresh)clearActiveRun();
+    const active=!forceFresh?readActiveRun(mode,moduleId):null;
+    if(active){
+      applyActiveRun(active);
+    }else{
+      const source=extra?((window.KANT_EXTRA_QUESTIONS||{})[Number(m.numero)]||[]):(m.questoes||[]).slice(0,8);
+      questions=source.map(q=>normalizeModuleQuestion(q,m));
+      const saved=moduleResult(moduleId);
+      const canResume=!extra&&!forceFresh&&saved.inProgress&&saved.currentTotal===questions.length&&saved.currentAnswered>0&&saved.currentAnswered<questions.length;
+      idx=canResume?saved.currentAnswered:0;lives=3;xp=0;streak=0;bestStreak=0;score=canResume?saved.currentCorrect:0;answered=false;hintUsed=false;lightning=false;runDeadline=0;runDuration=0;
+      if(!extra&&!canResume) recordModuleCheckpoint(false);
+    }
     $("#modeLabel").textContent=extra?`Módulo ${m.numero} • Treino extra`:`Módulo ${m.numero} • Prática`;
     $("#lightningToggle").style.display="none";
-    if(!extra&&!canResume) recordModuleCheckpoint(false);
     show("game");render();
   }
   function buildSet(m){
@@ -471,10 +515,17 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
   function start(m,forceFresh=false){
     if((m==="quick"||m==="lightning")&&!challengeAccess()){renderChallenges();return;}
     if(m==="vestibular"&&!vestibularAccess()){renderChallenges();return;}
-    const nextSet=buildSet(m);
-    if(["quick","lightning","vestibular"].includes(m)&&!nextSet.length){renderChallenges();window.alert("Banco concluído: não há mais questões inéditas disponíveis neste desafio.");return;}
-    lastMode=m;mode=m;currentModuleId=null;questions=nextSet;idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=(m==="lightning");runDeadline=0;runDuration=0;
-    if(lightning){runDuration=120000;runDeadline=performance.now()+runDuration;}
+    lastMode=m;mode=m;currentModuleId=null;
+    if(forceFresh)clearActiveRun();
+    const active=!forceFresh?readActiveRun(m,null):null;
+    if(active){
+      applyActiveRun(active);
+    }else{
+      const nextSet=buildSet(m);
+      if(["quick","lightning","vestibular"].includes(m)&&!nextSet.length){renderChallenges();window.alert("Banco concluído: não há mais questões inéditas disponíveis neste desafio.");return;}
+      questions=nextSet;idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;hintUsed=false;lightning=(m==="lightning");runDeadline=0;runDuration=0;
+      if(lightning){runDuration=120000;runDeadline=performance.now()+runDuration;}
+    }
     $("#modeLabel").textContent=m==="campaign"?"Revisão integrada":m==="quick"?"Batalha Rápida":m==="lightning"?"Desafio Relâmpago":"Desafio Vestibulares";
     $("#lightningToggle").style.display="none";
     show("game");render();
@@ -604,7 +655,7 @@ A alternativa correta é ${letter}) ${answer}.`;
       }
     }
     const expMedia=$("#explanationMedia");if(expMedia){expMedia.innerHTML="";expMedia.hidden=true;}
-    updateStats();if(mode==="module"&&answered)recordModuleCheckpoint(true);
+    updateStats();if(mode==="module"&&answered)recordModuleCheckpoint(true);saveActiveRun();
   }
   function revealAnswer(){
     if(answered||idx>=questions.length)return;
@@ -615,7 +666,7 @@ A alternativa correta é ${letter}) ${answer}.`;
     const expMedia=$("#explanationMedia");if(expMedia){expMedia.innerHTML="";expMedia.hidden=!q.explanationImageUrl;if(q.explanationImageUrl){const img=document.createElement("img");img.src=q.explanationImageUrl;img.alt="Imagem da explicação";expMedia.appendChild(img);}}
     const reveal=$("#answerRevealActions");if(reveal)reveal.hidden=true;
     if($("#hintBtn"))$("#hintBtn").disabled=true;
-    $("#nextBtn").style.display="inline-block";updateStats();if(mode==="module")recordModuleCheckpoint(true);
+    $("#nextBtn").style.display="inline-block";updateStats();if(mode==="module")recordModuleCheckpoint(true);saveActiveRun();
   }
   function startRunTimer(){
     if(!lightning)return;$("#timerWrap").style.display="block";if(!runDeadline){runDuration=120000;runDeadline=performance.now()+runDuration;}tickRunTimer();
@@ -623,11 +674,11 @@ A alternativa correta é ${letter}) ${answer}.`;
   function tickRunTimer(){const rem=Math.max(0,runDeadline-performance.now());$("#timerText").textContent=Math.ceil(rem/1000)+" s";$("#timerBar").style.width=(rem/runDuration*100)+"%";if(rem<=0){runDeadline=0;clearTimer();finish();return;}timerId=requestAnimationFrame(tickRunTimer);}
   function clearTimer(){if(timerId){cancelAnimationFrame(timerId);timerId=null;}}
   function restartCurrent(){
-    clearTimer();
+    clearTimer();clearActiveRun();
     if((mode==="module"||mode==="module-extra")&&currentModuleId)startModule(currentModuleId,true,mode==="module-extra");
     else start(mode,true);
   }
-  function next(){if(lives<=0){restartCurrent();return;}idx++;render();}
+  function next(){if(lives<=0){restartCurrent();return;}idx++;saveActiveRun();render();}
 
 
   async function recordModuleCheckpoint(answeredCurrent=false){
@@ -655,7 +706,7 @@ A alternativa correta é ${letter}) ${answer}.`;
     renderModules();
   }
   async function finish(){
-    clearTimer();runDeadline=0;
+    clearTimer();runDeadline=0;clearActiveRun();
     $("#rScore").textContent=score;$("#rTotal").textContent=questions.length;$("#rXp").textContent=xp;$("#rStreak").textContent=bestStreak;
     const rate=questions.length?Math.round(score/questions.length*100):0,continueBtn=$("#continuePhaseBtn"),extraBtn=$("#extraPracticeBtn");if($("#againBtn"))$("#againBtn").disabled=false;
     if(extraBtn)extraBtn.style.display="none";
@@ -683,8 +734,8 @@ A alternativa correta é ${letter}) ${answer}.`;
   document.getElementById("navHome")?.addEventListener("click",()=>show("home"));document.getElementById("navChallenges")?.addEventListener("click",()=>show("challenges"));document.getElementById("navProfile")?.addEventListener("click",()=>show("profile"));document.getElementById("navAdmin")?.addEventListener("click",()=>{if(window.kantIsAdmin)show("admin");});document.getElementById("profileChangePhotoBtn")?.addEventListener("click",()=>document.getElementById("settingsBtn")?.click());
   $("#studyBackBtn")?.addEventListener("click",()=>show("home"));$("#startModulePracticeBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId));$("#startModuleExtraBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId,true,true));
   function resetRunState(){clearTimer();idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=false;runDeadline=0;runDuration=0;currentModuleId=null;}
-  function leaveRun(){clearTimer();if(mode==="module"&&currentModuleId)Promise.resolve(recordModuleCheckpoint(answered)).catch(()=>{});show("home");if(window.geoquestFlushXP)Promise.resolve(window.geoquestFlushXP()).catch(()=>{});resetRunState();}
-  $("#nextBtn")?.addEventListener("click",next);$("#hintBtn")?.addEventListener("click",()=>{if(answered)return;const q=questions[idx];if(!q?.hint)return;if(!hintUsed){const ok=window.confirm("Abrir a dica reduz pela metade o XP que esta questão pode conceder. Deseja ver a dica mesmo assim?");if(!ok)return;hintUsed=true;}const box=$("#hintBox"),btn=$("#hintBtn");box.textContent=q.hint;box.hidden=false;window.KantMath?.renderInline(box);btn.textContent="💡 Dica aberta • XP pela metade";btn.disabled=true;});
+  function leaveRun(){saveActiveRun();clearTimer();if(mode==="module"&&currentModuleId)Promise.resolve(recordModuleCheckpoint(answered)).catch(()=>{});show("home");if(window.geoquestFlushXP)Promise.resolve(window.geoquestFlushXP()).catch(()=>{});resetRunState();}
+  $("#nextBtn")?.addEventListener("click",next);$("#hintBtn")?.addEventListener("click",()=>{if(answered)return;const q=questions[idx];if(!q?.hint)return;if(!hintUsed){const ok=window.confirm("Abrir a dica reduz pela metade o XP que esta questão pode conceder. Deseja ver a dica mesmo assim?");if(!ok)return;hintUsed=true;}const box=$("#hintBox"),btn=$("#hintBtn");box.textContent=q.hint;box.hidden=false;window.KantMath?.renderInline(box);btn.textContent="💡 Dica aberta • XP pela metade";btn.disabled=true;saveActiveRun();});
   $("#showAnswerBtn")?.addEventListener("click",revealAnswer);
   $("#restartBtn")?.addEventListener("click",(e)=>{e.preventDefault();restartCurrent();});$("#backBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});$("#quitRunBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});
   $("#continuePhaseBtn")?.addEventListener("click",()=>{if(!lastModuleId)return;const i=modules.findIndex(m=>m.id===lastModuleId);if(i>=0&&i<modules.length-1)openStudy(modules[i+1].id);});$("#extraPracticeBtn")?.addEventListener("click",()=>{if(lastModuleId)startModule(lastModuleId,true,true);});$("#againBtn")?.addEventListener("click",()=>{if((lastMode==="module"||lastMode==="module-extra")&&lastModuleId)startModule(lastModuleId,true,lastMode==="module-extra");else start(lastMode,true);});$("#menuBtn")?.addEventListener("click",()=>show("home"));$("#lightningToggle")?.addEventListener("click",()=>{});
@@ -697,4 +748,5 @@ A alternativa correta é ${letter}) ${answer}.`;
   window.addEventListener("geoquest:user-ready",()=>{refreshContent();syncRemoteProgress();});
   renderModules();
   window.addEventListener("kant:admin-test-mode",()=>{renderModules();});
+  window.addEventListener("beforeunload",()=>{if(document.getElementById("game")?.classList.contains("active"))saveActiveRun();});
 })();
