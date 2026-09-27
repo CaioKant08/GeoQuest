@@ -129,10 +129,20 @@
     const hero=$("#moduleStudyHero"); hero.className=`module-study-hero study-${m.cor}`;
     const practiceCta=document.querySelector("#moduleStudy .practice-cta"); if(practiceCta) practiceCta.className=`practice-cta practice-${m.cor}`;
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
-    const grid=$("#theoryGrid"); grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><span>${t.exemplo}</span>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
-    m.teoria.forEach((t,i)=>window.KantMath?.renderFormula(grid.querySelector(`[data-formula-index="${i}"]`),t.formula));
-    grid.querySelectorAll(".theory-card>p").forEach(el=>window.KantMath?.renderTextWithMath(el, el.textContent));
-    grid.querySelectorAll(".guided-example span").forEach(el=>window.KantMath?.renderTextWithMath(el, el.textContent));
+    const grid=$("#theoryGrid"); grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card" data-theory-index="${i}"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
+    m.teoria.forEach((t,i)=>{
+      window.KantMath?.renderFormula(grid.querySelector(`[data-formula-index="${i}"]`),t.formula);
+      const exampleEl=grid.querySelector(`[data-example-index="${i}"]`);
+      window.KantMath?.renderTextWithMath(exampleEl,t.exemplo,{allowLatexPrefix:true});
+    });
+    grid.querySelectorAll(".theory-card>p").forEach((el,i)=>window.KantMath?.renderTextWithMath(el, m.teoria[i]?.texto||el.textContent));
+    if(m.id==="modulo-1" && window.KantCartesian){
+      const cards=[...grid.querySelectorAll(".theory-card")];
+      const distanceIndex=m.teoria.findIndex(t=>/distância entre dois pontos/i.test(t.titulo||""));
+      const midpointIndex=m.teoria.findIndex(t=>/ponto médio/i.test(t.titulo||""));
+      if(distanceIndex>=0) window.KantCartesian.renderForTheoryCard(cards[distanceIndex],"distance");
+      if(midpointIndex>=0) window.KantCartesian.renderForTheoryCard(cards[midpointIndex],"midpoint");
+    }
     $("#practiceSummary").textContent=`${m.questoes.length} questões progressivas • feedback imediato • 70% libera o próximo módulo.`;
     show("moduleStudy");
   }

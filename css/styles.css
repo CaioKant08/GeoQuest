@@ -4315,3 +4315,30 @@ body.dark .learning-module-art .module-symbol-shell{
 .admin-module-item b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .admin-module-item small{line-height:1.35;word-break:break-word}
 .theory-card{overflow:hidden}
+
+/* KANT Cartesian Engine — diagramas matemáticos vetoriais */
+.kant-theory-viz{margin:18px 0 4px;padding:10px 10px 6px;border:1px solid #e5ecf2;border-radius:18px;background:linear-gradient(180deg,#fbfdfc 0%,#f7faf8 100%);overflow:hidden}
+.kant-cartesian-svg{display:block;width:100%;height:auto;max-height:340px}
+.kant-grid-line{stroke:#e8eee9;stroke-width:1}.kant-grid-zero{stroke:#d3ddd6;stroke-width:1.15}
+.kant-axis{stroke:#526159;stroke-width:1.8;stroke-linecap:round}.kant-axis-arrow{fill:#526159}
+.kant-tick{font:600 11px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#87948c}
+.kant-axis-label{font:700 italic 14px Georgia,serif;fill:#5d6b63}
+.kant-segment{stroke:#20a765;stroke-width:4.2;stroke-linecap:round}
+.kant-guide{stroke:#9bcdb2;stroke-width:1.8;stroke-dasharray:6 5}
+.kant-point{fill:#118f56;stroke:#fff;stroke-width:2.5}.kant-midpoint{fill:#0f6f48;stroke-width:3}
+.kant-point-label{font:700 13px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#26362d;paint-order:stroke;stroke:#fbfdfc;stroke-width:4;stroke-linejoin:round}
+.kant-delta-label{font:700 11.5px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#6b8b78;paint-order:stroke;stroke:#fbfdfc;stroke-width:4}
+.kant-label-bg{fill:#eaf8f0;stroke:#c7ead6;stroke-width:1}.kant-distance-label{font:800 14px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#11824e}
+.kant-half-marker{fill:#6cb78e;stroke:#fff;stroke-width:1.2}
+body.dark .kant-theory-viz{background:#111b18;border-color:#2b3c35}
+body.dark .kant-grid-line{stroke:#23342d}body.dark .kant-grid-zero{stroke:#30463c}body.dark .kant-axis{stroke:#80958a}body.dark .kant-axis-arrow{fill:#80958a}
+body.dark .kant-tick,body.dark .kant-axis-label{fill:#85998f}body.dark .kant-point-label{fill:#e5f0e9;stroke:#111b18}body.dark .kant-delta-label{fill:#9cc4ad;stroke:#111b18}
+@media(max-width:640px){.kant-theory-viz{padding:6px 4px 2px;margin-top:14px}.kant-cartesian-svg{min-width:0}.kant-point-label{font-size:12px}.kant-tick{font-size:10px}}
+
+/* Exemplos guiados com matemática tipográfica */
+.guided-example .guided-example-content{font-size:.96rem;line-height:1.62;color:#263445;overflow-x:auto}
+.guided-example .guided-example-content .katex{font-size:1.08em}
+.guided-example .guided-example-content .katex-display{margin:.55em 0;text-align:left;overflow-x:auto;overflow-y:hidden}
+.guided-example .guided-example-content .katex-display>.katex{white-space:nowrap}
+body.dark .guided-example .guided-example-content{color:#e6edf5}
+.admin-latex-help{margin:-2px 0 10px;color:var(--muted);font-size:.76rem;line-height:1.5}

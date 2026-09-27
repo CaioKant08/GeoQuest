@@ -23,13 +23,13 @@ window.KANT_DEFAULT_MODULES = [
         "titulo": "Distância entre dois pontos",
         "texto": "As diferenças horizontal e vertical formam os catetos de um triângulo retângulo. Por isso, a fórmula da distância é o Teorema de Pitágoras escrito em coordenadas.",
         "formula": "latex:d=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}",
-        "exemplo": "Entre A(−2,5) e B(4,−3): d = √(6² + (−8)²) = 10."
+        "exemplo": "Entre $A(-2,5)$ e $B(4,-3)$:\n$$d=\\sqrt{(4-(-2))^2+(-3-5)^2}=\\sqrt{6^2+(-8)^2}=10$$"
       },
       {
         "titulo": "Ponto médio",
         "texto": "O ponto médio divide o segmento em duas partes de mesmo comprimento. Suas coordenadas são as médias aritméticas das coordenadas dos extremos.",
         "formula": "latex:M=\\left(\\frac{x_1+x_2}{2},\\frac{y_1+y_2}{2}\\right)",
-        "exemplo": "Para A(7,−1) e B(−3,11), M = (2,5)."
+        "exemplo": "Para $A(7,-1)$ e $B(-3,11)$:\n$$M=\\left(\\frac{7+(-3)}{2},\\frac{-1+11}{2}\\right)=(2,5)$$"
       },
       {
         "titulo": "Aplicações",

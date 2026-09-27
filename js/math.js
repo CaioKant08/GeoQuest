@@ -117,11 +117,15 @@
     return /[=√²³₀₁₂₃]|\b[xydmrabcABC]\b|\d\s*\/\s*\d|->|→|⇔|\([^()]*,[^()]*\)/.test(source);
   }
 
-  function renderTextWithMath(el, value){
+  function renderTextWithMath(el, value, options={}){
     if(!el) return;
     const source = String(value ?? "");
     if(!source.trim()){
       el.textContent = "";
+      return;
+    }
+    if(options.allowLatexPrefix && source.trim().toLowerCase().startsWith("latex:")){
+      renderFormula(el, source.trim().slice(6).trim(), true);
       return;
     }
     if(/[\\][\[(]|\$\$?|\\begin\{/.test(source)){
