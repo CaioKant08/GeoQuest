@@ -4225,3 +4225,37 @@ body.dark .learning-module-art .module-symbol-glow{
     margin-top:16px !important;
   }
 }
+
+/* =========================================================
+   KANT v3.8.4 — remove o texto da arte e sobe levemente o ícone
+   ========================================================= */
+.learning-module-art .art-label{
+  display:none !important;
+}
+.learning-module-art{
+  min-height:228px !important;
+  height:228px !important;
+  padding-top:8px !important;
+}
+.learning-module-art .module-art-center{
+  justify-content:flex-start !important;
+  gap:0 !important;
+  padding-top:0 !important;
+}
+.learning-module-art .module-symbol-shell{
+  margin-top:8px !important;
+}
+body.dark .learning-module-art .module-symbol-shell{
+  margin-top:8px !important;
+}
+@media(max-width:760px){
+  .learning-module-art{
+    min-height:214px !important;
+    height:214px !important;
+    padding-top:6px !important;
+  }
+  .learning-module-art .module-symbol-shell,
+  body.dark .learning-module-art .module-symbol-shell{
+    margin-top:6px !important;
+  }
+}
