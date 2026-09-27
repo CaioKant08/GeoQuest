@@ -1,4 +1,4 @@
-window.KANT_MODULES = [
+window.KANT_DEFAULT_MODULES = [
   {
     "id": "modulo-1",
     "numero": 1,
@@ -972,3 +972,7 @@ window.KANT_MODULES = [
     ]
   }
 ];
+
+
+// A plataforma usa esta cópia até carregar o conteúdo publicado do Supabase.
+window.KANT_MODULES = JSON.parse(JSON.stringify(window.KANT_DEFAULT_MODULES));

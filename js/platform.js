@@ -65,6 +65,9 @@
   }
   function showLoggedOut(){
     window.geoquestCurrentUserId=null;
+    window.kantCurrentProfile=null;
+    window.kantIsAdmin=false;
+    document.getElementById("navAdmin")?.setAttribute("hidden","");
     authLoading.hidden=true;
     appWrap.hidden=true;
     authGate.hidden=false;
@@ -85,7 +88,7 @@
       target.textContent=initials(name);
     }
   }
-  function showLoggedIn(user){
+  async function showLoggedIn(user){
     window.geoquestCurrentUserId=user?.id || null;
     authLoading.hidden=true;
     authGate.hidden=true;
@@ -101,12 +104,19 @@
     }
     if(menuUserName) menuUserName.textContent=name;
     if(menuUserEmail) menuUserEmail.textContent=user?.email || "";
-    if(typeof syncProfileScreen === "function") syncProfileScreen();
     paintAvatar(headerAvatar,avatarUrl,name);
     paintAvatar(avatarPreview,avatarUrl,name);
+
+    const profile=await ensureProfile(user);
+    window.kantCurrentProfile=profile;
+    window.kantIsAdmin=profile?.role==="admin";
+    const adminButton=document.getElementById("navAdmin");
+    if(adminButton){
+      if(window.kantIsAdmin) adminButton.removeAttribute("hidden");
+      else adminButton.setAttribute("hidden","");
+    }
     if(typeof syncProfileScreen === "function") syncProfileScreen();
-    ensureProfile(user);
-    window.dispatchEvent(new CustomEvent("geoquest:user-ready",{detail:{userId:user?.id || null}}));
+    window.dispatchEvent(new CustomEvent("geoquest:user-ready",{detail:{userId:user?.id || null,profile,isAdmin:window.kantIsAdmin}}));
   }
 
   if(!window.supabase || !window.supabase.createClient){
@@ -117,6 +127,7 @@
   const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
     auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
   });
+  window.kantDb=db;
 
   const XP_PER_LEVEL = 1000;
   let currentProfile = null;
@@ -142,7 +153,7 @@
 
     const {data:existing,error:readError}=await db
       .from("profiles")
-      .select("id,display_name,avatar_url,xp")
+      .select("id,display_name,avatar_url,xp,role")
       .eq("id",user.id)
       .maybeSingle();
 
@@ -159,7 +170,7 @@
         const {data:updated}=await db.from("profiles")
           .update({display_name:displayName,avatar_url:avatarUrl,updated_at:new Date().toISOString()})
           .eq("id",user.id)
-          .select("id,display_name,avatar_url,xp")
+          .select("id,display_name,avatar_url,xp,role")
           .single();
         if(updated) currentProfile=updated;
       }
@@ -168,8 +179,8 @@
 
     const {data:created,error:createError}=await db
       .from("profiles")
-      .insert({id:user.id,display_name:displayName,avatar_url:avatarUrl,xp:0})
-      .select("id,display_name,avatar_url,xp")
+      .insert({id:user.id,display_name:displayName,avatar_url:avatarUrl,xp:0,role:"user"})
+      .select("id,display_name,avatar_url,xp,role")
       .single();
 
     if(createError){
@@ -219,7 +230,7 @@
           updated_at:new Date().toISOString()
         })
         .eq("id",user.id)
-        .select("id,display_name,avatar_url,xp")
+        .select("id,display_name,avatar_url,xp,role")
         .single();
 
       if(updateError) throw updateError;
@@ -251,7 +262,7 @@
     const {data:{user}}=await db.auth.getUser();
     const {data,error}=await db
       .from("profiles")
-      .select("id,display_name,avatar_url,xp")
+      .select("id,display_name,avatar_url,xp,role")
       .order("xp",{ascending:false})
       .order("display_name",{ascending:true})
       .limit(100);

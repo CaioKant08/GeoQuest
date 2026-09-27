@@ -1,8 +1,8 @@
 (() => {
-  const modules = window.KANT_MODULES || [];
-  const bank = window.KANT_QUESTIONS || [];
+  let modules = window.KANT_MODULES || [];
+  let bank = window.KANT_QUESTIONS || [];
   const $ = (s) => document.querySelector(s);
-  const screens = ["home","moduleStudy","challenges","profile","game","results"].reduce((o,id)=>(o[id]=$("#"+id),o),{});
+  const screens = ["home","moduleStudy","challenges","profile","admin","game","results"].reduce((o,id)=>(o[id]=$("#"+id),o),{});
 
   let mode="quick", questions=[], idx=0, lives=3, xp=0, streak=0, bestStreak=0, score=0, answered=false, lightning=false;
   let timerId=null, endAt=0, lastMode="quick";
@@ -11,8 +11,8 @@
   const moduleById=(id)=>modules.find(m=>m.id===id);
 
   function setNavActive(name){
-    const map={home:"navHome",challenges:"navChallenges",profile:"navProfile"};
-    ["navHome","navChallenges","navProfile"].forEach(id=>document.getElementById(id)?.classList.remove("active"));
+    const map={home:"navHome",challenges:"navChallenges",profile:"navProfile",admin:"navAdmin"};
+    ["navHome","navChallenges","navProfile","navAdmin"].forEach(id=>document.getElementById(id)?.classList.remove("active"));
     if(map[name]) document.getElementById(map[name])?.classList.add("active");
   }
   function syncProfileScreen(){
@@ -36,6 +36,25 @@
   function getProgress(){try{return JSON.parse(localStorage.getItem(progressKey())||"{}");}catch(_e){return {};}}
   function saveProgress(p){try{localStorage.setItem(progressKey(),JSON.stringify(p));}catch(_e){}}
   function moduleResult(id){const p=getProgress(); return p[id]||{best:0,completed:false,attempts:0};}
+
+  async function syncRemoteProgress(){
+    const db=window.kantDb, userId=window.geoquestCurrentUserId;
+    if(!db || !userId) return;
+    try{
+      const {data,error}=await db.from("user_module_progress")
+        .select("module_id,best,completed,attempts,updated_at")
+        .eq("user_id",userId);
+      if(error) throw error;
+      const p=getProgress();
+      (data||[]).forEach(row=>{
+        p[row.module_id]={best:Number(row.best)||0,completed:!!row.completed,attempts:Number(row.attempts)||0,updatedAt:row.updated_at||null};
+      });
+      saveProgress(p);
+      renderModules();
+    }catch(err){
+      console.warn("Progresso remoto indisponível:",err?.message||err);
+    }
+  }
   function isUnlocked(moduleIndex){if(moduleIndex===0)return true; return !!moduleResult(modules[moduleIndex-1].id).completed;}
 
   function renderModules(){
@@ -91,16 +110,36 @@
   function clearTimer(){if(timerId){cancelAnimationFrame(timerId);timerId=null;}}
   function next(){idx++;if(lives<=0)lives=3;render();}
 
-  function recordModuleResult(moduleId,rate){const p=getProgress(),prev=p[moduleId]||{best:0,completed:false,attempts:0};p[moduleId]={best:Math.max(prev.best||0,rate),completed:prev.completed||rate>=70,attempts:(prev.attempts||0)+1,updatedAt:new Date().toISOString()};saveProgress(p);}
-  async function finish(){clearTimer();$("#rScore").textContent=score;$("#rTotal").textContent=questions.length;$("#rXp").textContent=xp;$("#rStreak").textContent=bestStreak;const rate=questions.length?Math.round(score/questions.length*100):0,continueBtn=$("#continuePhaseBtn");if(mode==="module"){const m=moduleById(currentModuleId);recordModuleResult(currentModuleId,rate);const moduleIndex=modules.findIndex(x=>x.id===currentModuleId),passed=rate>=70,hasNext=moduleIndex<modules.length-1;$("#resultMessage").textContent=passed?(hasNext?`${m.titulo}: ${rate}% de acertos. Próximo módulo desbloqueado.`:`${m.titulo}: ${rate}% de acertos. Trilha principal concluída!`):`${m.titulo}: ${rate}% de acertos. Você precisa de 70% para liberar o próximo módulo.`;if(continueBtn){continueBtn.style.display=passed&&hasNext?"inline-block":"none";continueBtn.textContent=passed&&hasNext?`Abrir módulo ${moduleIndex+2} →`:"";}$("#againBtn").textContent="Refazer prática";}else{$("#resultMessage").textContent=rate>=85?"Excelente domínio. Você chegou forte nesta rodada.":rate>=65?"Bom desempenho. Vale revisar os erros antes de outra rodada.":"A base está sendo construída. Refaça a rodada e observe as explicações dos erros.";if(continueBtn)continueBtn.style.display="none";$("#againBtn").textContent="Jogar novamente";}show("results");if(window.geoquestFlushXP){try{await window.geoquestFlushXP();}catch(_e){}}}
+  async function recordModuleResult(moduleId,rate){
+    const p=getProgress(),prev=p[moduleId]||{best:0,completed:false,attempts:0};
+    const next={best:Math.max(prev.best||0,rate),completed:prev.completed||rate>=70,attempts:(prev.attempts||0)+1,updatedAt:new Date().toISOString()};
+    p[moduleId]=next; saveProgress(p);
+    const db=window.kantDb, userId=window.geoquestCurrentUserId;
+    if(db && userId){
+      try{
+        const {error}=await db.from("user_module_progress").upsert({
+          user_id:userId,module_id:moduleId,best:next.best,completed:next.completed,attempts:next.attempts,updated_at:next.updatedAt
+        },{onConflict:"user_id,module_id"});
+        if(error) throw error;
+      }catch(err){ console.warn("Progresso não salvo no Supabase:",err?.message||err); }
+    }
+  }
+  async function finish(){clearTimer();$("#rScore").textContent=score;$("#rTotal").textContent=questions.length;$("#rXp").textContent=xp;$("#rStreak").textContent=bestStreak;const rate=questions.length?Math.round(score/questions.length*100):0,continueBtn=$("#continuePhaseBtn");if(mode==="module"){const m=moduleById(currentModuleId);await recordModuleResult(currentModuleId,rate);const moduleIndex=modules.findIndex(x=>x.id===currentModuleId),passed=rate>=70,hasNext=moduleIndex<modules.length-1;$("#resultMessage").textContent=passed?(hasNext?`${m.titulo}: ${rate}% de acertos. Próximo módulo desbloqueado.`:`${m.titulo}: ${rate}% de acertos. Trilha principal concluída!`):`${m.titulo}: ${rate}% de acertos. Você precisa de 70% para liberar o próximo módulo.`;if(continueBtn){continueBtn.style.display=passed&&hasNext?"inline-block":"none";continueBtn.textContent=passed&&hasNext?`Abrir módulo ${moduleIndex+2} →`:"";}$("#againBtn").textContent="Refazer prática";}else{$("#resultMessage").textContent=rate>=85?"Excelente domínio. Você chegou forte nesta rodada.":rate>=65?"Bom desempenho. Vale revisar os erros antes de outra rodada.":"A base está sendo construída. Refaça a rodada e observe as explicações dos erros.";if(continueBtn)continueBtn.style.display="none";$("#againBtn").textContent="Jogar novamente";}show("results");if(window.geoquestFlushXP){try{await window.geoquestFlushXP();}catch(_e){}}}
 
   document.querySelectorAll("[data-mode]").forEach(el=>el.addEventListener("click",()=>start(el.dataset.mode)));
-  document.getElementById("navHome")?.addEventListener("click",()=>show("home"));document.getElementById("navChallenges")?.addEventListener("click",()=>show("challenges"));document.getElementById("navProfile")?.addEventListener("click",()=>show("profile"));document.getElementById("profileChangePhotoBtn")?.addEventListener("click",()=>document.getElementById("settingsBtn")?.click());
+  document.getElementById("navHome")?.addEventListener("click",()=>show("home"));document.getElementById("navChallenges")?.addEventListener("click",()=>show("challenges"));document.getElementById("navProfile")?.addEventListener("click",()=>show("profile"));document.getElementById("navAdmin")?.addEventListener("click",()=>{if(window.kantIsAdmin)show("admin");});document.getElementById("profileChangePhotoBtn")?.addEventListener("click",()=>document.getElementById("settingsBtn")?.click());
   $("#studyBackBtn")?.addEventListener("click",()=>show("home"));$("#startModulePracticeBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId));
   function resetRunState(){clearTimer();idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=false;currentModuleId=null;}
   function leaveRun(){clearTimer();show("home");if(window.geoquestFlushXP)Promise.resolve(window.geoquestFlushXP()).catch(()=>{});resetRunState();}
   $("#nextBtn")?.addEventListener("click",next);$("#hintBtn")?.addEventListener("click",()=>{if(answered)return;const q=questions[idx];if(!q?.hint)return;const box=$("#hintBox"),btn=$("#hintBtn");box.textContent=q.hint;box.hidden=false;btn.textContent="💡 Dica aberta";btn.disabled=true;});
   $("#restartBtn")?.addEventListener("click",(e)=>{e.preventDefault();clearTimer();if(mode==="module"&&currentModuleId)startModule(currentModuleId);else start(mode);});$("#backBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});$("#quitRunBtn")?.addEventListener("click",(e)=>{e.preventDefault();leaveRun();});
   $("#continuePhaseBtn")?.addEventListener("click",()=>{if(!lastModuleId)return;const i=modules.findIndex(m=>m.id===lastModuleId);if(i>=0&&i<modules.length-1)openStudy(modules[i+1].id);});$("#againBtn")?.addEventListener("click",()=>{if(lastMode==="module"&&lastModuleId)startModule(lastModuleId);else start(lastMode);});$("#menuBtn")?.addEventListener("click",()=>show("home"));$("#lightningToggle")?.addEventListener("click",()=>{if(answered||mode==="module")return;lightning=!lightning;$("#lightningToggle").textContent=lightning?"Desativar Relâmpago":"Ativar Relâmpago";clearTimer();if(lightning)startTimer();else $("#timerWrap").style.display="none";});
-  window.addEventListener("geoquest:user-ready",renderModules);renderModules();
+  function refreshContent(){
+    modules=window.KANT_MODULES||[];
+    bank=window.KANT_QUESTIONS||[];
+    renderModules();
+  }
+  window.addEventListener("kant:content-ready",refreshContent);
+  window.addEventListener("geoquest:user-ready",()=>{refreshContent();syncRemoteProgress();});
+  renderModules();
 })();
