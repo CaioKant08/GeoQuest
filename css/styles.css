@@ -4432,3 +4432,17 @@ body.dark .kant-circle{fill:rgba(53,177,111,.08);stroke:#43b579}
   .kant-axis-label{font-size:16px}
   .kant-tick{font-size:11px}
 }
+
+
+/* KANT v3.9.1 — rótulos mais consistentes, plano expandido e exemplo guiado maior */
+.guided-example .guided-example-content{font-size:1.18rem;line-height:1.9}
+.guided-example .guided-example-content .katex{font-size:1.28em}
+.guided-example .guided-example-content .katex-display{margin:1em 0}
+.kant-cartesian-svg{max-height:640px}
+.kant-point-label{font-size:17px}
+.kant-line-label,.kant-area-label{font-size:17px}
+.kant-distance-label{font-size:19px}
+@media(max-width:720px){
+  .guided-example .guided-example-content{font-size:1.08rem;line-height:1.82}
+  .guided-example .guided-example-content .katex{font-size:1.16em}
+}
