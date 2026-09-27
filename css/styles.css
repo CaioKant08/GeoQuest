@@ -4179,3 +4179,49 @@ body.dark .learning-module-art{
   background:none !important;
   box-shadow:none !important;
 }
+
+/* =========================================================
+   KANT v3.8.3 — afasta o símbolo do texto para eliminar a faixa visual
+   ========================================================= */
+/* A faixa percebida vinha do glow muito próximo da área de texto.
+   Em vez de insistir no z-index, afastamos fisicamente o símbolo. */
+.learning-module-art{
+  min-height:246px !important;
+  height:246px !important;
+  padding-top:18px !important;
+  overflow:visible !important;
+}
+.learning-module-art .module-art-center{
+  justify-content:flex-start !important;
+  gap:18px !important;
+  padding-top:2px !important;
+}
+.learning-module-art .art-label{
+  position:relative !important;
+  z-index:6 !important;
+}
+.learning-module-art .module-symbol-shell{
+  margin-top:22px !important;
+  z-index:4 !important;
+}
+body.dark .learning-module-art .module-symbol-shell{
+  margin-top:26px !important;
+}
+body.dark .learning-module-art .module-symbol-glow{
+  opacity:.26 !important;
+  filter:blur(24px) !important;
+}
+@media(max-width:760px){
+  .learning-module-art{
+    min-height:228px !important;
+    height:228px !important;
+    padding-top:14px !important;
+  }
+  .learning-module-art .module-art-center{
+    gap:14px !important;
+  }
+  .learning-module-art .module-symbol-shell,
+  body.dark .learning-module-art .module-symbol-shell{
+    margin-top:16px !important;
+  }
+}
