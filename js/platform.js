@@ -650,8 +650,12 @@
   }
   profileChangeNicknameBtn?.addEventListener("click",openNicknameModal);
   closeNicknameModal?.addEventListener("click",closeNickname);
-  nicknameModal?.addEventListener("click",e=>{if(e.target===nicknameModal)closeNickname();});
+  // O modal de nickname não fecha ao clicar/arrastar fora do campo.
+  // Isso evita perder a edição ao selecionar texto e ultrapassar os limites do input.
   nicknameInput?.addEventListener("keydown",e=>{if(e.key==="Enter")saveNicknameBtn?.click();});
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape" && nicknameModal?.classList.contains("open")) closeNickname();
+  });
   saveNicknameBtn?.addEventListener("click",async()=>{
     const name=(nicknameInput?.value||"").trim();
     if(name.length<2){if(nicknameStatus){nicknameStatus.textContent="Use pelo menos 2 caracteres.";nicknameStatus.className="settings-status err";}return;}

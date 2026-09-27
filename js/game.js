@@ -101,7 +101,7 @@
       card.innerHTML=`
         <div class="module-top"><div class="module-num">${m.numero}</div><button class="module-arrow" type="button" ${unlocked?"":"disabled"}>›</button></div>
         <div class="module-heading"><h3>Módulo ${m.numero}</h3><h4>${m.titulo}</h4><p>${m.descricao}</p></div>
-        <div class="module-art learning-module-art"><span class="art-label">${m.subtitulo}</span><div class="module-symbol-shell"><div class="module-symbol-glow"></div><div class="module-symbol">${moduleIconSvg(m.numero)}</div></div></div>
+        <div class="module-art learning-module-art"><div class="module-art-center"><span class="art-label">${m.subtitulo}</span><div class="module-symbol-shell"><div class="module-symbol-glow"></div><div class="module-symbol">${moduleIconSvg(m.numero)}</div></div></div></div>
         <div class="module-progress learning-progress">
           <div class="progress-top"><span>Domínio</span><b>${pct}%</b></div><div class="bar"><span style="width:${pct}%"></span></div>
           <div class="module-best-result ${bestClass}"><span>Melhor resultado</span><b>${best>0?best+"%":"—"}</b></div>
