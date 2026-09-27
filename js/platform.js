@@ -96,6 +96,8 @@
   }
   async function showLoggedIn(user){
     window.geoquestCurrentUserId=user?.id || null;
+    window.kantCurrentUserEmail=(user?.email||"").toLowerCase();
+    window.kantIsSuperAdmin=window.kantCurrentUserEmail==="caiokvalcanti@gmail.com";
     authLoading.hidden=true;
     authGate.hidden=true;
     appWrap.hidden=false;
@@ -124,7 +126,7 @@
       else adminButton.setAttribute("hidden","");
     }
     if(typeof syncProfileScreen === "function") syncProfileScreen();
-    window.dispatchEvent(new CustomEvent("geoquest:user-ready",{detail:{userId:user?.id || null,profile,isAdmin:window.kantIsAdmin}}));
+    window.dispatchEvent(new CustomEvent("geoquest:user-ready",{detail:{userId:user?.id || null,profile,isAdmin:window.kantIsAdmin,isSuperAdmin:window.kantIsSuperAdmin}}));
   }
 
   if(!window.supabase || !window.supabase.createClient){

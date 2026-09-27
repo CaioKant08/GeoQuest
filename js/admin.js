@@ -1,11 +1,13 @@
 (() => {
   const $=(s,root=document)=>root.querySelector(s);
   const $$=(s,root=document)=>[...root.querySelectorAll(s)];
-  const state={modules:[],selectedModuleId:null,theory:[],questions:[],editingTheoryId:null,editingQuestionId:null,users:[],progress:[],theoryImageUrl:"",questionImageUrl:"",explanationImageUrl:""};
+  const state={modules:[],selectedModuleId:null,theory:[],questions:[],editingTheoryId:null,editingQuestionId:null,users:[],progress:[],theoryImageUrl:"",formulaImageUrl:"",exampleImageUrl:"",questionImageUrl:"",explanationImageUrl:""};
 
   const esc=(v)=>String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
   const db=()=>window.kantDb;
   const isAdmin=()=>window.kantIsAdmin===true;
+  const isSuperAdmin=()=>window.kantIsSuperAdmin===true;
+  const protectedAdminEmail="caiokvalcanti@gmail.com";
 
   function status(message,type="ok"){
     const el=$("#adminStatus"); if(!el)return;
@@ -183,7 +185,7 @@
 
   async function loadTheory(moduleId){
     const {data,error}=await db().from("theory_blocks")
-      .select("id,module_id,position,titulo,texto,formula,exemplo,image_url,published")
+      .select("id,module_id,position,titulo,texto,formula,exemplo,image_url,formula_image_url,example_image_url,published")
       .eq("module_id",moduleId).order("position",{ascending:true});
     if(error){status(error.message,"err");return;}
     state.theory=data||[]; renderTheory(state.theory);
@@ -202,24 +204,30 @@
   }
 
   function newTheory(){
-    state.editingTheoryId=null; state.theoryImageUrl=""; $("#adminTheoryForm").reset();
+    state.editingTheoryId=null; state.theoryImageUrl=""; state.formulaImageUrl=""; state.exampleImageUrl=""; $("#adminTheoryForm").reset();
     $("#adminTheoryPosition").value=(state.theory.length+1); $("#adminTheoryPublished").checked=true;
     setImagePreview("#adminTheoryImagePreview","");
+    setImagePreview("#adminFormulaImagePreview","");
+    setImagePreview("#adminExampleImagePreview","");
     $("#adminTheoryEditor").hidden=false; $("#adminTheoryTitle").focus();
   }
   function editTheory(r){
-    state.editingTheoryId=r.id; state.theoryImageUrl=r.image_url||"";
+    state.editingTheoryId=r.id; state.theoryImageUrl=r.image_url||""; state.formulaImageUrl=r.formula_image_url||""; state.exampleImageUrl=r.example_image_url||"";
     $("#adminTheoryForm").reset(); $("#adminTheoryTitle").value=r.titulo||""; $("#adminTheoryText").value=r.texto||""; $("#adminTheoryFormula").value=r.formula||""; $("#adminTheoryExample").value=r.exemplo||""; $("#adminTheoryPosition").value=r.position||1; $("#adminTheoryPublished").checked=!!r.published;
-    setImagePreview("#adminTheoryImagePreview",state.theoryImageUrl); $("#adminTheoryEditor").hidden=false;
+    setImagePreview("#adminTheoryImagePreview",state.theoryImageUrl); setImagePreview("#adminFormulaImagePreview",state.formulaImageUrl); setImagePreview("#adminExampleImagePreview",state.exampleImageUrl); $("#adminTheoryEditor").hidden=false;
   }
   async function saveTheory(e){
     e.preventDefault(); if(!state.selectedModuleId)return;
     try{
-      const imageUrl=await uploadContentImage("#adminTheoryImage",`${state.selectedModuleId}/theory`,state.theoryImageUrl);
-      const payload={module_id:state.selectedModuleId,position:Number($("#adminTheoryPosition").value)||1,titulo:$("#adminTheoryTitle").value.trim(),texto:$("#adminTheoryText").value.trim(),formula:$("#adminTheoryFormula").value.trim(),exemplo:$("#adminTheoryExample").value.trim(),image_url:imageUrl,published:$("#adminTheoryPublished").checked,updated_at:new Date().toISOString()};
+      const [imageUrl,formulaImageUrl,exampleImageUrl]=await Promise.all([
+        uploadContentImage("#adminTheoryImage",`${state.selectedModuleId}/theory`,state.theoryImageUrl),
+        uploadContentImage("#adminFormulaImage",`${state.selectedModuleId}/formulas`,state.formulaImageUrl),
+        uploadContentImage("#adminExampleImage",`${state.selectedModuleId}/examples`,state.exampleImageUrl)
+      ]);
+      const payload={module_id:state.selectedModuleId,position:Number($("#adminTheoryPosition").value)||1,titulo:$("#adminTheoryTitle").value.trim(),texto:$("#adminTheoryText").value.trim(),formula:$("#adminTheoryFormula").value.trim(),exemplo:$("#adminTheoryExample").value.trim(),image_url:imageUrl,formula_image_url:formulaImageUrl,example_image_url:exampleImageUrl,published:$("#adminTheoryPublished").checked,updated_at:new Date().toISOString()};
       let q=state.editingTheoryId?db().from("theory_blocks").update(payload).eq("id",state.editingTheoryId):db().from("theory_blocks").insert(payload);
       const {error}=await q;if(error)throw error;
-      $("#adminTheoryEditor").hidden=true;state.editingTheoryId=null;state.theoryImageUrl="";status("Bloco teórico salvo.");await loadTheory(state.selectedModuleId);await refreshPublicContent();
+      $("#adminTheoryEditor").hidden=true;state.editingTheoryId=null;state.theoryImageUrl="";state.formulaImageUrl="";state.exampleImageUrl="";status("Bloco teórico salvo.");await loadTheory(state.selectedModuleId);await refreshPublicContent();
     }catch(err){status(err.message||"Não foi possível salvar o bloco.","err");}
   }
   async function deleteTheory(id){if(!confirm("Excluir este bloco teórico?"))return;const {error}=await db().from("theory_blocks").delete().eq("id",id);if(error)return status(error.message,"err");await loadTheory(state.selectedModuleId);await refreshPublicContent();}
@@ -286,14 +294,37 @@
     const term=($("#adminUserSearch")?.value||"").trim().toLowerCase();
     state.users.filter(u=>!term||`${u.display_name||""} ${u.email||""}`.toLowerCase().includes(term)).forEach(u=>{
       const tr=document.createElement("tr");
-      tr.innerHTML=`<td><b>${esc(u.display_name||"Jogador")}</b><small>${esc(u.email||"e-mail ainda não sincronizado")}</small></td><td>${esc(currentModuleFor(u.id))}</td><td><input class="admin-xp-input" type="number" min="0" step="1" value="${Number(u.xp)||0}"></td><td><select class="admin-role-select"><option value="user" ${u.role!=="admin"?"selected":""}>Usuário</option><option value="admin" ${u.role==="admin"?"selected":""}>Administrador</option></select></td><td><button class="btn secondary admin-save-user" type="button">Salvar</button></td>`;
+      const email=(u.email||"").toLowerCase();
+      const protectedAccount=email===protectedAdminEmail;
+      const roleControl=isSuperAdmin()
+        ? (protectedAccount?'<span class="admin-role-locked">🔒 Superadmin</span>':`<select class="admin-role-select"><option value="user" ${u.role!=="admin"?"selected":""}>Usuário</option><option value="admin" ${u.role==="admin"?"selected":""}>Administrador</option></select>`)
+        : `<span class="admin-role-readonly">${u.role==="admin"?"Administrador":"Usuário"}</span>`;
+      tr.innerHTML=`<td><b>${esc(u.display_name||"Jogador")}</b><small>${esc(u.email||"e-mail ainda não sincronizado")}</small></td><td>${esc(currentModuleFor(u.id))}</td><td><input class="admin-xp-input" type="number" min="0" step="1" value="${Number(u.xp)||0}"></td><td>${roleControl}</td><td><button class="btn secondary admin-save-user" type="button">Salvar</button></td>`;
       $(".admin-save-user",tr).onclick=()=>saveUser(u.id,tr);body.appendChild(tr);
     });
     if(!body.children.length)body.innerHTML='<tr><td colspan="5" class="admin-empty">Nenhum usuário encontrado.</td></tr>';
   }
   async function saveUser(id,row){
-    const xp=Math.max(0,Number($(".admin-xp-input",row).value)||0),role=$(".admin-role-select",row).value;
-    const {error}=await db().from("profiles").update({xp,role,updated_at:new Date().toISOString()}).eq("id",id);if(error)return status(error.message,"err");status("Usuário atualizado.");await loadUsers();
+    const xp=Math.max(0,Number($(".admin-xp-input",row).value)||0);
+    const payload={xp,updated_at:new Date().toISOString()};
+    const roleSelect=$(".admin-role-select",row);
+    if(isSuperAdmin()&&roleSelect)payload.role=roleSelect.value;
+    const {error}=await db().from("profiles").update(payload).eq("id",id);if(error)return status(error.message,"err");status("Usuário atualizado.");await loadUsers();
+  }
+
+  function testUnlockKey(){return `kant:admin-unlock-all:${window.geoquestCurrentUserId||"anon"}`;}
+  async function applyAdminTestMode(enabled){
+    window.kantAdminUnlockAll=!!enabled && isAdmin();
+    const input=$("#adminUnlockAllModules"); if(input)input.checked=window.kantAdminUnlockAll;
+    try{localStorage.setItem(testUnlockKey(),window.kantAdminUnlockAll?"1":"0");}catch(_e){}
+    if(typeof window.kantLoadContent==="function")await window.kantLoadContent();
+    window.dispatchEvent(new CustomEvent("kant:admin-test-mode",{detail:{enabled:window.kantAdminUnlockAll}}));
+    status(window.kantAdminUnlockAll?"Modo de teste ativado: módulos e rascunhos liberados só para você.":"Modo de teste desativado.");
+  }
+  function restoreAdminTestMode(){
+    let enabled=false;try{enabled=localStorage.getItem(testUnlockKey())==="1";}catch(_e){}
+    window.kantAdminUnlockAll=enabled&&isAdmin();
+    const input=$("#adminUnlockAllModules");if(input)input.checked=window.kantAdminUnlockAll;
   }
 
   async function refreshPublicContent(){
@@ -302,7 +333,11 @@
 
   async function bootAdmin(){
     if(!isAdmin())return;
-    try{await loadModules();await loadOverview();}catch(err){status(err.message,"err");}
+    restoreAdminTestMode();
+    try{
+      if(window.kantAdminUnlockAll&&typeof window.kantLoadContent==="function")await window.kantLoadContent();
+      await loadModules();await loadOverview();
+    }catch(err){status(err.message,"err");}
   }
 
   document.addEventListener("click",e=>{
@@ -321,11 +356,17 @@
   $("#adminQuestionForm")?.addEventListener("submit",saveQuestion);
   $("#adminUserSearch")?.addEventListener("input",renderUsers);
   $("#adminTheoryImage")?.addEventListener("change",()=>previewFile("#adminTheoryImage","#adminTheoryImagePreview"));
+  $("#adminFormulaImage")?.addEventListener("change",()=>previewFile("#adminFormulaImage","#adminFormulaImagePreview"));
+  $("#adminExampleImage")?.addEventListener("change",()=>previewFile("#adminExampleImage","#adminExampleImagePreview"));
   $("#adminQuestionImage")?.addEventListener("change",()=>previewFile("#adminQuestionImage","#adminQuestionImagePreview"));
   $("#adminExplanationImage")?.addEventListener("change",()=>previewFile("#adminExplanationImage","#adminExplanationImagePreview"));
   $("#adminRemoveTheoryImage")?.addEventListener("click",()=>{state.theoryImageUrl="";if($("#adminTheoryImage"))$("#adminTheoryImage").value="";setImagePreview("#adminTheoryImagePreview","");});
+  $("#adminRemoveFormulaImage")?.addEventListener("click",()=>{state.formulaImageUrl="";if($("#adminFormulaImage"))$("#adminFormulaImage").value="";setImagePreview("#adminFormulaImagePreview","");});
+  $("#adminRemoveExampleImage")?.addEventListener("click",()=>{state.exampleImageUrl="";if($("#adminExampleImage"))$("#adminExampleImage").value="";setImagePreview("#adminExampleImagePreview","");});
   $("#adminRemoveQuestionImage")?.addEventListener("click",()=>{state.questionImageUrl="";if($("#adminQuestionImage"))$("#adminQuestionImage").value="";setImagePreview("#adminQuestionImagePreview","");});
   $("#adminRemoveExplanationImage")?.addEventListener("click",()=>{state.explanationImageUrl="";if($("#adminExplanationImage"))$("#adminExplanationImage").value="";setImagePreview("#adminExplanationImagePreview","");});
+
+  $("#adminUnlockAllModules")?.addEventListener("change",e=>{applyAdminTestMode(e.target.checked).catch(err=>status(err.message,"err"));});
 
   window.addEventListener("geoquest:user-ready",bootAdmin);
   window.addEventListener("kant:content-ready",()=>{if(isAdmin())loadOverview();});

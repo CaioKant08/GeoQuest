@@ -87,12 +87,16 @@
       console.warn("Progresso remoto indisponível:",err?.message||err);
     }
   }
-  function isUnlocked(moduleIndex){if(moduleIndex===0)return true; return !!moduleResult(modules[moduleIndex-1].id).completed;}
+  function isUnlocked(moduleIndex){
+    if(window.kantIsAdmin===true && window.kantAdminUnlockAll===true)return true;
+    if(moduleIndex===0)return true;
+    return !!moduleResult(modules[moduleIndex-1].id).completed;
+  }
 
   function renderModules(){
     const grid=$("#modulesGrid"); if(!grid)return; grid.innerHTML="";
     modules.forEach((m,i)=>{
-      const result=moduleResult(m.id), unlocked=isUnlocked(i);
+      const result=moduleResult(m.id), unlocked=isUnlocked(i), adminTest=window.kantIsAdmin===true&&window.kantAdminUnlockAll===true;
       const livePct=result.currentTotal?Math.round((Number(result.currentAnswered)||0)/Number(result.currentTotal)*100):0;
       const pct=result.inProgress?livePct:(result.completed?100:0);
       const best=Number(result.best)||0;
@@ -111,7 +115,7 @@
             <div><span>03</span><b>Prática</b><small>${m.questoes.length} questões</small></div>
           </div>
           <button class="module-btn module-open-btn" type="button" ${unlocked?"":"disabled"}>${unlocked?(result.inProgress?"▶ Continuar prática":result.completed?"↻ Revisar módulo":"▶ Abrir módulo"):"🔒 Conclua o módulo anterior"}</button>
-          <div class="module-note">${result.inProgress?`Progresso salvo • ${result.currentAnswered}/${result.currentTotal} questões respondidas`:result.completed?"Módulo concluído. Você pode revisar quando quiser.":unlocked?"Estude a teoria antes de iniciar a prática.":"Desbloqueado ao atingir 70% no módulo anterior."}</div>
+          <div class="module-note">${adminTest&&!result.completed?"🛡 Modo de teste ADM • módulo liberado somente para você":result.inProgress?`Progresso salvo • ${result.currentAnswered}/${result.currentTotal} questões respondidas`:result.completed?"Módulo concluído. Você pode revisar quando quiser.":unlocked?"Estude a teoria antes de iniciar a prática.":"Desbloqueado ao atingir 70% no módulo anterior."}</div>
         </div>`;
       if(unlocked){ card.querySelectorAll(".module-arrow,.module-open-btn").forEach(btn=>btn.addEventListener("click",()=>openStudy(m.id))); }
       grid.appendChild(card);
@@ -124,7 +128,7 @@
     $("#studyModuleNumber").textContent=m.numero; $("#studyKicker").textContent=`Módulo ${m.numero} • ${m.subtitulo}`; $("#studyTitle").textContent=m.titulo; $("#studyDescription").textContent=m.descricao;
     const hero=$("#moduleStudyHero"); hero.className=`module-study-hero study-${m.cor}`;
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
-    const grid=$("#theoryGrid"); grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula">${t.formula}</div><div class="guided-example"><b>Exemplo guiado</b><span>${t.exemplo}</span></div></article>`).join("");
+    const grid=$("#theoryGrid"); grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula">${t.formula}</div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><span>${t.exemplo}</span>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
     $("#practiceSummary").textContent=`${m.questoes.length} questões progressivas • feedback imediato • 70% libera o próximo módulo.`;
     show("moduleStudy");
   }
@@ -196,4 +200,5 @@
   window.addEventListener("kant:content-ready",refreshContent);
   window.addEventListener("geoquest:user-ready",()=>{refreshContent();syncRemoteProgress();});
   renderModules();
+  window.addEventListener("kant:admin-test-mode",()=>{renderModules();});
 })();

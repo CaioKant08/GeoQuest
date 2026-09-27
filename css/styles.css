@@ -3893,3 +3893,71 @@ body.dark .profile-level-track>span{background:linear-gradient(90deg,#35d98b,#6a
     font-size:.72rem !important;
   }
 }
+
+/* KANT v3.6 — mídia teórica, modo teste e acabamento dos símbolos */
+.admin-test-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+}
+.admin-test-card>div{max-width:720px}
+.admin-test-toggle{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  min-width:300px;
+  padding:14px 16px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:var(--paper-2);
+  cursor:pointer;
+}
+.admin-test-toggle input{margin-top:4px;accent-color:var(--accent)}
+.admin-test-toggle span{display:grid;gap:3px}
+.admin-test-toggle b{font-size:.94rem}
+.admin-test-toggle small{color:var(--muted);line-height:1.4}
+.admin-role-locked,.admin-role-readonly{
+  display:inline-flex;
+  align-items:center;
+  min-height:40px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--paper-2);
+  font-weight:800;
+  font-size:.84rem;
+  white-space:nowrap;
+}
+.admin-role-locked{color:#996400;background:#fff8dc;border-color:#efd99a}
+body.dark .admin-role-locked{color:#ffd86b;background:#342b15;border-color:#5b4920}
+body.dark .admin-role-readonly{color:#cbd6e5;background:#151e2a;border-color:#2b394c}
+
+.theory-inline-image{
+  display:block;
+  width:100%;
+  max-height:360px;
+  object-fit:contain;
+  margin:12px 0 0;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:var(--paper-2);
+  padding:8px;
+  box-sizing:border-box;
+}
+.guided-example .theory-inline-image{margin-top:12px}
+body.dark .theory-inline-image{background:#111923;border-color:#2b394c}
+
+/* remove a linha/brilho acima do quadrado do símbolo */
+.module-symbol-glow{display:none !important}
+.module-symbol-shell::before{
+  box-shadow:0 12px 26px rgba(32,53,93,.10),inset 0 1px 0 rgba(255,255,255,.75) !important;
+}
+body.dark .module-symbol-shell::before{
+  box-shadow:0 12px 26px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+
+@media(max-width:760px){
+  .admin-test-card{flex-direction:column;align-items:stretch}
+  .admin-test-toggle{min-width:0;width:100%;box-sizing:border-box}
+}

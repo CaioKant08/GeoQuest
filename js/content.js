@@ -35,27 +35,27 @@
     if(!db) return applyContent(clone(defaults), "local");
 
     try{
-      const {data:moduleRows,error:moduleError}=await db
+      const adminPreview=window.kantIsAdmin===true && window.kantAdminUnlockAll===true;
+      let moduleQuery=db
         .from("modules")
         .select("id,numero,titulo,subtitulo,cor,icone,descricao,objetivos,published,position")
-        .eq("published",true)
         .order("position",{ascending:true})
         .order("numero",{ascending:true});
+      if(!adminPreview)moduleQuery=moduleQuery.eq("published",true);
+      const {data:moduleRows,error:moduleError}=await moduleQuery;
       if(moduleError) throw moduleError;
       if(!moduleRows?.length) return applyContent(clone(defaults), "local");
 
       const ids=moduleRows.map(m=>m.id);
       const [{data:theoryRows,error:theoryError},{data:questionRows,error:questionError}] = await Promise.all([
-        db.from("theory_blocks")
-          .select("id,module_id,position,titulo,texto,formula,exemplo,image_url,published")
+        (()=>{let q=db.from("theory_blocks")
+          .select("id,module_id,position,titulo,texto,formula,exemplo,image_url,formula_image_url,example_image_url,published")
           .in("module_id",ids)
-          .eq("published",true)
-          .order("position",{ascending:true}),
-        db.from("questions")
+          .order("position",{ascending:true});return adminPreview?q:q.eq("published",true);})(),
+        (()=>{let q=db.from("questions")
           .select("id,module_id,position,dificuldade,xp,enunciado,alternativas,correta,dica,explicacao,image_url,explanation_image_url,published")
           .in("module_id",ids)
-          .eq("published",true)
-          .order("position",{ascending:true})
+          .order("position",{ascending:true});return adminPreview?q:q.eq("published",true);})()
       ]);
       if(theoryError) throw theoryError;
       if(questionError) throw questionError;
@@ -75,7 +75,9 @@
           texto:t.texto||"",
           formula:t.formula||"",
           exemplo:t.exemplo||"",
-          image_url:t.image_url||""
+          image_url:t.image_url||"",
+          formula_image_url:t.formula_image_url||"",
+          example_image_url:t.example_image_url||""
         })),
         questoes:(questionRows||[]).filter(q=>q.module_id===row.id).map(q=>({
           id:q.id,

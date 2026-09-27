@@ -5,7 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
 <link href="assets/kant-symbol.png?v=3.5.0" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=3.5.3" rel="stylesheet"/>
+<link href="css/styles.css?v=3.6.0" rel="stylesheet"/>
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
@@ -309,7 +309,11 @@
       <article><span>Questões</span><b id="adminStatQuestions">—</b></article>
       <article><span>Usuários</span><b id="adminStatUsers">—</b></article>
     </div>
-    <div class="admin-info-card"><h3>Como funciona</h3><p>Use <b>Conteúdo</b> para editar a experiência de todos os jogadores. Módulos em rascunho ficam invisíveis. Use <b>Usuários</b> para consultar XP, papel e o módulo atual de cada conta.</p></div>
+    <div class="admin-info-card"><h3>Como funciona</h3><p>Use <b>Conteúdo</b> para editar a experiência de todos os jogadores. Módulos em rascunho ficam invisíveis. Use <b>Usuários</b> para consultar XP e o módulo atual de cada conta.</p></div>
+    <div class="admin-info-card admin-test-card">
+      <div><h3>Modo de teste</h3><p>Libera todos os módulos somente para a sua conta de administrador. Não altera o progresso nem desbloqueia conteúdo para outros jogadores.</p></div>
+      <label class="admin-test-toggle"><input id="adminUnlockAllModules" type="checkbox"><span><b>Liberar todos os módulos</b><small>Ideal para revisar teoria, imagens e questões antes de publicar.</small></span></label>
+    </div>
   </section>
 
   <section class="admin-panel" data-admin-panel="content" hidden>
@@ -345,9 +349,19 @@
               <label><span>Título</span><input id="adminTheoryTitle" required type="text"></label>
               <label><span>Texto</span><textarea id="adminTheoryText" required rows="5"></textarea></label>
               <label><span>Fórmula / resumo</span><input id="adminTheoryFormula" type="text"></label>
+              <div class="admin-image-field">
+                <label><span>Imagem da fórmula / resumo (opcional)</span><input accept="image/png,image/jpeg,image/webp" id="adminFormulaImage" type="file"></label>
+                <div class="admin-image-preview" id="adminFormulaImagePreview"><span>Sem imagem</span></div>
+                <button class="btn ghost admin-remove-image" id="adminRemoveFormulaImage" type="button">Remover imagem</button>
+              </div>
               <label><span>Exemplo guiado</span><textarea id="adminTheoryExample" rows="3"></textarea></label>
               <div class="admin-image-field">
-                <label><span>Imagem do bloco teórico (opcional)</span><input accept="image/png,image/jpeg,image/webp" id="adminTheoryImage" type="file"></label>
+                <label><span>Imagem do exemplo guiado (opcional)</span><input accept="image/png,image/jpeg,image/webp" id="adminExampleImage" type="file"></label>
+                <div class="admin-image-preview" id="adminExampleImagePreview"><span>Sem imagem</span></div>
+                <button class="btn ghost admin-remove-image" id="adminRemoveExampleImage" type="button">Remover imagem</button>
+              </div>
+              <div class="admin-image-field">
+                <label><span>Imagem geral do bloco teórico (opcional)</span><input accept="image/png,image/jpeg,image/webp" id="adminTheoryImage" type="file"></label>
                 <div class="admin-image-preview" id="adminTheoryImagePreview"><span>Sem imagem</span></div>
                 <button class="btn ghost admin-remove-image" id="adminRemoveTheoryImage" type="button">Remover imagem</button>
               </div>
@@ -528,6 +542,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.5.3"></script><script src="js/platform.js?v=3.5.3"></script><script src="js/modules.js?v=3.5.3"></script><script src="js/questions.js?v=3.5.3"></script><script src="js/content.js?v=3.5.3"></script><script src="js/admin.js?v=3.5.3"></script><script src="js/game.js?v=3.5.3"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.6.0"></script><script src="js/platform.js?v=3.6.0"></script><script src="js/modules.js?v=3.6.0"></script><script src="js/questions.js?v=3.6.0"></script><script src="js/content.js?v=3.6.0"></script><script src="js/admin.js?v=3.6.0"></script><script src="js/game.js?v=3.6.0"></script>
 </body>
 </html>
