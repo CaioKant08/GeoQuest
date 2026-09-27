@@ -297,6 +297,33 @@
     return xpQueue;
   };
 
+  function localQuestionAwardKey(userId){return `kant:${userId||"local"}:question-xp-v1`;}
+  function getLocalAwardedQuestions(userId){try{return new Set(JSON.parse(localStorage.getItem(localQuestionAwardKey(userId))||"[]"));}catch(_e){return new Set();}}
+  function saveLocalAwardedQuestions(userId,set){try{localStorage.setItem(localQuestionAwardKey(userId),JSON.stringify([...set]));}catch(_e){}}
+
+  window.kantAwardQuestionXPOnce=async function(questionId,amount){
+    const gain=Math.max(0,Math.round(Number(amount)||0));
+    const qid=String(questionId||"").trim();
+    if(!gain||!qid)return {awarded:false,xp:displayedGlobalXp,reason:"invalid"};
+    const {data:{user}}=await db.auth.getUser();
+    if(!user)return {awarded:false,xp:displayedGlobalXp,reason:"auth"};
+    try{
+      const {data,error}=await db.rpc("award_question_xp_once",{p_question_id:qid,p_amount:gain});
+      if(error)throw error;
+      const row=Array.isArray(data)?data[0]:data;
+      if(row&&Number.isFinite(Number(row.total_xp)))setCurrentProfileXP(Number(row.total_xp));
+      return {awarded:!!row?.awarded,xp:Number(row?.total_xp)||displayedGlobalXp,reason:row?.awarded?"first":"already"};
+    }catch(err){
+      // Compatibilidade enquanto a migração SQL ainda não foi aplicada: bloqueio local no dispositivo.
+      const set=getLocalAwardedQuestions(user.id);
+      if(set.has(qid))return {awarded:false,xp:displayedGlobalXp,reason:"already-local"};
+      await window.geoquestAddXP(gain);
+      set.add(qid);saveLocalAwardedQuestions(user.id,set);
+      console.warn("Anti-farm usando fallback local; aplique a migração SQL para proteção entre dispositivos.",err?.message||err);
+      return {awarded:true,xp:displayedGlobalXp,reason:"fallback-local"};
+    }
+  };
+
   window.geoquestFlushXP=function(){
     return xpQueue;
   };

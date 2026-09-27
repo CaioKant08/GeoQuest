@@ -355,6 +355,14 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     $("#studyModuleNumber").textContent=m.numero; $("#studyKicker").textContent=`Módulo ${m.numero} • ${m.subtitulo}`; $("#studyTitle").textContent=m.titulo; $("#studyDescription").textContent=m.descricao;
     const hero=$("#moduleStudyHero"); hero.className=`module-study-hero study-${m.cor}`;
     const practiceCta=document.querySelector("#moduleStudy .practice-cta"); if(practiceCta) practiceCta.className=`practice-cta practice-${m.cor}`;
+    const moduleDone=!!moduleResult(moduleId).completed;
+    const reviewChoice=$("#completedReviewChoice");
+    if(reviewChoice){
+      reviewChoice.hidden=!moduleDone;
+      reviewChoice.innerHTML=moduleDone?`<div><span class="review-choice-kicker">Módulo concluído ✓</span><b>Você voltou para revisar. Como quer estudar agora?</b><p>Você pode reler a teoria normalmente ou pular direto para as 12 questões extras.</p></div><div class="review-choice-actions"><button class="btn secondary" type="button" id="reviewTheoryBtn">Rever teoria</button><button class="btn primary" type="button" id="reviewExtrasBtn">Ir direto às 12 extras →</button></div>`:"";
+      reviewChoice.querySelector("#reviewTheoryBtn")?.addEventListener("click",()=>document.querySelector("#moduleStudy .theory-heading")?.scrollIntoView({behavior:"smooth",block:"start"}));
+      reviewChoice.querySelector("#reviewExtrasBtn")?.addEventListener("click",()=>startModule(moduleId,true,true));
+    }
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
     const grid=$("#theoryGrid");
     grid.classList.add("theory-paged-grid");
@@ -408,7 +416,10 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
       pager.dataset.currentTitle=currentTheory?.titulo||"";
     };
     renderTheoryPage(0,false);
-    $("#practiceSummary").textContent=`8 questões obrigatórias • 12 questões extras de treino • feedback imediato • 70% libera o próximo módulo.`;
+    $("#practiceSummary").textContent=moduleDone?`Módulo já concluído • você pode refazer as 8 principais ou ir direto às 12 extras.`:`8 questões obrigatórias • 12 questões extras de treino • feedback imediato • 70% libera o próximo módulo.`;
+    const mainPracticeBtn=$("#startModulePracticeBtn"),extraPracticeBtn=$("#startModuleExtraBtn");
+    if(mainPracticeBtn)mainPracticeBtn.textContent=moduleDone?"Refazer 8 principais →":"Começar exercícios →";
+    if(extraPracticeBtn){extraPracticeBtn.hidden=!moduleDone;}
     show("moduleStudy");
   }
 
@@ -462,13 +473,22 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
     const modeMultiplier=mode==="lightning"?1.5:1;
     return {base,streakMultiplier,modeMultiplier,gain:Math.round(base*streakMultiplier*modeMultiplier)};
   }
-  function answer(choice,btn){
+  const repeatableXpMode=()=>!["module","module-extra"].includes(mode);
+  async function answer(choice,btn){
     if(answered)return;answered=true;clearTimer();const q=questions[idx],opts=[...document.querySelectorAll(".option")];const correct=choice===q.a;if(window.kantRecordAnswer)window.kantRecordAnswer(correct);
     opts.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct")});
     if(correct){
-      score++;streak++;bestStreak=Math.max(bestStreak,streak);const calc=xpForCorrect(q);xp+=calc.gain;if(window.geoquestAddXP)window.geoquestAddXP(calc.gain);
+      score++;streak++;bestStreak=Math.max(bestStreak,streak);const calc=xpForCorrect(q);
+      let awarded=true;
+      if(repeatableXpMode()){
+        xp+=calc.gain;if(window.geoquestAddXP)window.geoquestAddXP(calc.gain);
+      }else if(window.kantAwardQuestionXPOnce){
+        const result=await window.kantAwardQuestionXPOnce(q.id,calc.gain);awarded=!!result?.awarded;if(awarded)xp+=calc.gain;
+      }else{
+        xp+=calc.gain;if(window.geoquestAddXP)window.geoquestAddXP(calc.gain);
+      }
       const bonus=`${calc.streakMultiplier.toFixed(1)}× sequência${calc.modeMultiplier>1?` • ${calc.modeMultiplier.toFixed(1)}× relâmpago`:""}`;
-      $("#feedback").innerHTML=`<span class="ok"><b>✅ Acertou!</b> +${calc.gain} XP <small>(${bonus})</small></span><br><span class="feedback-explanation">${q.exp}</span>`;
+      $("#feedback").innerHTML=awarded?`<span class="ok"><b>✅ Acertou!</b> +${calc.gain} XP <small>(${bonus})</small></span><br><span class="feedback-explanation">${q.exp}</span>`:`<span class="ok"><b>✅ Acertou!</b> <small>XP desta questão já recebido anteriormente.</small></span><br><span class="xp-repeat-note">Você pode refazer a questão para estudar e manter a sequência, mas questões comuns concedem XP apenas no primeiro acerto.</span><br><span class="feedback-explanation">${q.exp}</span>`;
     }else{
       lives=Math.max(0,lives-1);streak=0;btn.classList.add("wrong");
       $("#feedback").innerHTML=`<span class="no"><b>❌ Resposta incorreta.</b>${lives===0?" Suas vidas acabaram: esta tentativa precisa recomeçar do início.":""}</span><br><span class="feedback-explanation">${q.exp}</span>`;
@@ -538,7 +558,7 @@ Se essa distância for exatamente igual ao raio, a reta é tangente. Se for meno
 
   document.querySelectorAll("[data-mode]").forEach(el=>el.addEventListener("click",()=>start(el.dataset.mode)));
   document.getElementById("navHome")?.addEventListener("click",()=>show("home"));document.getElementById("navChallenges")?.addEventListener("click",()=>show("challenges"));document.getElementById("navProfile")?.addEventListener("click",()=>show("profile"));document.getElementById("navAdmin")?.addEventListener("click",()=>{if(window.kantIsAdmin)show("admin");});document.getElementById("profileChangePhotoBtn")?.addEventListener("click",()=>document.getElementById("settingsBtn")?.click());
-  $("#studyBackBtn")?.addEventListener("click",()=>show("home"));$("#startModulePracticeBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId));
+  $("#studyBackBtn")?.addEventListener("click",()=>show("home"));$("#startModulePracticeBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId));$("#startModuleExtraBtn")?.addEventListener("click",()=>studyModuleId&&startModule(studyModuleId,true,true));
   function resetRunState(){clearTimer();idx=0;lives=3;xp=0;streak=0;bestStreak=0;score=0;answered=false;lightning=false;runDeadline=0;runDuration=0;currentModuleId=null;}
   function leaveRun(){clearTimer();if(mode==="module"&&currentModuleId)Promise.resolve(recordModuleCheckpoint(answered)).catch(()=>{});show("home");if(window.geoquestFlushXP)Promise.resolve(window.geoquestFlushXP()).catch(()=>{});resetRunState();}
   $("#nextBtn")?.addEventListener("click",next);$("#hintBtn")?.addEventListener("click",()=>{if(answered)return;const q=questions[idx];if(!q?.hint)return;const box=$("#hintBox"),btn=$("#hintBtn");box.textContent=q.hint;box.hidden=false;window.KantMath?.renderInline(box);btn.textContent="💡 Dica aberta";btn.disabled=true;});

@@ -4693,3 +4693,17 @@ body.dark .challenge-status{background:#192638!important;border-color:#34465d!im
 body.dark .challenge-status.is-ready{background:#173426!important;border-color:#2f6047!important;color:#a5e4c0!important}
 body.dark .challenge-status.is-coming{background:#2b2440!important;border-color:#4b3b66!important;color:#cbb9e7!important}
 body.dark .challenge-unlock-note{background:#0e1928!important;border-color:#34485f!important}
+
+
+/* KANT v3.9.7 — revisão direta, anti-farm e correção definitiva do KaTeX */
+.completed-review-choice{width:min(1120px,calc(100% - 36px));margin:16px auto 18px;padding:18px 20px;border-radius:20px;border:1px solid #cfe5d8;background:linear-gradient(135deg,#f6fcf8,#f2f8ff);display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:0 12px 30px rgba(34,68,105,.06)}
+.completed-review-choice[hidden]{display:none!important}.review-choice-kicker{display:block;color:#168653;font-size:.74rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}.completed-review-choice b{display:block;color:#172c47;font-size:1.05rem}.completed-review-choice p{margin:5px 0 0;color:#66788e;line-height:1.55;font-size:.9rem}.review-choice-actions{display:flex;gap:10px;flex:0 0 auto}.practice-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.practice-extra-btn[hidden]{display:none!important}
+body.dark .completed-review-choice{background:linear-gradient(135deg,#12231b,#142239);border-color:#2f4c3e}body.dark .completed-review-choice b{color:#eef5fb}body.dark .completed-review-choice p{color:#adbdcb}
+.xp-repeat-note{display:inline-block;margin:7px 0 2px;padding:7px 10px;border-radius:10px;background:#f4f7fa;color:#6e7e91;font-size:.8rem;line-height:1.45}body.dark .xp-repeat-note{background:#162235;color:#b7c4d2}
+
+/* KaTeX: os blocos teóricos precisam permitir a altura real de raízes e expoentes. */
+.theory-card.theory-page.active,.theory-page>.guided-example,.guided-example,.guided-example-content,.guided-example .guided-example-content{overflow:visible!important}
+.guided-example .guided-example-content .katex-display,.theory-formula .katex-display{overflow:visible!important;padding:1.05em .35em .9em!important;min-height:3.6em!important;line-height:1.45!important}
+.guided-example .guided-example-content .katex-display>.katex,.theory-formula .katex-display>.katex{overflow:visible!important;line-height:1.4!important;display:inline-block!important;padding:.12em 0 .18em!important}
+.guided-example .katex-html,.theory-formula .katex-html{overflow:visible!important;padding-top:.08em;padding-bottom:.08em}
+@media(max-width:760px){.completed-review-choice{width:100%;margin:12px 0 16px;flex-direction:column;align-items:stretch}.review-choice-actions,.practice-actions{width:100%;display:grid;grid-template-columns:1fr}.review-choice-actions .btn,.practice-actions .btn{width:100%}}
