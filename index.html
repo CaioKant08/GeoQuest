@@ -4,13 +4,13 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
-<link href="assets/kant-symbol.png?v=3.1.0" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=3.1.0" rel="stylesheet"/>
+<link href="assets/kant-symbol.png?v=3.2.0" rel="icon" type="image/png"/>
+<link href="css/styles.css?v=3.2.0" rel="stylesheet"/>
 </head>
 <body>
 <div class="auth-loading" id="authLoading">
 <div>
-<img alt="Kant" src="assets/kant-symbol.png?v=3.1.0" style="width:72px;height:72px;object-fit:contain;margin-bottom:10px"/>
+<img alt="Kant" src="assets/kant-symbol.png?v=3.2.0" style="width:72px;height:72px;object-fit:contain;margin-bottom:10px"/>
 <div>Conectando ao GeoQuest...</div>
 </div>
 </div>
@@ -19,7 +19,7 @@
 <div class="card auth-shell">
 <div class="auth-intro">
 <div class="auth-brand">
-<img alt="Kant" src="assets/kant-symbol.png?v=3.1.0"/>
+<img alt="Kant" src="assets/kant-symbol.png?v=3.2.0"/>
 <div><b>GeoQuest</b><span>Geometria Analítica</span></div>
 </div>
 <h2>Entre, jogue e evolua.</h2>
@@ -71,7 +71,7 @@
 <header class="topbar kant-header">
 <div aria-label="Kant" class="kant-brand">
 <div aria-hidden="true" class="kant-brand-symbol" style="width:56px;height:56px;overflow:hidden;display:grid;place-items:center;flex:0 0 56px">
-      <img src="assets/kant-symbol.png?v=3.1.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
+      <img src="assets/kant-symbol.png?v=3.2.0" alt="" style="display:block;width:43px;height:43px;max-width:43px;max-height:43px;object-fit:contain">
     </div>
 <div class="kant-wordmark">KANT</div>
 </div>
@@ -326,6 +326,11 @@
               <label><span>Texto</span><textarea id="adminTheoryText" required rows="5"></textarea></label>
               <label><span>Fórmula / resumo</span><input id="adminTheoryFormula" type="text"></label>
               <label><span>Exemplo guiado</span><textarea id="adminTheoryExample" rows="3"></textarea></label>
+              <div class="admin-image-field">
+                <label><span>Imagem do bloco teórico (opcional)</span><input accept="image/png,image/jpeg,image/webp" id="adminTheoryImage" type="file"></label>
+                <div class="admin-image-preview" id="adminTheoryImagePreview"><span>Sem imagem</span></div>
+                <button class="btn ghost admin-remove-image" id="adminRemoveTheoryImage" type="button">Remover imagem</button>
+              </div>
               <div class="admin-inline-actions"><button class="btn primary" type="submit">Salvar bloco</button><button class="btn ghost" id="adminCancelTheory" type="button">Cancelar</button></div>
             </form>
           </div>
@@ -338,9 +343,19 @@
             <form id="adminQuestionForm">
               <div class="admin-form-grid compact"><label><span>Ordem</span><input id="adminQuestionPosition" min="1" type="number"></label><label><span>Dificuldade</span><select id="adminQuestionDifficulty"><option value="facil">Fácil</option><option value="media">Média</option><option value="desafio">Desafio</option></select></label><label><span>XP</span><input id="adminQuestionXp" min="0" step="1" type="number"></label><label><span>Correta</span><select id="adminQuestionCorrect"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></label></div>
               <label><span>Enunciado</span><textarea id="adminQuestionText" required rows="4"></textarea></label>
+              <div class="admin-image-field">
+                <label><span>Imagem da questão (opcional)</span><input accept="image/png,image/jpeg,image/webp" id="adminQuestionImage" type="file"></label>
+                <div class="admin-image-preview" id="adminQuestionImagePreview"><span>Sem imagem</span></div>
+                <button class="btn ghost admin-remove-image" id="adminRemoveQuestionImage" type="button">Remover imagem</button>
+              </div>
               <div class="admin-form-grid"><label><span>Alternativa A</span><input id="adminAlt0" required type="text"></label><label><span>Alternativa B</span><input id="adminAlt1" required type="text"></label><label><span>Alternativa C</span><input id="adminAlt2" required type="text"></label><label><span>Alternativa D</span><input id="adminAlt3" required type="text"></label></div>
               <label><span>Dica</span><input id="adminQuestionHint" type="text"></label>
               <label><span>Explicação</span><textarea id="adminQuestionExplanation" rows="4"></textarea></label>
+              <div class="admin-image-field">
+                <label><span>Imagem da explicação (opcional)</span><input accept="image/png,image/jpeg,image/webp" id="adminExplanationImage" type="file"></label>
+                <div class="admin-image-preview" id="adminExplanationImagePreview"><span>Sem imagem</span></div>
+                <button class="btn ghost admin-remove-image" id="adminRemoveExplanationImage" type="button">Remover imagem</button>
+              </div>
               <label class="admin-check"><input id="adminQuestionPublished" type="checkbox"><span>Questão publicada</span></label>
               <div class="admin-inline-actions"><button class="btn primary" type="submit">Salvar questão</button><button class="btn ghost" id="adminCancelQuestion" type="button">Cancelar</button></div>
             </form>
@@ -392,12 +407,14 @@
 <div class="question-box">
 <div class="mini-visual" id="visual"></div>
 <div class="question" id="question"></div>
+<div class="question-media" id="questionMedia" hidden></div>
 <div class="hint-area" id="hintArea">
 <button class="btn ghost hint-btn" id="hintBtn" type="button">💡 Ver dica</button>
 <div class="hint-box" id="hintBox" hidden></div>
 </div>
 <div class="options" id="options"></div>
 <div aria-live="polite" class="feedback" id="feedback"></div>
+<div class="explanation-media" id="explanationMedia" hidden></div>
 <div class="game-actions">
 <button class="btn ghost" id="restartBtn" type="button">Reiniciar partida</button>
 <button class="btn primary" id="nextBtn" style="display:none">Próxima questão →</button>
@@ -471,6 +488,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.1.0"></script><script src="js/platform.js?v=3.1.0"></script><script src="js/modules.js?v=3.1.0"></script><script src="js/questions.js?v=3.1.0"></script><script src="js/content.js?v=3.1.0"></script><script src="js/admin.js?v=3.1.0"></script><script src="js/game.js?v=3.1.0"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.2.0"></script><script src="js/platform.js?v=3.2.0"></script><script src="js/modules.js?v=3.2.0"></script><script src="js/questions.js?v=3.2.0"></script><script src="js/content.js?v=3.2.0"></script><script src="js/admin.js?v=3.2.0"></script><script src="js/game.js?v=3.2.0"></script>
 </body>
 </html>

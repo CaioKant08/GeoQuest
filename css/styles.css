@@ -2702,3 +2702,169 @@ body.dark .admin-hero,body.dark .admin-info-card,body.dark .admin-card,body.dark
 
 @media(max-width:1100px){.admin-content-layout{grid-template-columns:1fr}.admin-sidebar{position:static}.admin-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-form-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.admin-shell{padding-top:12px}.admin-hero{padding:22px;border-radius:24px}.admin-badge{display:none}.admin-stats-grid,.admin-form-grid,.admin-form-grid.compact{grid-template-columns:1fr}.admin-section-head{align-items:flex-start;flex-direction:column}.admin-inline-actions{width:100%}.admin-inline-actions .btn{flex:1}.admin-info-card,.admin-card,.admin-sidebar{padding:18px;border-radius:21px}.admin-tab{padding:10px 13px}.admin-content-row{align-items:flex-start;flex-direction:column}.admin-row-actions{width:100%}.admin-row-actions button{flex:1}}
+
+/* =========================================================
+   KANT v3.2 — ADM, progresso, imagens e ranking
+   ========================================================= */
+
+/* 1-2) Painel ADM: tabs funcionais e sidebar estável */
+.admin-panel[hidden]{display:none!important}
+.admin-panel.active{display:grid}
+.admin-content-layout{align-items:start}
+.admin-sidebar{
+  position:sticky;
+  top:112px;
+  align-self:start;
+  max-height:calc(100vh - 132px);
+  overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  z-index:3;
+}
+.admin-module-list{padding-right:2px}
+
+/* 3) Formulário de módulo sempre legível quando selecionado */
+#adminModuleForm{scroll-margin-top:118px}
+
+/* 4) Imagens em teoria, questões e explicações */
+.admin-image-field{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 180px auto;
+  gap:12px;
+  align-items:end;
+  padding:14px;
+  border:1px solid #e3eaf4;
+  border-radius:18px;
+  background:#fbfcff;
+}
+.admin-image-preview{
+  width:180px;
+  height:112px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border-radius:14px;
+  border:1px dashed #d5dfec;
+  background:#fff;
+  color:#8b96a8;
+  font-size:.78rem;
+  font-weight:800;
+}
+.admin-image-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.admin-remove-image{align-self:center;white-space:nowrap}
+.theory-content-image,.question-media img,.explanation-media img{
+  display:block;
+  width:100%;
+  max-height:420px;
+  object-fit:contain;
+  border-radius:18px;
+  border:1px solid #e1e8f2;
+  background:#fff;
+}
+.theory-content-image{margin:14px 0 4px}
+.question-media,.explanation-media{margin:14px 0 6px}
+.explanation-media{margin-top:12px}
+
+/* 5-6) progresso salvo + melhor resultado */
+.module-best-result{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:-5px 0 16px;
+  padding:9px 12px;
+  border-radius:13px;
+  font-size:.83rem;
+  font-weight:850;
+  border:1px solid transparent;
+}
+.module-best-result span{opacity:.82}
+.module-best-result b{font-size:.96rem}
+.module-best-result.best-good{background:#e9f9f0;color:#16794d;border-color:#cbeedb}
+.module-best-result.best-ok{background:#eef8e8;color:#4f7d24;border-color:#d9ebcb}
+.module-best-result.best-warn{background:#fff6de;color:#9b6b10;border-color:#f2dfae}
+.module-best-result.best-bad{background:#fff0f1;color:#b73543;border-color:#f2ccd1}
+.module-best-result.best-none{background:#f4f7fb;color:#7d899d;border-color:#e4eaf2}
+
+/* 7) podium do ranking */
+.rank-podium{
+  display:grid;
+  grid-template-columns:1fr 1.16fr 1fr;
+  align-items:end;
+  gap:10px;
+  margin:4px 0 18px;
+  padding:18px 10px 8px;
+}
+.podium-player{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  min-width:0;
+  padding:16px 10px 14px;
+  border-radius:22px 22px 16px 16px;
+  border:1px solid #e1e8f2;
+  background:linear-gradient(180deg,#fff,#f7f9fd);
+  box-shadow:0 12px 28px rgba(43,65,105,.08);
+}
+.podium-1{padding-top:24px;min-height:214px;background:linear-gradient(180deg,#fffbea,#fff7cf);border-color:#f2d879;box-shadow:0 18px 36px rgba(210,159,29,.16)}
+.podium-2{min-height:184px;background:linear-gradient(180deg,#fbfcff,#eef2f8);border-color:#d9e0eb}
+.podium-3{min-height:168px;background:linear-gradient(180deg,#fff8f1,#fbe8db);border-color:#ecc7ad}
+.podium-player.me{outline:2px solid #557ee8;outline-offset:2px}
+.podium-crown{height:22px;margin-bottom:2px;font-size:1.35rem;color:#d59a11;line-height:1}
+.podium-2 .podium-crown{color:#8e9ab1}.podium-3 .podium-crown{color:#bd7446}
+.podium-avatar{
+  width:72px;height:72px;border-radius:50%;overflow:hidden;display:grid;place-items:center;
+  background:#fff;border:4px solid #fff;box-shadow:0 8px 20px rgba(40,61,100,.15);font-weight:1000;color:#25334a;
+}
+.podium-1 .podium-avatar{width:86px;height:86px;border-color:#ffe77b}
+.podium-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.podium-place{
+  width:30px;height:30px;display:grid;place-items:center;margin-top:-12px;z-index:2;border-radius:50%;
+  background:#fff;border:2px solid #dfe6f0;font-weight:1000;color:#42516c;box-shadow:0 5px 12px rgba(40,61,100,.12)
+}
+.podium-1 .podium-place{background:#ffc928;border-color:#f4b700;color:#704d00}
+.podium-2 .podium-place{background:#e9edf4;border-color:#cbd3df;color:#556174}
+.podium-3 .podium-place{background:#efad74;border-color:#da8b4e;color:#7b3f18}
+.podium-player b{margin-top:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1d2c47}
+.podium-player small{margin-top:3px;color:#8591a4;font-size:.72rem}
+.podium-player strong{margin-top:8px;color:#2e5bd5;font-size:.86rem}
+
+/* 8) header quando o usuário é ADM: mantém tudo em uma linha em desktop */
+@media(min-width:1251px){
+  body.kant-admin-user .kant-header{grid-template-columns:auto minmax(560px,1fr) auto!important;gap:14px!important}
+  body.kant-admin-user .kant-nav{min-width:560px;gap:2px!important;padding:5px 7px!important}
+  body.kant-admin-user .kant-nav .nav-link{padding:0 13px!important;gap:7px}
+  body.kant-admin-user .kant-nav .nav-icon{width:20px;height:20px}
+  body.kant-admin-user .kant-account-cluster{gap:7px}
+  body.kant-admin-user .kant-xp-chip{min-width:122px}
+  body.kant-admin-user .kant-level-chip{width:160px}
+}
+
+body.dark .admin-image-field{background:#131f31;border-color:#2c3b52}
+body.dark .admin-image-preview{background:#111c2d;border-color:#304058;color:#9eacc0}
+body.dark .module-best-result.best-none{background:#1a2638;color:#a9b5c7;border-color:#2c3b50}
+body.dark .podium-player{background:#162134;border-color:#2d3c52}
+body.dark .podium-player b{color:#eef4ff}
+body.dark .podium-1{background:linear-gradient(180deg,#332d18,#262317);border-color:#6f5c25}
+body.dark .podium-2{background:linear-gradient(180deg,#222b39,#182231)}
+body.dark .podium-3{background:linear-gradient(180deg,#33251e,#251c19)}
+
+@media(max-width:1100px){
+  .admin-sidebar{position:static;max-height:none;overflow:visible}
+  .admin-image-field{grid-template-columns:1fr 150px}
+  .admin-remove-image{grid-column:1/-1;justify-self:start}
+}
+@media(max-width:650px){
+  .admin-image-field{grid-template-columns:1fr}
+  .admin-image-preview{width:100%;height:180px}
+  .rank-podium{gap:6px;padding-inline:0}
+  .podium-player{padding-inline:6px}
+  .podium-avatar{width:56px;height:56px}.podium-1 .podium-avatar{width:66px;height:66px}
+  .podium-player b{font-size:.78rem}.podium-player strong{font-size:.7rem}
+}
+.ranking-card{width:min(760px,100%)}
+/* O menu principal nunca quebra os itens em duas linhas. */
+.kant-nav{flex-wrap:nowrap!important}
+@media(max-width:820px){.kant-nav{justify-content:flex-start!important;overflow-x:auto}}

@@ -110,6 +110,7 @@
     const profile=await ensureProfile(user);
     window.kantCurrentProfile=profile;
     window.kantIsAdmin=profile?.role==="admin";
+    document.body.classList.toggle("kant-admin-user",window.kantIsAdmin);
     const adminButton=document.getElementById("navAdmin");
     if(adminButton){
       if(window.kantIsAdmin) adminButton.removeAttribute("hidden");
@@ -284,38 +285,42 @@
     }
 
     rankingList.innerHTML="";
-    data.forEach((p,index)=>{
-      const row=document.createElement("div");
-      row.className="ranking-row"+(p.id===user?.id?" me":"");
 
-      const pos=document.createElement("div");
-      pos.className="rank-pos"+(index<3?` top${index+1}`:"");
-      pos.textContent=index===0?"🥇":index===1?"🥈":index===2?"🥉":String(index+1);
+    const makeAvatar=(p,className)=>{
+      const avatar=document.createElement("div");avatar.className=className;
+      if(p.avatar_url){const img=document.createElement("img");img.src=p.avatar_url;img.alt="";avatar.appendChild(img);}else avatar.textContent=rankInitials(p.display_name);
+      return avatar;
+    };
 
-      const avatar=document.createElement("div");
-      avatar.className="rank-avatar";
-      if(p.avatar_url){
-        const img=document.createElement("img");
-        img.src=p.avatar_url; img.alt="";
-        avatar.appendChild(img);
-      }else{
-        avatar.textContent=rankInitials(p.display_name);
-      }
+    const top=data.slice(0,3);
+    if(top.length){
+      const podium=document.createElement("div");podium.className="rank-podium";
+      const order=top.length===1?[0]:top.length===2?[1,0]:[1,0,2];
+      order.forEach(index=>{
+        const p=top[index]; if(!p)return;
+        const place=index+1;
+        const item=document.createElement("article");item.className=`podium-player podium-${place}`+(p.id===user?.id?" me":"");
+        const crown=document.createElement("div");crown.className="podium-crown";crown.textContent=place===1?"♛":place===2?"♜":"♜";
+        const avatar=makeAvatar(p,"podium-avatar");
+        const badge=document.createElement("div");badge.className="podium-place";badge.textContent=place===1?"1":place===2?"2":"3";
+        const name=document.createElement("b");name.textContent=p.display_name||"Jogador";
+        const level=document.createElement("small");level.textContent=`Nível ${Math.floor((Number(p.xp)||0)/XP_PER_LEVEL)+1}`;
+        const xp=document.createElement("strong");xp.textContent=`${(Number(p.xp)||0).toLocaleString("pt-BR")} XP`;
+        item.append(crown,avatar,badge,name,level,xp);podium.appendChild(item);
+      });
+      rankingList.appendChild(podium);
+    }
 
-      const userBox=document.createElement("div");
-      userBox.className="rank-user";
-      const name=document.createElement("b");
-      name.textContent=p.display_name || "Jogador";
-      const level=document.createElement("small");
-      level.textContent=`Nível ${Math.floor((Number(p.xp)||0)/XP_PER_LEVEL)+1}`;
-      userBox.append(name,level);
-
-      const xpBox=document.createElement("div");
-      xpBox.className="rank-xp";
-      xpBox.textContent=`${(Number(p.xp)||0).toLocaleString("pt-BR")} XP`;
-
-      row.append(pos,avatar,userBox,xpBox);
-      rankingList.appendChild(row);
+    data.slice(3).forEach((p,index)=>{
+      const absoluteIndex=index+3;
+      const row=document.createElement("div");row.className="ranking-row"+(p.id===user?.id?" me":"");
+      const pos=document.createElement("div");pos.className="rank-pos";pos.textContent=String(absoluteIndex+1);
+      const avatar=makeAvatar(p,"rank-avatar");
+      const userBox=document.createElement("div");userBox.className="rank-user";
+      const name=document.createElement("b");name.textContent=p.display_name||"Jogador";
+      const level=document.createElement("small");level.textContent=`Nível ${Math.floor((Number(p.xp)||0)/XP_PER_LEVEL)+1}`;userBox.append(name,level);
+      const xpBox=document.createElement("div");xpBox.className="rank-xp";xpBox.textContent=`${(Number(p.xp)||0).toLocaleString("pt-BR")} XP`;
+      row.append(pos,avatar,userBox,xpBox);rankingList.appendChild(row);
     });
   }
 

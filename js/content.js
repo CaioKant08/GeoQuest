@@ -13,6 +13,8 @@
         opts: [...(q.alternativas || [])],
         a: Number(q.correta) || 0,
         exp: q.explicacao || "",
+        imageUrl: q.image_url || "",
+        explanationImageUrl: q.explanation_image_url || "",
         hint: q.dica || "",
         difficulty: q.dificuldade || "media",
         sourceModuleId: module.id,
@@ -45,12 +47,12 @@
       const ids=moduleRows.map(m=>m.id);
       const [{data:theoryRows,error:theoryError},{data:questionRows,error:questionError}] = await Promise.all([
         db.from("theory_blocks")
-          .select("id,module_id,position,titulo,texto,formula,exemplo,published")
+          .select("id,module_id,position,titulo,texto,formula,exemplo,image_url,published")
           .in("module_id",ids)
           .eq("published",true)
           .order("position",{ascending:true}),
         db.from("questions")
-          .select("id,module_id,position,dificuldade,xp,enunciado,alternativas,correta,dica,explicacao,published")
+          .select("id,module_id,position,dificuldade,xp,enunciado,alternativas,correta,dica,explicacao,image_url,explanation_image_url,published")
           .in("module_id",ids)
           .eq("published",true)
           .order("position",{ascending:true})
@@ -72,7 +74,8 @@
           titulo:t.titulo||"",
           texto:t.texto||"",
           formula:t.formula||"",
-          exemplo:t.exemplo||""
+          exemplo:t.exemplo||"",
+          image_url:t.image_url||""
         })),
         questoes:(questionRows||[]).filter(q=>q.module_id===row.id).map(q=>({
           id:q.id,
@@ -82,7 +85,9 @@
           alternativas:Array.isArray(q.alternativas)?q.alternativas:[],
           correta:Number(q.correta)||0,
           dica:q.dica||"",
-          explicacao:q.explicacao||""
+          explicacao:q.explicacao||"",
+          image_url:q.image_url||"",
+          explanation_image_url:q.explanation_image_url||""
         }))
       }));
       return applyContent(modules,"supabase");
