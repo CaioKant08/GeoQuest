@@ -4342,3 +4342,44 @@ body.dark .kant-tick,body.dark .kant-axis-label{fill:#85998f}body.dark .kant-poi
 .guided-example .guided-example-content .katex-display>.katex{white-space:nowrap}
 body.dark .guided-example .guided-example-content{color:#e6edf5}
 .admin-latex-help{margin:-2px 0 10px;color:var(--muted);font-size:.76rem;line-height:1.5}
+
+/* KANT v3.8.9 — teoria paginada + biblioteca ampliada de diagramas */
+.theory-grid.theory-paged-grid{display:block;max-width:980px;margin:0 auto}
+.theory-page{width:100%;min-height:0;padding:30px 32px}
+.theory-page[hidden]{display:none!important}
+.theory-page.active{display:block;animation:kantTheoryIn .22s ease-out}
+@keyframes kantTheoryIn{from{opacity:.2;transform:translateY(8px)}to{opacity:1;transform:none}}
+.theory-page-top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.theory-page-count{font-size:.78rem;font-weight:850;letter-spacing:.04em;text-transform:uppercase;color:#8a97aa}
+.theory-pager{max-width:980px;margin:16px auto 28px;display:grid;grid-template-columns:minmax(145px,1fr) auto minmax(220px,1fr);gap:14px;align-items:center;padding:12px;border:1px solid #e4eaf2;border-radius:20px;background:rgba(255,255,255,.82);box-shadow:0 12px 32px rgba(42,66,111,.05)}
+.theory-nav-btn{min-height:46px;border:1px solid #dce5ef;border-radius:14px;background:#fff;color:#34435a;font:800 .9rem/1.15 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:10px 14px;cursor:pointer;transition:.18s ease}
+.theory-nav-btn:hover:not(:disabled){transform:translateY(-1px);border-color:#b9d8c6;background:#f7fcf9}
+.theory-nav-btn:disabled{opacity:.38;cursor:not-allowed}
+.theory-next{text-align:right;color:#13784c;border-color:#cfe8da;background:#f4fbf7}
+.theory-prev{text-align:left}
+.theory-pager-center{display:grid;justify-items:center;gap:7px;color:#7c899c;font-size:.78rem;font-weight:850;white-space:nowrap}
+.theory-dots{display:flex;gap:7px;align-items:center}
+.theory-dot{width:9px;height:9px;border:0;border-radius:999px;background:#d5dde7;padding:0;cursor:pointer;transition:.18s ease}
+.theory-dot.active{width:24px;background:#1b9a5b}
+.kant-math-line{stroke:#1a9b5b;stroke-width:3.2;stroke-linecap:round;fill:none}
+.kant-math-line.alt{stroke:#5f76a8}
+.kant-perpendicular{stroke:#e1a62c;stroke-width:3;stroke-dasharray:6 5;stroke-linecap:round}
+.kant-radius{stroke:#1a9b5b;stroke-width:2.5;stroke-dasharray:5 4}
+.kant-circle{fill:rgba(26,155,91,.06);stroke:#1a9b5b;stroke-width:3}
+.kant-line-label,.kant-area-label{font:800 12px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#53647a;paint-order:stroke;stroke:#fbfdfc;stroke-width:4;stroke-linejoin:round}
+.kant-area-label{font-size:14px;fill:#17804e}
+body.dark .theory-pager{background:#111d2e;border-color:#293c54;box-shadow:none}
+body.dark .theory-nav-btn{background:#162337;border-color:#30425a;color:#dce6f2}
+body.dark .theory-next{background:#12291e;border-color:#2c5a41;color:#9fdbb9}
+body.dark .theory-page-count,body.dark .theory-pager-center{color:#94a4b8}
+body.dark .theory-dot{background:#3a485b}body.dark .theory-dot.active{background:#47b87c}
+body.dark .kant-line-label,body.dark .kant-area-label{stroke:#111b18;fill:#dbe9df}
+body.dark .kant-circle{fill:rgba(53,177,111,.08);stroke:#43b579}
+@media(max-width:720px){
+  .theory-page{padding:22px 18px}
+  .theory-pager{grid-template-columns:1fr 1fr;gap:9px;padding:9px}
+  .theory-pager-center{grid-column:1/-1;grid-row:1}
+  .theory-prev{grid-column:1;grid-row:2}.theory-next{grid-column:2;grid-row:2}
+  .theory-nav-btn{min-height:48px;font-size:.82rem;padding:9px 11px}
+}
+.practice-cta[hidden]{display:none!important}

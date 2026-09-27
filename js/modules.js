@@ -16,26 +16,26 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Coordenadas cartesianas",
         "texto": "O plano cartesiano tem dois eixos perpendiculares: x, horizontal, e y, vertical. Um ponto P(x, y) é um par ordenado; trocar a ordem das coordenadas muda o ponto.",
-        "formula": "1º: (+,+) • 2º: (−,+) • 3º: (−,−) • 4º: (+,−)",
-        "exemplo": "A(−4,3) está no 2º quadrante; B(2,−5), no 4º."
+        "formula": "latex:\\begin{array}{c|c}1^\\circ &(+,+)\\\\2^\\circ&(-,+)\\\\3^\\circ&(-,-)\\\\4^\\circ&(+,-)\\end{array}",
+        "exemplo": "O ponto $A(-4,3)$ tem $x<0$ e $y>0$, portanto está no $2^\\circ$ quadrante. Já $B(2,-5)$ tem $x>0$ e $y<0$, logo está no $4^\\circ$ quadrante."
       },
       {
         "titulo": "Distância entre dois pontos",
         "texto": "As diferenças horizontal e vertical formam os catetos de um triângulo retângulo. Por isso, a fórmula da distância é o Teorema de Pitágoras escrito em coordenadas.",
         "formula": "latex:d=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}",
-        "exemplo": "Entre $A(-2,5)$ e $B(4,-3)$:\n$$d=\\sqrt{(4-(-2))^2+(-3-5)^2}=\\sqrt{6^2+(-8)^2}=10$$"
+        "exemplo": "Entre $A(-2,5)$ e $B(4,-3)$:\n$$d=\\sqrt{(4-(-2))^2+(-3-5)^2}$$\n$$d=\\sqrt{6^2+(-8)^2}=\\sqrt{100}=10$$"
       },
       {
         "titulo": "Ponto médio",
         "texto": "O ponto médio divide o segmento em duas partes de mesmo comprimento. Suas coordenadas são as médias aritméticas das coordenadas dos extremos.",
         "formula": "latex:M=\\left(\\frac{x_1+x_2}{2},\\frac{y_1+y_2}{2}\\right)",
-        "exemplo": "Para $A(7,-1)$ e $B(-3,11)$:\n$$M=\\left(\\frac{7+(-3)}{2},\\frac{-1+11}{2}\\right)=(2,5)$$"
+        "exemplo": "Para $A(7,-1)$ e $B(-3,11)$:\n$$M=\\left(\\frac{7+(-3)}{2},\\frac{-1+11}{2}\\right)$$\n$$M=(2,5)$$"
       },
       {
         "titulo": "Aplicações",
         "texto": "Distância e ponto médio aparecem em classificação de triângulos, diagonais, medianas, centros de segmentos e problemas de equidistância.",
-        "formula": "mesma ordenada → d = |x₂−x₁| • mesma abscissa → d = |y₂−y₁|",
-        "exemplo": "Se A e B têm o mesmo y, basta medir a diferença horizontal."
+        "formula": "latex:y_1=y_2\\Rightarrow d=|x_2-x_1|\\qquad x_1=x_2\\Rightarrow d=|y_2-y_1|",
+        "exemplo": "Se $A(-3,4)$ e $B(5,4)$ têm a mesma ordenada, então:\n$$d=|5-(-3)|=8$$"
       }
     ],
     "questoes": [
@@ -179,25 +179,25 @@ window.KANT_DEFAULT_MODULES = [
         "titulo": "Coeficiente angular",
         "texto": "O coeficiente angular mede a taxa de variação de y em relação a x. Ele indica se a reta cresce, decresce ou é horizontal. Retas verticais não têm coeficiente angular definido.",
         "formula": "latex:m=\\frac{y_2-y_1}{x_2-x_1}=\\frac{\\Delta y}{\\Delta x}",
-        "exemplo": "A(2,3) e B(6,11): m=(11−3)/(6−2)=2."
+        "exemplo": "Para $A(2,3)$ e $B(6,11)$:\n$$m=\\frac{11-3}{6-2}=\\frac{8}{4}=2$$"
       },
       {
         "titulo": "Forma geral e reduzida",
         "texto": "Toda reta pode ser escrita na forma geral. Quando B≠0, podemos isolar y e obter a forma reduzida, em que m aparece diretamente.",
-        "formula": "Ax + By + C = 0   ⇄   y = mx + b",
-        "exemplo": "3x−2y+6=0 → y=(3/2)x+3."
+        "formula": "latex:Ax+By+C=0\\qquad\\Longleftrightarrow\\qquad y=mx+b",
+        "exemplo": "Partindo de $3x-2y+6=0$:\n$$-2y=-3x-6$$\n$$y=\\frac{3}{2}x+3$$"
       },
       {
         "titulo": "Forma ponto–inclinação",
         "texto": "Se conhecemos um ponto da reta e seu coeficiente angular, a forma ponto–inclinação é o caminho mais direto para montar a equação.",
-        "formula": "y − y₀ = m(x − x₀)",
-        "exemplo": "m=3 e P(2,−1): y+1=3(x−2) → y=3x−7."
+        "formula": "latex:y-y_0=m(x-x_0)",
+        "exemplo": "Com $m=3$ e $P(2,-1)$:\n$$y-(-1)=3(x-2)$$\n$$y=3x-7$$"
       },
       {
         "titulo": "Dois pontos e interceptos",
         "texto": "Dois pontos distintos determinam uma única reta. Para localizar os interceptos, faça y=0 para o eixo x e x=0 para o eixo y.",
-        "formula": "reta vertical: x=k • reta horizontal: y=k",
-        "exemplo": "y=2x−6 corta o eixo x em (3,0) e o eixo y em (0,−6)."
+        "formula": "latex:x=k\\ \\text{(vertical)}\\qquad y=k\\ \\text{(horizontal)}",
+        "exemplo": "Na reta $y=2x-6$:\n$$y=0\\Rightarrow x=3\\Rightarrow (3,0)$$\n$$x=0\\Rightarrow y=-6\\Rightarrow (0,-6)$$"
       }
     ],
     "questoes": [
@@ -340,26 +340,26 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Interseção",
         "texto": "Duas retas concorrentes têm um único ponto em comum. Esse ponto é a solução do sistema formado pelas duas equações.",
-        "formula": "r ∩ s = solução do sistema",
-        "exemplo": "y=x+1 e y=−2x+7 → x=2 e y=3."
+        "formula": "latex:r\\cap s=\\text{solução do sistema}",
+        "exemplo": "Para $r:y=x+1$ e $s:y=-2x+7$:\n$$x+1=-2x+7\\Rightarrow 3x=6\\Rightarrow x=2$$\n$$y=2+1=3$$\nLogo, $r\\cap s=(2,3)$."
       },
       {
         "titulo": "Paralelas e coincidentes",
         "texto": "Retas não verticais paralelas têm o mesmo coeficiente angular. Se também tiverem o mesmo coeficiente linear, são coincidentes.",
-        "formula": "paralelas: m₁=m₂",
-        "exemplo": "y=3x+2 e y=3x−4 são paralelas distintas."
+        "formula": "latex:m_1=m_2\\Rightarrow\\text{retas paralelas ou coincidentes}",
+        "exemplo": "As retas $y=3x+2$ e $y=3x-4$ têm o mesmo coeficiente angular $m=3$, mas interceptos diferentes. Portanto, são paralelas distintas."
       },
       {
         "titulo": "Perpendicularidade",
         "texto": "No caso usual, os coeficientes angulares de retas perpendiculares são inversos opostos. Uma reta vertical é perpendicular a uma horizontal.",
-        "formula": "m₁·m₂ = −1",
-        "exemplo": "Se m₁=1/2, então m₂=−2."
+        "formula": "latex:m_1\\cdot m_2=-1",
+        "exemplo": "Se $m_1=\\frac12$, a reta perpendicular deve ter:\n$$\\frac12\\cdot m_2=-1\\Rightarrow m_2=-2$$"
       },
       {
         "titulo": "Quadro de decisão",
         "texto": "Mesmo m e interceptos diferentes: paralelas. Equações equivalentes: coincidentes. Coeficientes diferentes: concorrentes. Produto −1: perpendiculares.",
-        "formula": "mesmo m ≠ mesma reta",
-        "exemplo": "2x−y+3=0 e 4x−2y+6=0 representam a mesma reta."
+        "formula": "latex:m_1=m_2\\not\\Rightarrow r=s",
+        "exemplo": "Multiplicando $2x-y+3=0$ por $2$, obtemos:\n$$4x-2y+6=0$$\nAs duas equações representam a mesma reta."
       }
     ],
     "questoes": [
@@ -502,26 +502,26 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Pontos colineares",
         "texto": "Três pontos são colineares quando pertencem à mesma reta. Podemos comparar coeficientes angulares ou usar um determinante, inclusive em retas verticais.",
-        "formula": "det |x y 1| = 0",
-        "exemplo": "A(1,2), B(3,6), C(5,10): as inclinações são iguais, então os pontos estão alinhados."
+        "formula": "latex:\\det\\begin{pmatrix}x_1&y_1&1\\\\x_2&y_2&1\\\\x_3&y_3&1\\end{pmatrix}=0",
+        "exemplo": "Para $A(1,2)$, $B(3,6)$ e $C(5,10)$:\n$$m_{AB}=\\frac{6-2}{3-1}=2\\qquad m_{BC}=\\frac{10-6}{5-3}=2$$\nComo as inclinações são iguais, os três pontos estão alinhados."
       },
       {
         "titulo": "Determinante e alinhamento",
         "texto": "O determinante de ordem 3 organiza as coordenadas dos três pontos. Se o resultado for zero, a área associada também é zero.",
-        "formula": "D = x₁(y₂−y₃)+x₂(y₃−y₁)+x₃(y₁−y₂)",
-        "exemplo": "D=0 ⇔ os três pontos são colineares."
+        "formula": "latex:D=x_1(y_2-y_3)+x_2(y_3-y_1)+x_3(y_1-y_2)",
+        "exemplo": "Se, após substituir as coordenadas, obtivermos\n$$D=0,$$\nentão os três pontos são colineares."
       },
       {
         "titulo": "Área de triângulo",
         "texto": "A área de um triângulo no plano cartesiano é metade do módulo do mesmo determinante usado para testar colinearidade.",
         "formula": "latex:A=\\frac{|D|}{2}",
-        "exemplo": "A(1,1), B(5,1), C(3,4) → A=6."
+        "exemplo": "Para $A(1,1)$, $B(5,1)$ e $C(3,4)$:\n$$D=1(1-4)+5(4-1)+3(1-1)=12$$\n$$A=\\frac{|12|}{2}=6$$"
       },
       {
         "titulo": "Ligação conceitual",
         "texto": "Colinearidade e área são duas faces do mesmo cálculo: se o determinante é zero, o triângulo “achata” e sua área é zero.",
-        "formula": "área zero ⇔ colinearidade",
-        "exemplo": "Esse vínculo ajuda a resolver problemas com parâmetros."
+        "formula": "latex:A=0\\qquad\\Longleftrightarrow\\qquad D=0\\qquad\\Longleftrightarrow\\qquad\\text{colinearidade}",
+        "exemplo": "Se um problema pede o valor de um parâmetro para que três pontos fiquem alinhados, podemos impor diretamente:\n$$A=0\\quad\\text{ou}\\quad D=0$$"
       }
     ],
     "questoes": [
@@ -664,26 +664,26 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Ideia geométrica",
         "texto": "A distância de um ponto a uma reta é o comprimento do segmento perpendicular que liga o ponto à reta. É a menor distância possível.",
-        "formula": "distância = segmento perpendicular mínimo",
-        "exemplo": "Não basta escolher qualquer ponto da reta; o segmento precisa ser perpendicular."
+        "formula": "latex:d(P,r)=\\text{comprimento do segmento perpendicular de }P\\text{ até }r",
+        "exemplo": "A menor distância de um ponto $P$ até uma reta $r$ é medida sobre a perpendicular a $r$. Um segmento oblíquo seria maior."
       },
       {
         "titulo": "Fórmula ponto–reta",
         "texto": "Para usar a fórmula, a reta deve estar na forma geral Ax+By+C=0. O valor absoluto impede resultado negativo.",
         "formula": "latex:d=\\frac{|Ax_0+By_0+C|}{\\sqrt{A^2+B^2}}",
-        "exemplo": "P(2,−1) e 3x+4y−10=0 → d=8/5."
+        "exemplo": "Para $P(2,-1)$ e $r:3x+4y-10=0$:\n$$d=\\frac{|3(2)+4(-1)-10|}{\\sqrt{3^2+4^2}}$$\n$$d=\\frac{8}{5}$$"
       },
       {
         "titulo": "Casos simples",
         "texto": "Em retas verticais ou horizontais, a distância é apenas a diferença absoluta entre a coordenada do ponto e a constante da reta.",
-        "formula": "x=k → |x₀−k| • y=k → |y₀−k|",
-        "exemplo": "De (7,−4) até x=2, a distância é 5."
+        "formula": "latex:x=k\\Rightarrow d=|x_0-k|\\qquad y=k\\Rightarrow d=|y_0-k|",
+        "exemplo": "Do ponto $P(7,-4)$ até a reta vertical $x=2$:\n$$d=|7-2|=5$$"
       },
       {
         "titulo": "Retas paralelas",
         "texto": "Para duas retas paralelas com os mesmos coeficientes A e B, a distância depende apenas da diferença entre os termos constantes.",
         "formula": "latex:d=\\frac{|C_1-C_2|}{\\sqrt{A^2+B^2}}",
-        "exemplo": "3x+4y−2=0 e 3x+4y+18=0 → d=20/5=4."
+        "exemplo": "Para $r:3x+4y-2=0$ e $s:3x+4y+18=0$:\n$$d=\\frac{|-2-18|}{\\sqrt{3^2+4^2}}=\\frac{20}{5}=4$$"
       }
     ],
     "questoes": [
@@ -826,26 +826,26 @@ window.KANT_DEFAULT_MODULES = [
       {
         "titulo": "Definição e forma reduzida",
         "texto": "Circunferência é o conjunto dos pontos que estão à mesma distância de um centro C(a,b). Essa distância constante é o raio r.",
-        "formula": "(x−a)² + (y−b)² = r²",
-        "exemplo": "Centro (2,−3), raio 5 → (x−2)²+(y+3)²=25."
+        "formula": "latex:(x-a)^2+(y-b)^2=r^2",
+        "exemplo": "Com centro $C(2,-3)$ e raio $r=5$:\n$$(x-2)^2+(y+3)^2=25$$"
       },
       {
         "titulo": "Forma geral",
         "texto": "Ao desenvolver a forma reduzida, obtemos uma equação com x² e y². Completando quadrados, recuperamos centro e raio.",
-        "formula": "x²+y²+Dx+Ey+F=0",
-        "exemplo": "x²+y²−6x+4y−12=0 → (x−3)²+(y+2)²=25."
+        "formula": "latex:x^2+y^2+Dx+Ey+F=0",
+        "exemplo": "Em $x^2+y^2-6x+4y-12=0$, completando quadrados:\n$$(x-3)^2+(y+2)^2=25$$\nLogo, $C=(3,-2)$ e $r=5$."
       },
       {
         "titulo": "Posição de um ponto",
         "texto": "Compare a distância do ponto ao centro com o raio. Menor: interior; igual: sobre a circunferência; maior: exterior.",
-        "formula": "d<r: interior • d=r: pertencente • d>r: exterior",
-        "exemplo": "Em centro (1,2), r=4, o ponto (4,2) está no interior porque d=3."
+        "formula": "latex:d<r:\\ \\text{interior}\\qquad d=r:\\ \\text{pertencente}\\qquad d>r:\\ \\text{exterior}",
+        "exemplo": "Na circunferência de centro $C(1,2)$ e raio $4$, para $P(4,2)$:\n$$d(C,P)=3<4$$\nLogo, $P$ está no interior."
       },
       {
         "titulo": "Tangência",
         "texto": "Uma reta é tangente quando toca a circunferência em um único ponto. Isso acontece quando a distância do centro à reta é exatamente igual ao raio.",
-        "formula": "reta tangente ⇔ d(C,r)=raio",
-        "exemplo": "Centro (2,3) e reta 4x+3y−2=0 → distância 3, então o raio tangente é 3."
+        "formula": "latex:r\\text{ tangente}\\qquad\\Longleftrightarrow\\qquad d(C,r)=R",
+        "exemplo": "Para centro $C(2,3)$ e reta $4x+3y-2=0$:\n$$d=\\frac{|4(2)+3(3)-2|}{\\sqrt{4^2+3^2}}=3$$\nAssim, uma circunferência de raio $3$ é tangente a essa reta."
       }
     ],
     "questoes": [
@@ -972,7 +972,3 @@ window.KANT_DEFAULT_MODULES = [
     ]
   }
 ];
-
-
-// A plataforma usa esta cópia até carregar o conteúdo publicado do Supabase.
-window.KANT_MODULES = JSON.parse(JSON.stringify(window.KANT_DEFAULT_MODULES));

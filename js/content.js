@@ -2,6 +2,47 @@
   const clone = (value) => JSON.parse(JSON.stringify(value));
   const defaults = clone(window.KANT_DEFAULT_MODULES || window.KANT_MODULES || []);
 
+
+  const LEGACY_THEORY = {
+    "1:1": {formula:"1º: (+,+) • 2º: (−,+) • 3º: (−,−) • 4º: (+,−)", exemplo:"A(−4,3) está no 2º quadrante; B(2,−5), no 4º."},
+    "1:2": {formula:"latex:d=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}", exemplo:"Entre $A(-2,5)$ e $B(4,-3)$:\n$$d=\\sqrt{(4-(-2))^2+(-3-5)^2}=\\sqrt{6^2+(-8)^2}=10$$"},
+    "1:3": {formula:"latex:M=\\left(\\frac{x_1+x_2}{2},\\frac{y_1+y_2}{2}\\right)", exemplo:"Para $A(7,-1)$ e $B(-3,11)$:\n$$M=\\left(\\frac{7+(-3)}{2},\\frac{-1+11}{2}\\right)=(2,5)$$"},
+    "1:4": {formula:"mesma ordenada → d = |x₂−x₁| • mesma abscissa → d = |y₂−y₁|", exemplo:"Se A e B têm o mesmo y, basta medir a diferença horizontal."},
+    "2:1": {formula:"latex:m=\\frac{y_2-y_1}{x_2-x_1}=\\frac{\\Delta y}{\\Delta x}", exemplo:"A(2,3) e B(6,11): m=(11−3)/(6−2)=2."},
+    "2:2": {formula:"Ax + By + C = 0   ⇄   y = mx + b", exemplo:"3x−2y+6=0 → y=(3/2)x+3."},
+    "2:3": {formula:"y − y₀ = m(x − x₀)", exemplo:"m=3 e P(2,−1): y+1=3(x−2) → y=3x−7."},
+    "2:4": {formula:"reta vertical: x=k • reta horizontal: y=k", exemplo:"y=2x−6 corta o eixo x em (3,0) e o eixo y em (0,−6)."},
+    "3:1": {formula:"r ∩ s = solução do sistema", exemplo:"y=x+1 e y=−2x+7 → x=2 e y=3."},
+    "3:2": {formula:"paralelas: m₁=m₂", exemplo:"y=3x+2 e y=3x−4 são paralelas distintas."},
+    "3:3": {formula:"m₁·m₂ = −1", exemplo:"Se m₁=1/2, então m₂=−2."},
+    "3:4": {formula:"mesmo m ≠ mesma reta", exemplo:"2x−y+3=0 e 4x−2y+6=0 representam a mesma reta."},
+    "4:1": {formula:"det |x y 1| = 0", exemplo:"A(1,2), B(3,6), C(5,10): as inclinações são iguais, então os pontos estão alinhados."},
+    "4:2": {formula:"D = x₁(y₂−y₃)+x₂(y₃−y₁)+x₃(y₁−y₂)", exemplo:"D=0 ⇔ os três pontos são colineares."},
+    "4:3": {formula:"latex:A=\\frac{|D|}{2}", exemplo:"A(1,1), B(5,1), C(3,4) → A=6."},
+    "4:4": {formula:"área zero ⇔ colinearidade", exemplo:"Esse vínculo ajuda a resolver problemas com parâmetros."},
+    "5:1": {formula:"distância = segmento perpendicular mínimo", exemplo:"Não basta escolher qualquer ponto da reta; o segmento precisa ser perpendicular."},
+    "5:2": {formula:"latex:d=\\frac{|Ax_0+By_0+C|}{\\sqrt{A^2+B^2}}", exemplo:"P(2,−1) e 3x+4y−10=0 → d=8/5."},
+    "5:3": {formula:"x=k → |x₀−k| • y=k → |y₀−k|", exemplo:"De (7,−4) até x=2, a distância é 5."},
+    "5:4": {formula:"latex:d=\\frac{|C_1-C_2|}{\\sqrt{A^2+B^2}}", exemplo:"3x+4y−2=0 e 3x+4y+18=0 → d=20/5=4."},
+    "6:1": {formula:"(x−a)² + (y−b)² = r²", exemplo:"Centro (2,−3), raio 5 → (x−2)²+(y+3)²=25."},
+    "6:2": {formula:"x²+y²+Dx+Ey+F=0", exemplo:"x²+y²−6x+4y−12=0 → (x−3)²+(y+2)²=25."},
+    "6:3": {formula:"d<r: interior • d=r: pertencente • d>r: exterior", exemplo:"Em centro (1,2), r=4, o ponto (4,2) está no interior porque d=3."},
+    "6:4": {formula:"reta tangente ⇔ d(C,r)=raio", exemplo:"Centro (2,3) e reta 4x+3y−2=0 → distância 3, então o raio tangente é 3."}
+  };
+
+  function enhanceLegacyTheory(modules){
+    (modules||[]).forEach(module=>{
+      const local=defaults.find(d=>Number(d.numero)===Number(module.numero));
+      (module.teoria||[]).forEach((t,i)=>{
+        const key=`${Number(module.numero)}:${i+1}`, legacy=LEGACY_THEORY[key], upgraded=local?.teoria?.[i];
+        if(!legacy||!upgraded)return;
+        if(String(t.formula||"").trim()===String(legacy.formula||"").trim()) t.formula=upgraded.formula;
+        if(String(t.exemplo||"").trim()===String(legacy.exemplo||"").trim()) t.exemplo=upgraded.exemplo;
+      });
+    });
+    return modules;
+  }
+
   function buildQuestionBank(modules){
     return (modules || []).flatMap((module, moduleIndex) =>
       (module.questoes || []).map((q, questionIndex) => ({
@@ -92,7 +133,7 @@
           explanation_image_url:q.explanation_image_url||""
         }))
       }));
-      return applyContent(modules,"supabase");
+      return applyContent(enhanceLegacyTheory(modules),"supabase");
     }catch(err){
       console.warn("Conteúdo do Supabase indisponível; usando versão local:",err?.message||err);
       return applyContent(clone(defaults),"local");

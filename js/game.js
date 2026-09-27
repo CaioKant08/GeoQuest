@@ -129,20 +129,43 @@
     const hero=$("#moduleStudyHero"); hero.className=`module-study-hero study-${m.cor}`;
     const practiceCta=document.querySelector("#moduleStudy .practice-cta"); if(practiceCta) practiceCta.className=`practice-cta practice-${m.cor}`;
     const objectives=$("#studyObjectives"); objectives.innerHTML=m.objetivos.map((o,i)=>`<div><span>0${i+1}</span><p>${o}</p></div>`).join("");
-    const grid=$("#theoryGrid"); grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card" data-theory-index="${i}"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
+    const grid=$("#theoryGrid");
+    grid.classList.add("theory-paged-grid");
+    grid.innerHTML=m.teoria.map((t,i)=>`<article class="theory-card theory-page" data-theory-index="${i}" aria-hidden="true"><div class="theory-page-top"><div class="theory-index">${String(i+1).padStart(2,"0")}</div><span class="theory-page-count">Etapa ${i+1} de ${m.teoria.length}</span></div><h4>${t.titulo}</h4><p>${t.texto}</p>${t.image_url?`<img class="theory-content-image" src="${t.image_url}" alt="Imagem de apoio do conteúdo">`:""}<div class="theory-formula" data-formula-index="${i}"></div>${t.formula_image_url?`<img class="theory-inline-image theory-formula-image" src="${t.formula_image_url}" alt="Imagem da fórmula ou resumo">`:""}<div class="guided-example"><b>Exemplo guiado</b><div class="guided-example-content" data-example-index="${i}"></div>${t.example_image_url?`<img class="theory-inline-image theory-example-image" src="${t.example_image_url}" alt="Imagem do exemplo guiado">`:""}</div></article>`).join("");
     m.teoria.forEach((t,i)=>{
       window.KantMath?.renderFormula(grid.querySelector(`[data-formula-index="${i}"]`),t.formula);
       const exampleEl=grid.querySelector(`[data-example-index="${i}"]`);
       window.KantMath?.renderTextWithMath(exampleEl,t.exemplo,{allowLatexPrefix:true});
     });
-    grid.querySelectorAll(".theory-card>p").forEach((el,i)=>window.KantMath?.renderTextWithMath(el, m.teoria[i]?.texto||el.textContent));
-    if(m.id==="modulo-1" && window.KantCartesian){
+    grid.querySelectorAll(".theory-card>p").forEach((el,i)=>window.KantMath?.renderTextWithMath(el,m.teoria[i]?.texto||el.textContent));
+    if(window.KantCartesian){
       const cards=[...grid.querySelectorAll(".theory-card")];
-      const distanceIndex=m.teoria.findIndex(t=>/distância entre dois pontos/i.test(t.titulo||""));
-      const midpointIndex=m.teoria.findIndex(t=>/ponto médio/i.test(t.titulo||""));
-      if(distanceIndex>=0) window.KantCartesian.renderForTheoryCard(cards[distanceIndex],"distance");
-      if(midpointIndex>=0) window.KantCartesian.renderForTheoryCard(cards[midpointIndex],"midpoint");
+      m.teoria.forEach((t,i)=>window.KantCartesian.renderForTheoryCard(cards[i],m,t));
     }
+
+    let pager=document.querySelector("#theoryPager");
+    if(!pager){
+      pager=document.createElement("nav");pager.id="theoryPager";pager.className="theory-pager";pager.setAttribute("aria-label","Navegação da teoria");grid.insertAdjacentElement("afterend",pager);
+    }
+    const total=m.teoria.length;
+    let current=0;
+    const renderTheoryPage=(nextIndex,scroll=false)=>{
+      current=Math.max(0,Math.min(total-1,nextIndex));
+      const cards=[...grid.querySelectorAll(".theory-page")];
+      cards.forEach((card,i)=>{const active=i===current;card.classList.toggle("active",active);card.hidden=!active;card.setAttribute("aria-hidden",String(!active));});
+      const currentTheory=m.teoria[current];
+      pager.innerHTML=`<button class="theory-nav-btn theory-prev" type="button" ${current===0?"disabled":""}>← Anterior</button><div class="theory-pager-center"><span>${current+1} de ${total}</span><div class="theory-dots">${m.teoria.map((_,i)=>`<button type="button" class="theory-dot ${i===current?"active":""}" data-theory-page="${i}" aria-label="Abrir etapa ${i+1}" aria-current="${i===current?"step":"false"}"></button>`).join("")}</div></div><button class="theory-nav-btn theory-next" type="button">${current===total-1?"Ir para a prática →":`Próximo: ${m.teoria[current+1]?.titulo||"etapa"} →`}</button>`;
+      pager.querySelector(".theory-prev")?.addEventListener("click",()=>renderTheoryPage(current-1,true));
+      pager.querySelector(".theory-next")?.addEventListener("click",()=>{
+        if(current<total-1)renderTheoryPage(current+1,true);
+        else practiceCta?.scrollIntoView({behavior:"smooth",block:"center"});
+      });
+      pager.querySelectorAll("[data-theory-page]").forEach(btn=>btn.addEventListener("click",()=>renderTheoryPage(Number(btn.dataset.theoryPage),true)));
+      if(practiceCta)practiceCta.hidden=current!==total-1;
+      if(scroll){document.querySelector("#moduleStudy .theory-heading")?.scrollIntoView({behavior:"smooth",block:"start"});}
+      pager.dataset.currentTitle=currentTheory?.titulo||"";
+    };
+    renderTheoryPage(0,false);
     $("#practiceSummary").textContent=`${m.questoes.length} questões progressivas • feedback imediato • 70% libera o próximo módulo.`;
     show("moduleStudy");
   }
