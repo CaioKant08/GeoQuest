@@ -5,7 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KANT — Geometria Analítica</title>
 <link href="assets/kant-symbol.png?v=3.5.0" rel="icon" type="image/png"/>
-<link href="css/styles.css?v=3.10.0" rel="stylesheet"/>
+<link href="css/styles.css?v=3.11.1" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
 </head>
 <body>
@@ -116,7 +116,7 @@
 <div class="xp-hud-track kant-level-track">
 <div class="xp-hud-fill" id="globalXpBar"></div>
 </div>
-<small id="globalXpNext">0 / 1000 XP</small>
+<small id="globalXpNext">0 / 500 XP</small>
 </div>
 </div>
 <div class="account-area" id="accountArea">
@@ -272,27 +272,27 @@
       </div>
       <div class="lab-form-wrap">
         <form class="lab-form active" data-form="distance">
-          <div class="lab-form-grid"><label><span>x₁</span><input id="labDistX1" type="number" step="any" value="-2"></label><label><span>y₁</span><input id="labDistY1" type="number" step="any" value="5"></label><label><span>x₂</span><input id="labDistX2" type="number" step="any" value="4"></label><label><span>y₂</span><input id="labDistY2" type="number" step="any" value="-3"></label></div>
+          <div class="lab-form-grid"><label><span>x₁</span><input id="labDistX1" type="number" step="any" min="-25" max="25" inputmode="decimal" value="-2"></label><label><span>y₁</span><input id="labDistY1" type="number" step="any" min="-25" max="25" inputmode="decimal" value="5"></label><label><span>x₂</span><input id="labDistX2" type="number" step="any" min="-25" max="25" inputmode="decimal" value="4"></label><label><span>y₂</span><input id="labDistY2" type="number" step="any" min="-25" max="25" inputmode="decimal" value="-3"></label></div>
           <button class="btn primary" data-action="run-distance" type="button">Calcular distância</button>
         </form>
         <form class="lab-form" data-form="midpoint" hidden>
-          <div class="lab-form-grid"><label><span>x₁</span><input id="labMidX1" type="number" step="any" value="7"></label><label><span>y₁</span><input id="labMidY1" type="number" step="any" value="-1"></label><label><span>x₂</span><input id="labMidX2" type="number" step="any" value="-3"></label><label><span>y₂</span><input id="labMidY2" type="number" step="any" value="11"></label></div>
+          <div class="lab-form-grid"><label><span>x₁</span><input id="labMidX1" type="number" step="any" min="-25" max="25" inputmode="decimal" value="7"></label><label><span>y₁</span><input id="labMidY1" type="number" step="any" min="-25" max="25" inputmode="decimal" value="-1"></label><label><span>x₂</span><input id="labMidX2" type="number" step="any" min="-25" max="25" inputmode="decimal" value="-3"></label><label><span>y₂</span><input id="labMidY2" type="number" step="any" min="-25" max="25" inputmode="decimal" value="11"></label></div>
           <button class="btn primary" data-action="run-midpoint" type="button">Calcular ponto médio</button>
         </form>
         <form class="lab-form" data-form="line2pts" hidden>
-          <div class="lab-form-grid"><label><span>x₁</span><input id="labLine2X1" type="number" step="any" value="2"></label><label><span>y₁</span><input id="labLine2Y1" type="number" step="any" value="3"></label><label><span>x₂</span><input id="labLine2X2" type="number" step="any" value="6"></label><label><span>y₂</span><input id="labLine2Y2" type="number" step="any" value="11"></label></div>
+          <div class="lab-form-grid"><label><span>x₁</span><input id="labLine2X1" type="number" step="any" min="-25" max="25" inputmode="decimal" value="2"></label><label><span>y₁</span><input id="labLine2Y1" type="number" step="any" min="-25" max="25" inputmode="decimal" value="3"></label><label><span>x₂</span><input id="labLine2X2" type="number" step="any" min="-25" max="25" inputmode="decimal" value="6"></label><label><span>y₂</span><input id="labLine2Y2" type="number" step="any" min="-25" max="25" inputmode="decimal" value="11"></label></div>
           <button class="btn primary" data-action="run-line2pts" type="button">Gerar reta</button>
         </form>
         <form class="lab-form" data-form="lineeq" hidden>
-          <div class="lab-form-grid two"><label><span>m</span><input id="labEqM" type="number" step="any" value="2"></label><label><span>b</span><input id="labEqB" type="number" step="any" value="3"></label></div>
+          <div class="lab-form-grid two"><label><span>m</span><input id="labEqM" type="number" step="any" min="-25" max="25" inputmode="decimal" value="2"></label><label><span>b</span><input id="labEqB" type="number" step="any" min="-25" max="25" inputmode="decimal" value="3"></label></div>
           <button class="btn primary" data-action="run-lineeq" type="button">Desenhar reta</button>
         </form>
         <form class="lab-form" data-form="intersection" hidden>
-          <div class="lab-form-grid two"><label><span>m₁</span><input id="labIntM1" type="number" step="any" value="1"></label><label><span>b₁</span><input id="labIntB1" type="number" step="any" value="1"></label><label><span>m₂</span><input id="labIntM2" type="number" step="any" value="-2"></label><label><span>b₂</span><input id="labIntB2" type="number" step="any" value="7"></label></div>
+          <div class="lab-form-grid two"><label><span>m₁</span><input id="labIntM1" type="number" step="any" min="-25" max="25" inputmode="decimal" value="1"></label><label><span>b₁</span><input id="labIntB1" type="number" step="any" min="-25" max="25" inputmode="decimal" value="1"></label><label><span>m₂</span><input id="labIntM2" type="number" step="any" min="-25" max="25" inputmode="decimal" value="-2"></label><label><span>b₂</span><input id="labIntB2" type="number" step="any" min="-25" max="25" inputmode="decimal" value="7"></label></div>
           <button class="btn primary" data-action="run-intersection" type="button">Encontrar interseção</button>
         </form>
       </div>
-      <div class="lab-note">Dica: você pode usar o laboratório antes ou depois de resolver uma questão para enxergar melhor a geometria.</div>
+      <div class="lab-limit-note">Valores permitidos no laboratório: de −25 a +25.</div><div class="lab-note">Dica: escolha uma ferramenta por vez. O KANT mostra apenas os campos necessários para aquela investigação.</div>
     </aside>
     <section class="lab-workspace">
       <article class="card lab-plane-card">
@@ -321,7 +321,7 @@
       </div>
     </div>
     <div class="profile-level-badge">
-      <div class="profile-level-top"><small>NÍVEL ATUAL</small><span id="profileLevelProgressText">0 / 1000 XP</span></div>
+      <div class="profile-level-top"><small>NÍVEL ATUAL</small><span id="profileLevelProgressText">0 / 500 XP</span></div>
       <b id="profileLevelMirror">Nível 1</b>
       <span id="profileXpMirror">0 XP</span>
       <div class="profile-level-track"><span id="profileLevelBar"></span></div>
@@ -619,6 +619,6 @@
 <div class="ranking-loading">Carregando ranking...</div>
 </div>
 </div>
-</div><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script><script src="js/math.js?v=3.10.0"></script><script src="js/cartesian-engine.js?v=3.10.0"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.10.0"></script><script src="js/platform.js?v=3.10.0"></script><script src="js/modules.js?v=3.10.0"></script><script src="js/questions.js?v=3.10.0"></script><script src="js/variants.js?v=3.10.0"></script><script src="js/vestibular.js?v=3.10.0"></script><script src="js/content.js?v=3.10.0"></script><script src="js/admin.js?v=3.10.0"></script><script src="js/laboratory.js?v=3.11.0"></script><script src="js/game.js?v=3.11.0"></script>
+</div><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script><script src="js/math.js?v=3.10.0"></script><script src="js/cartesian-engine.js?v=3.10.0"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="js/config.js?v=3.10.0"></script><script src="js/platform.js?v=3.11.1"></script><script src="js/modules.js?v=3.10.0"></script><script src="js/questions.js?v=3.10.0"></script><script src="js/variants.js?v=3.10.0"></script><script src="js/vestibular.js?v=3.10.0"></script><script src="js/content.js?v=3.10.0"></script><script src="js/admin.js?v=3.10.0"></script><script src="js/laboratory.js?v=3.11.1"></script><script src="js/game.js?v=3.11.1"></script>
 </body>
 </html>

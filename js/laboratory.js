@@ -17,7 +17,15 @@
     return Number.isInteger(rounded) ? String(rounded) : String(rounded).replace('.', ',');
   };
   const latexNum = (n) => Number.isInteger(n) ? String(n) : String(Math.round(n*100)/100);
-  const read = (id) => Number(document.getElementById(id)?.value);
+  const LIMIT = 25;
+  const read = (id) => {
+    const el=document.getElementById(id);
+    let value=Number(el?.value);
+    if(!Number.isFinite(value)) return NaN;
+    value=Math.max(-LIMIT,Math.min(LIMIT,value));
+    if(el && Number(el.value)!==value) el.value=value;
+    return value;
+  };
   const setValues = (obj={}) => Object.entries(obj).forEach(([id,val]) => { const el=document.getElementById(id); if(el) el.value=val; });
   const showOutput = (title, bodyText) => {
     const host = document.getElementById('labOutput');
@@ -30,11 +38,16 @@
   const showError = (message) => showOutput('Confira os dados', message);
   const activateTool = (tool) => {
     currentTool = tool;
-    $$('.lab-tool').forEach(btn => btn.classList.toggle('active', btn.dataset.tool === tool));
+    $$('.lab-tool').forEach(btn => {
+      const active=btn.dataset.tool === tool;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
     $$('.lab-form').forEach(form => {
       const active = form.dataset.form === tool;
       form.hidden = !active;
       form.classList.toggle('active', active);
+      form.style.display = active ? 'grid' : 'none';
     });
   };
   const ensurePlane = () => document.getElementById('labPlane');
@@ -179,6 +192,15 @@ Logo, o ponto de interseção é $$I(${latexNum(x)}, ${latexNum(y)})$$.`);
   }
 
   function bind(){
+    $$('.lab-form input[type="number"]').forEach(input=>{
+      input.min=String(-LIMIT); input.max=String(LIMIT);
+      input.addEventListener('change',()=>{
+        let v=Number(input.value);
+        if(!Number.isFinite(v)) return;
+        v=Math.max(-LIMIT,Math.min(LIMIT,v));
+        input.value=v;
+      });
+    });
     $$('.lab-tool').forEach(btn => btn.addEventListener('click', () => { activateTool(btn.dataset.tool); runCurrent(); }));
     document.getElementById('labPresetBtn')?.addEventListener('click', applyPreset);
     document.getElementById('labResetBtn')?.addEventListener('click', resetForms);

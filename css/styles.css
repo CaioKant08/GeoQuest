@@ -4822,3 +4822,18 @@ body.dark .lab-note{background:#101925;border-color:#304560}
 body.dark .lab-plane{background:linear-gradient(180deg,#0e1724,#111d2d);border-color:#31465d}
 @media (max-width: 1100px){.lab-layout{grid-template-columns:1fr}.lab-plane{min-height:520px}}
 @media (max-width: 720px){.lab-hero{padding:20px;align-items:flex-start;flex-direction:column}.lab-form-grid,.lab-form-grid.two{grid-template-columns:1fr}.lab-plane{min-height:420px}}
+
+
+/* KANT v3.11.1 — polimento do laboratório */
+.lab-form[hidden]{display:none !important;}
+.lab-form-wrap{min-width:0;}
+.lab-form,.lab-form-grid,.lab-form label{min-width:0;}
+.lab-form input{width:100%;min-width:0;max-width:100%;box-sizing:border-box;}
+.lab-sidebar{min-width:0;overflow:hidden;}
+.lab-tool-list{grid-template-columns:1fr;}
+.lab-tool{width:100%;box-sizing:border-box;}
+.lab-form{padding-top:2px;}
+.lab-form .btn{width:100%;justify-content:center;}
+.lab-limit-note{font-size:.78rem;color:#7588a6;line-height:1.45;margin-top:-2px;}
+body.dark .lab-limit-note{color:#9fb1ca;}
+@media (min-width:1101px){.lab-layout{grid-template-columns:340px minmax(0,1fr);}.lab-sidebar{width:100%;}}

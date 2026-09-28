@@ -139,20 +139,31 @@
   });
   window.kantDb=db;
 
-  const XP_PER_LEVEL = 1000;
+  const BASE_LEVEL_XP = 500;
+  const LEVEL_XP_STEP = 50;
+  function levelInfo(totalXp=0){
+    const xp=Math.max(0,Number(totalXp)||0);
+    let level=1, spent=0, needed=BASE_LEVEL_XP;
+    while(xp-spent>=needed){
+      spent+=needed;
+      level+=1;
+      needed=BASE_LEVEL_XP+(level-1)*LEVEL_XP_STEP;
+    }
+    const inside=xp-spent;
+    return {level,inside,needed,pct:Math.min(100,(inside/needed)*100),spent};
+  }
+  window.kantLevelInfo=levelInfo;
   let currentProfile = null;
   let profileBusy = false;
 
   function renderGlobalXP(totalXp=0){
     const xp=Math.max(0,Number(totalXp)||0);
-    const level=Math.floor(xp/XP_PER_LEVEL)+1;
-    const inside=xp%XP_PER_LEVEL;
-    const pct=Math.min(100,(inside/XP_PER_LEVEL)*100);
+    const info=levelInfo(xp);
 
-    if(globalLevel) globalLevel.textContent=`Nível ${level}`;
+    if(globalLevel) globalLevel.textContent=`Nível ${info.level}`;
     if(globalXpText) globalXpText.textContent=`${xp.toLocaleString("pt-BR")} XP`;
-    if(globalXpBar) globalXpBar.style.width=pct+"%";
-    if(globalXpNext) globalXpNext.textContent=`${inside} / ${XP_PER_LEVEL} XP`;
+    if(globalXpBar) globalXpBar.style.width=info.pct+"%";
+    if(globalXpNext) globalXpNext.textContent=`${info.inside.toLocaleString("pt-BR")} / ${info.needed.toLocaleString("pt-BR")} XP`;
     if(typeof syncProfileScreen === "function") syncProfileScreen();
   }
 
@@ -380,7 +391,7 @@
         const avatar=makeAvatar(p,"podium-avatar");
         const badge=document.createElement("div");badge.className="podium-place";badge.textContent=place===1?"1":place===2?"2":"3";
         const name=document.createElement("b");name.textContent=p.display_name||"Jogador";
-        const level=document.createElement("small");level.textContent=`Nível ${Math.floor((Number(p.xp)||0)/XP_PER_LEVEL)+1}`;
+        const level=document.createElement("small");level.textContent=`Nível ${levelInfo(Number(p.xp)||0).level}`;
         const xp=document.createElement("strong");xp.textContent=`${(Number(p.xp)||0).toLocaleString("pt-BR")} XP`;
         item.append(crown,avatar,badge,name,level,xp);podium.appendChild(item);
       });
@@ -394,7 +405,7 @@
       const avatar=makeAvatar(p,"rank-avatar");
       const userBox=document.createElement("div");userBox.className="rank-user";
       const name=document.createElement("b");name.textContent=p.display_name||"Jogador";
-      const level=document.createElement("small");level.textContent=`Nível ${Math.floor((Number(p.xp)||0)/XP_PER_LEVEL)+1}`;userBox.append(name,level);
+      const level=document.createElement("small");level.textContent=`Nível ${levelInfo(Number(p.xp)||0).level}`;userBox.append(name,level);
       const xpBox=document.createElement("div");xpBox.className="rank-xp";xpBox.textContent=`${(Number(p.xp)||0).toLocaleString("pt-BR")} XP`;
       row.append(pos,avatar,userBox,xpBox);rankingList.appendChild(row);
     });
